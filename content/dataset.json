@@ -18,7 +18,13 @@
       "id": "AC-03",
       "window_minutes": 2,
       "definition": "For each eligible request, measure elapsed time from submission to first correct automatic assignment. Passing AC-03 requires assignment within two minutes, inclusive. A missing correct assignment at the deadline misses the window.",
-      "status": "Proposed. The pilot reported this operational window. AC-03 was not part of the recorded qa-204 AC-01/AC-02 pass."
+      "status": "Proposed. The pilot reported this operational window. AC-03 was not part of the recorded qa-204 AC-01/AC-02 pass.",
+      "teaching_counterexample": {
+        "status": "Hypothetical timing illustration; no execution recorded.",
+        "wrong_recipient_after_seconds": 30,
+        "first_correct_automatic_assignment_after_seconds": 100,
+        "outcome": "Meets the proposed time limit. Preserve the incorrect first routing event as a separate error."
+      }
     }
   },
   "accepted_source": {

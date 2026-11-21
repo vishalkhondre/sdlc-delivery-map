@@ -281,9 +281,9 @@
     "title": "Decide when to move a story or reopen a bug",
     "phase": "Define",
     "summary": "A reviewer wants to know whether the approval change can move forward and who gets the next decision. The story follows the change toward release, while a separate bug records a fault and its repair. Each move in Jira has a person who can explain the evidence behind it.",
-    "owner": "The workflow owner maintains the permitted moves with the Jira administrator. The person named at each handoff checks the evidence and updates the work item. The QA Lead owns defect triage, the review that establishes impact, priority and the next owner, with input from the Product Owner.",
+    "owner": "The workflow owner maintains the permitted moves with the Jira administrator. The person named at each handoff checks the evidence and updates the work item. The quality assurance (QA) lead owns defect triage, the review that establishes impact, priority and the next owner, with input from the Product Owner.",
     "inputs": [
-      "The current story or bug, its status, the next decision and permission to view, comment and transition the item.",
+      "The current story or bug, its status, the next decision and permission to view the item, add a comment and move it to another status.",
       "A reference to the relevant change, test run or approval. For a software candidate, identify the build, the packaged software produced from a revision.",
       "The applicable workflow and the role authorized by this team to make the move."
     ],
@@ -333,42 +333,50 @@
             "type": "table",
             "caption": "Seven story statuses in order under the example team policy",
             "columns": [
+              "Map step",
               "Status",
               "Who moves the story",
               "Evidence for the handoff"
             ],
             "rows": [
               [
+                "1. Commit a change",
                 "In development",
                 "Developer",
                 "Link the feature branch, the line of development containing the feature changes, to CC-123."
               ],
               [
+                "2. Check the feature PR",
                 "In review",
                 "Developer",
                 "Link PR-42 and its checks for the proposed change."
               ],
               [
+                "3. Merge and build",
                 "Ready for QA",
                 "Developer",
                 "Identify the integrated source revision and the packaged image digest from build-418."
               ],
               [
+                "4. Verify in QA",
                 "In QA",
                 "QA Lead",
                 "Record the candidate and its QA execution. In qa-204, qa-r17 with qa-routing-3 verifies automatic assignment (AC-01) and authorized decisions (AC-02)."
               ],
               [
+                "5. Business acceptance",
                 "In UAT",
                 "Business Analyst",
                 "Use the qualifying QA evidence. Keep the business rejection uat-80 visible, recheck the corrected mapping in qa-209, then record the representative's acceptance uat-82."
               ],
               [
+                "6. Publish GitHub release",
                 "Ready for release",
                 "Release Manager",
                 "Verify accepted digest, target version 1.3.0, tag v1.3.0 identifying the source revision, and production authorization."
               ],
               [
+                "7. Deploy to Prod",
                 "Released",
                 "Release Manager",
                 "Preserve the failed prod-r41 rollout. Record the prod-r42 smoke check, a short test of the running service, and its observation before moving the story."
@@ -655,7 +663,7 @@
         "blocks": [
           {
             "type": "text",
-            "value": "The later user acceptance test, a business check of the whole journey, shows the cost of an incomplete example. In uat-80 the unit B purchase reached unit A’s approver. A check that merely asked whether a purchase had any assignee would have passed. Use that failure to rehearse refinement: ask a representative to name unit B’s expected group without reading the application’s routing settings. If nobody can, mark CC-123 “Needs refinement” in the readiness note and identify who can resolve the dependency."
+            "value": "The later user acceptance test, a business check of the whole journey, exposed a mapping error. The record does not identify what happened during refinement. In uat-80 the unit B purchase reached unit A’s approver. A check that merely asked whether a purchase had any assignee would have passed. Use that failure to rehearse refinement: ask a representative to name unit B’s expected group without reading the application’s routing settings. If nobody can, mark CC-123 “Needs refinement” in the readiness note and identify who can resolve the dependency."
           },
           {
             "type": "text",
@@ -858,7 +866,7 @@
           },
           {
             "type": "text",
-            "value": "The fictional record shows the affected mapping and permissions rechecked in qa-209, then the business scenario accepted in uat-82 with uat-routing-6. The application image stayed the same. These observations can guide a design review without identifying the lookup architecture used in those runs. Proposed timing criterion AC-03 would count a correct assignment at exactly two minutes as on time. A wrong assignment by then still misses, and the earlier qa-204 pass covered only AC-01 and AC-02."
+            "value": "The fictional record shows the affected mapping and permissions rechecked in qa-209, then the business scenario accepted in uat-82 with uat-routing-6. The application image stayed the same. These observations can guide a design review without identifying the lookup architecture used in those runs. Proposed timing criterion AC-03 would count a correct assignment at exactly two minutes as on time. If no correct automatic assignment has occurred by the deadline, the request misses. A wrong assignment at 30 seconds followed by a correct automatic assignment at 100 seconds meets the timing rule, but the first routing error remains a defect. For comparison, the earlier qa-204 pass covered only AC-01 and AC-02."
           },
           {
             "type": "callout",
@@ -955,7 +963,7 @@
               ],
               [
                 "Stop",
-                "First recorded automatic assignment to the approver designated by the active rule for that request. A manual edit or an assignment to another unit leaves the clock running."
+                "First recorded automatic assignment to the recipient independently designated for that unit and submission time by the business-approved mapping. Record the deployed settings separately. A manual edit or an assignment to another unit leaves the clock running."
               ],
               [
                 "Compare",
@@ -1181,12 +1189,12 @@
             "type": "code",
             "language": "gherkin",
             "caption": "Illustrative Gherkin examples for CC-123",
-            "value": "Feature: Route a purchasing request and protect its decision\n\n  Scenario: AC-01 assigns the designated approver automatically\n    Given a new unassigned eligible request for a known purchasing unit\n    And I have recorded the designated approver from the active rule\n    When the requester submits it without choosing an approver\n    Then the first assignment names that designated approver\n    And the recorded assignment actor is the routing rule\n\n  Scenario: AC-02 permits the designated approver to decide\n    Given a pending request assigned to its designated approver\n    When that approver approves the request\n    Then reopening it shows the recorded approval\n\n  Scenario: AC-02 rejects an unrelated employee's decision\n    Given a pending request and an employee with no approval rights for it\n    When that employee attempts to approve the request\n    Then the service denies the attempt\n    And reopening the request shows it is still pending"
+            "value": "Feature: Route a purchasing request and protect its decision\n\n  Scenario: AC-01 assigns the designated approver automatically\n    Given a new unassigned eligible request for a known purchasing unit\n    And I have recorded the designated approver from the business-approved mapping for that unit and time, kept separately from the settings under test\n    When the requester submits it without choosing an approver\n    Then the first assignment names that designated approver\n    And the recorded assignment actor is the routing rule\n\n  Scenario: AC-02 permits the designated approver to decide\n    Given a pending request assigned to its designated approver\n    When that approver approves the request\n    Then reopening it shows the recorded approval\n\n  Scenario: AC-02 rejects an unrelated employee's decision\n    Given a pending request and an employee with no approval rights for it\n    When that employee attempts to approve the request\n    Then the service denies the attempt\n    And reopening the request shows it is still pending"
           },
           {
             "type": "callout",
             "label": "Principle",
-            "value": "Choose the expected recipient before submitting. Reading the active assignment and then copying it into the expected column makes the comparison meaningless."
+            "value": "Record the expected recipient from the approved business mapping before submitting. Keep the deployed configuration identifier separately. Reading the active assignment and then copying it into the expected column makes the comparison meaningless."
           }
         ]
       },
