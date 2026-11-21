@@ -110,6 +110,13 @@ class DepthModelTests(unittest.TestCase):
         overview.feed('<section id="go-deeper"><h2>Go deeper</h2>'
                       '<a href="ci-config.html">Configuration check</a></section>')
         validate.check_discovery(self.root, pages, self.topics.values(), False)
+        # A sidebar can link to related pages, but only actual children belong in Go deeper.
+        original_children = overview.deeper_links.copy()
+        for extra in ("ci-config.html", "flow-results.html"):
+            with self.subTest(extra=extra), self.assertRaisesRegex(ValueError, "Go deeper"):
+                overview.deeper_links = original_children + [extra]
+                validate.check_discovery(self.root, pages, self.topics.values(), False)
+        overview.deeper_links = original_children
         index.feed('<article class="topic-row" data-text="SonarQube">'
                    '<a href="topics/ci-static-analysis.html">Static analysis</a></article>')
         with self.assertRaisesRegex(ValueError, "quality gate"):

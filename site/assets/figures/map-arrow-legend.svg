@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 462 425" role="img" aria-labelledby="title desc">
+<title id="title">Follow an arrow on the map</title><desc id="desc">Four labeled arrow styles, each with its line pattern and an example from the feature.</desc>
+<defs><marker id="tip" viewBox="0 0 9 10" refX="8" refY="5" markerWidth="9" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 0 L9 5 L0 10 z" fill="#345765"/></marker></defs>
+<path fill="#f5f7f6" d="M0 0H462V425H0z"/>
+<text x="16" y="32" font-family="Arial, sans-serif" font-size="23" font-weight="700" text-anchor="start" fill="#162f40">Follow an arrow on the map</text>
+<g data-label-box=""><rect x="16" y="49" width="430" height="82" rx="7" stroke="#a5b5bc" fill="#fff"/>
+<path d="M29 71h45" stroke="#1b2a4e" stroke-width="2.5"/>
+<path d="M72 66l11 5 -11 5z" fill="#1b2a4e"/>
+<text x="96" y="76" font-family="Arial, sans-serif" font-size="18" font-weight="700" text-anchor="start" fill="#162f40">Next step in the same lane</text>
+<text x="29" y="98" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">Solid navy</text>
+<text x="29" y="119" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#162f40">Feature branch → Open pull request</text>
+</g>
+<g data-label-box=""><rect x="16" y="141" width="430" height="82" rx="7" stroke="#a5b5bc" fill="#fff"/>
+<path d="M29 163h45" stroke="#0f7c82" stroke-width="2.5"/>
+<path d="M72 158l11 5 -11 5z" fill="#0f7c82"/>
+<text x="96" y="168" font-family="Arial, sans-serif" font-size="18" font-weight="700" text-anchor="start" fill="#162f40">Handoff between lanes</text>
+<text x="29" y="190" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">Solid teal</text>
+<text x="29" y="211" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#162f40">Open pull request → Run CI checks</text>
+</g>
+<g data-label-box=""><rect x="16" y="233" width="430" height="82" rx="7" stroke="#a5b5bc" fill="#fff"/>
+<path d="M29 255h45" stroke="#a34a3d" stroke-width="2.5" stroke-dasharray="6 4"/>
+<path d="M72 250l11 5 -11 5z" fill="#a34a3d"/>
+<text x="96" y="260" font-family="Arial, sans-serif" font-size="18" font-weight="700" text-anchor="start" fill="#162f40">Failure or recovery path</text>
+<text x="29" y="282" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">Dashed red</text>
+<text x="29" y="303" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#162f40">Failed QA verification → Hold release</text>
+</g>
+<g data-label-box=""><rect x="16" y="325" width="430" height="82" rx="7" stroke="#a5b5bc" fill="#fff"/>
+<path d="M29 347h45" stroke="#758295" stroke-width="2.5" stroke-dasharray="6 4"/>
+<path d="M72 342l11 5 -11 5z" fill="#758295"/>
+<text x="96" y="352" font-family="Arial, sans-serif" font-size="18" font-weight="700" text-anchor="start" fill="#162f40">Linked record or evidence</text>
+<text x="29" y="374" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">Dashed gray</text>
+<text x="29" y="395" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#162f40">Record UAT decision → Validation summary</text>
+</g>
+</svg>

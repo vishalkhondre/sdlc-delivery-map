@@ -1,5 +1,6 @@
 """Check the public lesson inventory and every locally generated HTML destination."""
 import argparse
+from collections import defaultdict
 import json
 import re
 from html.parser import HTMLParser
@@ -250,13 +251,19 @@ class HTMLLinks(HTMLParser):
 
 
 def check_discovery(dist, pages, items, integration):
+    children_by_parent = defaultdict(list)
     for item in items:
         if item.get("kind") == "deep-dive":
-            parent = dist / "topics" / (item["parent"] + ".html")
-            children = {urljoin(parent.as_uri(), href) for href in pages[parent].deeper_links}
             child = dist / "topics" / (item["id"] + ".html")
-            if child.as_uri() not in children:
-                raise ValueError(f"{parent.name}: Go deeper section needs a link to {child.name}")
+            children_by_parent[item["parent"]].append(child.as_uri())
+    for item in items:
+        if item.get("kind", "overview") == "overview":
+            parent = dist / "topics" / (item["id"] + ".html")
+            expected = children_by_parent.get(item["id"], [])
+            actual = [urljoin(parent.as_uri(), href) for href in pages[parent].deeper_links]
+            if sorted(actual) != sorted(expected):
+                raise ValueError(f"{parent.name}: Go deeper links differ from its child lessons")
+    print(f"Validated Go deeper links on {len(children_by_parent)} overview parents")
     index = pages[dist / "topics.html"]
     probes = search_probes(integration)
     for query, target in probes.items():

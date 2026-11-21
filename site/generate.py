@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import html
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -204,7 +205,8 @@ def edition_stamp():
         ).strip()
     except (OSError, subprocess.CalledProcessError):
         sha = "unavailable"
-    return f"Edition {e(version)} · Commit {e(sha)}"
+    label = "Integration preview · Unbound" if os.environ.get("SDLC_INTEGRATION_PREVIEW") == "1" else f"Edition {e(version)}"
+    return f"{label} · Commit {e(sha)}"
 
 def shell(title, summary, body, *, active, prefix=""):
     tabs = "".join(f'<a href="{prefix}{path}"' + (' aria-current="true"' if name == active else '') + f'>{name}</a>' for name, path in NAV)
