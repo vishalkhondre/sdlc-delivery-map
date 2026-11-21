@@ -72,10 +72,20 @@ class DepthModelTests(unittest.TestCase):
             validate.check_block(self.root, figure, "ci-config")
         diagram.with_suffix(".mmd").write_text("flowchart TD\nstart --> tests")
         validate.check_block(self.root, figure, "ci-config")
+        validate.check_block(self.root, dict(figure, text_equivalent=["First lint.", "Then merge."]), "ci-config")
         for change in ({"alt": ""}, {"text_equivalent": ""}, {"src": "../jobs.svg"},
                        {"src": "assets/figures/%2e%2e/jobs.svg"}, {"src": "https://example.org/jobs.svg"}):
             with self.subTest(change=change), self.assertRaises(ValueError):
                 validate.check_block(self.root, dict(figure, **change), "ci-config")
+
+    def test_explicit_kiwi_behavior_requires_reader_visible_evidence_basis(self):
+        block = {"type": "callout", "label": "Tool behavior", "value": "Kiwi records the execution."}
+        self.child["detail"][0]["blocks"].append(block)
+        with self.assertRaisesRegex(ValueError, "Kiwi version"):
+            self.check(self.child)
+        block["value"] += (" Kiwi TCMS 17.2 behavior is drawn from its documentation and published source code. "
+                           "This example has not been demonstrated on a live Kiwi TCMS and Jira setup.")
+        self.check(self.child)
 
     def test_numbered_discovery_includes_tens_and_excludes_non_lessons(self):
         folder = self.root / "content"

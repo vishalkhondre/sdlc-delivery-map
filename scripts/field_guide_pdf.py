@@ -71,7 +71,13 @@ def detail_content(section):
             yield paragraph(entry["caption"], "label")
             yield Preformatted(entry["value"], STYLES["code"], maxLineLength=96)
         elif kind == "figure":
-            yield block(entry["caption"], entry["text_equivalent"])
+            yield paragraph(entry["caption"], "label")
+            equivalent = entry["text_equivalent"]
+            if isinstance(equivalent, list):
+                for item in equivalent:
+                    yield paragraph("• " + item)
+            else:
+                yield paragraph(equivalent)
         elif kind == "table":
             yield paragraph(entry["caption"], "label")
             grid = [[paragraph(cell, "label") for cell in entry["columns"]]]

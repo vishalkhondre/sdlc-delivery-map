@@ -60,6 +60,14 @@ def check_detail_routes(page, base, lessons):
             destination = jump.get_attribute("href")
             assert destination.startswith("#") and page.locator(destination).count() == 1
         page.set_viewport_size({"width": 390, "height": 844})
+        summary = page.locator(".mobile-contents summary")
+        summary.focus()
+        page.keyboard.press("Enter")
+        mobile_toc = page.get_by_role("navigation", name="On this page")
+        failure = mobile_toc.locator('a[href="#worked-failure"]')
+        failure.focus()
+        page.keyboard.press("Enter")
+        page.wait_for_url(base + f'topics/{item["id"]}.html#worked-failure')
         parent_link = page.get_by_role("navigation", name="Breadcrumb").get_by_role(
             "link", name=titles[parent], exact=True)
         parent_link.focus()

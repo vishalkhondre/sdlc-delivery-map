@@ -355,7 +355,7 @@
           {
             "type": "callout",
             "label": "Team policy",
-            "value": "The full unit suite must execute successfully for the current PR revision under this team’s main-branch rule. The developer records a web link on CC-123 to PR-42 and the failed run, with the criterion and test name. Keep the story In review, and append the passing replacement run after the push. Ready for QA follows integration and the recorded build digest."
+            "value": "Repository maintainers set the main-branch rule: the full unit suite must execute successfully for the current PR revision. The developer records a web link on CC-123 to PR-42 and the failed run, with the criterion and test name. Keep the story In review, and append the passing replacement run after the push. Ready for QA follows integration and the recorded build digest."
           }
         ]
       },
@@ -817,6 +817,11 @@
             "value": "The CI maintainer supplies a runner with the scanner CLI on its path, a reachable server, a project token with Execute Analysis permission, and an analyzed main branch. The checkout retains Git history and fetches the target. This job explicitly scans the PR source commit. When reading adjacent checks, inspect their own checkout instructions, since some may test GitHub’s proposed merge instead."
           },
           {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "This scanner job assumes a trusted same-repository change and access to the analysis token. Under GitHub’s default settings, fork and Dependabot pull requests do not receive this Actions secret. If the scanner cannot authenticate, keep the required check outstanding and ask a maintainer to run the team’s approved analysis on the reviewed revision. Keep the token away from untrusted code. A privileged pull_request_target job must never execute an unreviewed checkout to obtain a green check."
+          },
+          {
             "type": "code",
             "language": "yaml",
             "caption": "Illustrative GitHub Actions job excerpt for the Python service",
@@ -954,6 +959,10 @@
       {
         "title": "GitHub Docs · About protected branches",
         "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches"
+      },
+      {
+        "title": "Events that trigger workflows",
+        "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows"
       }
     ]
   },

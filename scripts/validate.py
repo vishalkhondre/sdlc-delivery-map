@@ -49,14 +49,36 @@ def require_text(obj, fields, where):
             raise ValueError(f"{where}: missing or empty {field}")
 
 
+def check_kiwi_disclosure(item):
+    # The source references and Tool behavior callouts identify product-specific material.
+    # Reviewers still verify the substance of the disclosure and any unlabelled claims.
+    detail = item.get("detail", [])
+    callouts = [block["value"] for section in detail for block in section["blocks"]
+                if block["type"] == "callout" and block["label"] == "Tool behavior"]
+    cited = any(urlsplit(ref["url"]).hostname in {"kiwitcms.readthedocs.io", "kiwitcms.org"}
+                for ref in item["sources"])
+    prose = " ".join(json.dumps(item.get(field, ""), ensure_ascii=False)
+                     for field in (*TEXT_FIELDS, "inputs", "steps", "detail")).lower()
+    if not re.search(r"\bkiwi\b", prose) or not (cited or any("kiwi" in c.lower() for c in callouts)):
+        return
+    if not (re.search(r"\bkiwi(?: tcms)?\s+(?:version\s+|v)?\d+\.\d+", prose)
+            and "documentation" in prose and "source" in prose and "jira" in prose
+            and re.search(r"\b(?:not|never|no|without)\b[^.!?]{0,120}\blive\b", prose)):
+        raise ValueError(f"{item['id']}: disclose the Kiwi version, documentation/source basis and live Jira verification status")
+
+
 def check_figure(root, block, where):
-    require_text(block, ("src", "caption", "alt", "text_equivalent"), where)
+    require_text(block, ("src", "caption", "alt"), where)
+    equivalent = block.get("text_equivalent")
+    if not (useful(equivalent) or strings(equivalent)):
+        raise ValueError(f"{where}: text_equivalent must be prose or a nonempty list")
     src = block["src"]
     if not re.fullmatch(r"assets/figures/(?:[\w-]+/)*[\w.-]+\.svg", src, re.ASCII):
         raise ValueError(f"{where}: expected a local SVG under assets/figures, got {src!r}")
     figures = (root / "site/assets/figures").resolve()
     image = root / "site" / src
-    if not image.resolve().is_relative_to(figures) or not image.is_file():
+    if (not figures.is_relative_to(root.resolve()) or not image.resolve().is_relative_to(figures)
+            or not image.is_file()):
         raise ValueError(f"{where}: missing or out-of-directory figure {src}")
     if not any(file.is_file() and file.resolve().is_relative_to(figures)
                for file in (image.with_suffix(ext) for ext in (".mmd", ".py", ".js", ".sh", ".r", ".R", ".rb", ".ts", ".mjs"))):
@@ -161,6 +183,7 @@ def validate_lesson(root, item, by_id):
     if kind == "deep-dive" and len({ref["url"] for ref in refs}) < 2:
         raise ValueError(f"{key}: deep dive requires at least two distinct HTTPS sources")
     check_detail(root, item, kind)
+    check_kiwi_disclosure(item)
     if PLACEHOLDER.search(json.dumps(item)):
         raise ValueError(f"{key}: unresolved placeholder in published material")
 
