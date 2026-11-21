@@ -477,3 +477,7 @@ Owner decisions of 21 November 2026 take precedence over the earlier instruction
 ### Gate 1 decision
 
 The owner approved the inventory and the recommended Python, pytest, Ruff and coverage.py examples, versioned SonarQube Server, and the existing map image. Edition 1.0.2 corrections are in the integration baseline. Every reader-facing lesson describing Kiwi TCMS behavior must name the version and state that the behavior comes from its documentation and published source and has not been demonstrated on a live Kiwi TCMS and Jira setup. Gate 2 covers only the model and six CI lessons.
+
+### Gate 2 decision
+
+The owner accepted the pilot depth. Apply the plain-language opening, first-use definitions and documented alternative for custom scripts in the template to every deep dive. The maintainer may merge syncs from main into edition/1.1.0. Leave all content PRs open for the owner.

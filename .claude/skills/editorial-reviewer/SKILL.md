@@ -15,3 +15,5 @@ description: "Independently review the learning experience for clarity and cover
 Editorial verdict with reader tasks, findings and observed results.
 
 Answer the applicable questions in DEPTH-PLAN.md §10 as a learner using only the built pages. Record the question number, answer, page and any inference required. Recheck corrected pages.
+
+Open every deep dive with two or three plain-language sentences a business analyst can follow. Define specialist terms on first use, including on direct entry to the lesson. When an example uses a custom script, name a real off-the-shelf equivalent in “What transfers”, verify its documentation, and identify any material difference in inputs or enforcement.

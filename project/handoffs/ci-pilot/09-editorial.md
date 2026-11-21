@@ -13,3 +13,5 @@ Finding: on the unit-test page the required rule was explicit but the person set
 | 5 | ci-static-analysis | Follow the PR quality gate into its SonarQube analysis. A reviewer with Administer Issues records the false-positive rationale and supporting evidence; obtain a fresh passing run. |
 | 6 | ci-security-checks | New high and critical dependency findings block under the example policy. Record versions, scope, exposure, owner, repair and retest on the restricted Jira item that blocks CC-123. |
 | 7 | ci-pipeline-anatomy | Unit tests, lint, new-line coverage, quality gate and dependency review are required. Type check is informational. |
+
+After Gate 2 the maintainer revised the six openings for direct entry by a business analyst and added the documented diff-cover alternative to the changed-line example. The project README for diff-cover was opened on 21 November 2026 to check its XML input, comparison base and fail-under option. The historical independent verdict above concerns the pilot reviewed at Gate 2.

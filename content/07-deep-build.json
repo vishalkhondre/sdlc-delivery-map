@@ -11,10 +11,10 @@
     "title": "Read a pull request’s CI pipeline",
     "phase": "Build",
     "activity": "Dev",
-    "summary": "On PR-42, five checks can pass while the change is still blocked. Read the checks beside the proposed revision, find the result the merge rule is waiting for, and follow it back to the job that produced it.",
-    "owner": "The change author investigates code and tests. The CI maintainer handles the workflow, runner and reporting failures. The repository maintainer configures the required checks on main.",
+    "summary": "Before a change to the approval app goes into the shared code, the team checks what it would do there. A pull request is the developer’s proposal to bring that change in. This page follows the proposal through the checks and shows who can act when one holds it up.",
+    "owner": "The change author investigates code and tests. The person who maintains continuous integration (CI), the service that checks each change, investigates failures in the automated checks or the machines that run them. The repository maintainer configures the required checks on main.",
     "inputs": [
-      "PR-42 for CC-123, targeting main",
+      "The developer’s pull request (PR-42) for feature CC-123 proposes a change to main, the shared branch. The test merge tree is the file snapshot GitHub prepares by temporarily combining the proposal with main.",
       "The workflow in .github/workflows/, its event and checked-out revision",
       "Pinned test dependencies, synthetic routing data and the required check names on main"
     ],
@@ -47,6 +47,10 @@
       {
         "title": "Store and share data with workflow artifacts",
         "url": "https://docs.github.com/en/actions/tutorials/store-and-share-data"
+      },
+      {
+        "title": "diff-cover: Automatically find diff lines that need test coverage",
+        "url": "https://github.com/Bachmann1234/diff_cover"
       }
     ],
     "detail": [
@@ -197,11 +201,15 @@
       },
       {
         "id": "transfer",
-        "title": "Carry the decision to another CI system",
+        "title": "What transfers",
         "blocks": [
           {
             "type": "text",
             "value": "Find the event, the checkout and the producer of each named result. Trace the dependency only where one job consumes another’s output, then locate the repository rule that turns a result into a merge decision."
+          },
+          {
+            "type": "text",
+            "value": "For the custom changed-line coverage check, diff-cover is an off-the-shelf alternative. From the same tested revision, export coverage.py’s results as Cobertura XML with coverage xml and give diff-cover the saved target revision as its comparison base. Its --fail-under=80 option returns a failing exit status below the threshold. Check the file paths, included lines and comparison base against the team’s 31-of-50 example before adopting it; the custom script reads JSON."
           }
         ]
       }
@@ -219,11 +227,11 @@
     "title": "Read and repair a failing unit test",
     "phase": "Build",
     "activity": "Dev",
-    "summary": "A useful routing test can distinguish a rule that assigned a request from a person who happened to select the right approver. Follow a red unit tests check on PR-42 from the failing assertion to a repair that demonstrates AC-01.",
-    "owner": "The change author reads and repairs a failed test or the application behavior it exposed. The reviewer checks that the assertions still express CC-123’s agreed criteria.",
+    "summary": "A request reaches the right person, but how did it get there? A small, automated test starts with nobody assigned and checks who made the first assignment. If it fails, the result gives the developer a specific behavior to investigate.",
+    "owner": "The change author reads and repairs a failed test or the application behavior it exposed. The reviewer checks that each assertion (a test’s statement of the expected result) matches the agreed rules for feature CC-123.",
     "inputs": [
-      "AC-01 and AC-02 on CC-123, with distinct requester, authorized approver and unrelated employee identities",
-      "The checked-out PR revision, pinned pytest dependencies, and clean per-test service fixtures",
+      "The feature’s acceptance criteria (AC-01 and AC-02) describe the routing and authorization rules. Use separate requester, approver and unrelated employee identities.",
+      "The test merge revision, GitHub’s temporary combination of the proposal and its target branch. Use the team’s fixed versions of pytest (the test runner) and fresh starting data for each test.",
       "The failed unit tests job with its pytest output and run link"
     ],
     "steps": [
@@ -398,10 +406,10 @@
       "Reviewer",
       "CI maintainer"
     ],
-    "summary": "PR-42 flags an unused import in a file the author never edited. Read the diagnostic, decide who can safely change the file and find out whether the finding holds the merge. The same checks panel can also show a formatting difference or a type error, each calling for a different edit.",
-    "owner": "The PR author investigates the first failure. The module owner reviews changes outside the feature, and the CI maintainer owns the rule configuration and check scope.",
+    "summary": "A check can flag a problem in a file the developer never touched. Here, a tool finds a line that brings in something the program never uses. Follow the finding to decide who should fix it and whether the proposed change can go ahead.",
+    "owner": "The developer who proposed the change investigates the first failure. The module owner reviews changes outside the feature, and the maintainer of the automated checks owns the rule configuration and check scope.",
     "inputs": [
-      "The PR’s tested revision, target revision, check name and command from the job log",
+      "The pull request (PR) and the job log, which records the commands and their results. Identify the version checked and the version of the shared code it targets.",
       "A read-only checkout, the repository’s Python tool lockfile, pyproject.toml and the paths selected for checking"
     ],
     "steps": [
@@ -583,10 +591,10 @@
       "QA Engineer",
       "CI maintainer"
     ],
-    "summary": "PR-42 exercises 31 of its 50 new executable lines. The required new-line coverage check fails at 62% because the team set an 80% minimum. Read the report to locate untested behavior, then inspect what the tests actually prove about automatic assignment.",
-    "owner": "The Developer owns missing behavior tests. The reviewer checks their starting state and assertions. Repository maintainers set the merge policy, and the CI maintainer owns the collection and comparison jobs.",
+    "summary": "The team wants to know how much of the changed code its tests actually ran. In this example the tests reach 31 of 50 new lines, below the team’s minimum. Even reaching every line would leave a second question: did the test check that the right person received the request?",
+    "owner": "The developer writes tests for behavior the existing tests missed. The reviewer checks their starting state and assertions. Repository maintainers set the merge policy, and the maintainer of the automated checks owns the collection and comparison jobs.",
     "inputs": [
-      "The exact tested tree, its recorded target base, the proposed change and the service’s source paths",
+      "The test merge tree, the snapshot made by temporarily combining the proposed change with its target branch. Record both that tested version and the target version so the comparison can be repeated.",
       "The unit test run for that tree, coverage.py data with executable, executed and missing lines, and the team’s new-line threshold"
     ],
     "steps": [
@@ -618,6 +626,10 @@
       {
         "title": "About protected branches",
         "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches"
+      },
+      {
+        "title": "diff-cover: Automatically find diff lines that need test coverage",
+        "url": "https://github.com/Bachmann1234/diff_cover"
       }
     ],
     "detail": [
@@ -766,6 +778,16 @@
             "value": "In a different language, identify the tool that records execution and the component that decides which changed lines count. Keep their input revisions and pass rule visible, and ask which assertion would detect the business failure."
           }
         ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "For the custom changed-line coverage check, diff-cover is an off-the-shelf alternative. From the same tested revision, export coverage.py’s results as Cobertura XML with coverage xml and give diff-cover the saved target revision as its comparison base. Its --fail-under=80 option returns a failing exit status below the threshold. Check the file paths, included lines and comparison base against the team’s 31-of-50 example before adopting it; the custom script reads JSON."
+          }
+        ]
       }
     ]
   },
@@ -780,10 +802,10 @@
       "Developer",
       "Reviewer"
     ],
-    "summary": "PR-42 shows a red quality gate. Follow the check to the new bug that caused it, decide whether the finding describes a defect, and give the reviewer the evidence needed to resume the merge decision.",
-    "owner": "The developer investigates the finding. The quality gate owner maintains the conditions. A reviewer with project-level Administer Issues permission can record a justified false positive.",
+    "summary": "A tool reads the proposed code and flags a path where a request might go to the wrong person. The team has a rule for when such a finding blocks the change. Follow the evidence a reviewer needs to decide whether the warning is justified.",
+    "owner": "The developer investigates the finding. The quality gate owner maintains the rules that determine whether the analysis passes. A reviewer with project-level Administer Issues permission can record a justified false positive.",
     "inputs": [
-      "PR-42 source commit, target branch, Git history and corresponding SonarQube project",
+      "PR-42, the pull request containing the proposed change. Identify its source commit (the saved version under review), the target branch it would join and its SonarQube project.",
       "A Python quality profile, a custom quality gate, a scanner and a project analysis token",
       "A GitHub repository bound to the SonarQube project for PR reporting, and a required Actions job named quality gate"
     ],
@@ -921,6 +943,16 @@
             "value": "With another analyzer, find its comparison baseline, the specific rule result, the configured threshold and the check that enforces it. Preserve the revision and reviewer’s reasoning so a later change to the tool does not erase the basis for the decision."
           }
         ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "For the custom changed-line coverage check, diff-cover is an off-the-shelf alternative. From the same tested revision, export coverage.py’s results as Cobertura XML with coverage xml and give diff-cover the saved target revision as its comparison base. Its --fail-under=80 option returns a failing exit status below the threshold. Check the file paths, included lines and comparison base against the team’s 31-of-50 example before adopting it; the custom script reads JSON."
+          }
+        ]
       }
     ],
     "evidence": "PR-42’s required check, the linked SonarQube analysis, the issue, the reviewed source commit and Jira web links identify the condition, the actor and the final decision.",
@@ -963,6 +995,10 @@
       {
         "title": "Events that trigger workflows",
         "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows"
+      },
+      {
+        "title": "diff-cover: Automatically find diff lines that need test coverage",
+        "url": "https://github.com/Bachmann1234/diff_cover"
       }
     ]
   },
@@ -977,10 +1013,10 @@
       "Developer",
       "Security reviewer"
     ],
-    "summary": "When dependency review fails on PR-42, find the package version the change introduces, determine where the program uses it, and record who owns the fix. A merge rule and an alert queue answer different questions about the same proposed change.",
+    "summary": "The approval app uses software packages maintained by other people. If a proposed change brings in a version with a known security problem, the team needs to decide whether to hold the change. This example follows the finding to the person who owns the repair and the evidence that closes it.",
     "owner": "The developer owns the dependency change. The designated security triager reviews exposure, assigns follow-up and verifies the evidence before closing the security work item.",
     "inputs": [
-      "PR-42 base and head revisions, dependency graph and resolved Python requirements",
+      "The pull request (PR-42), the versions before and after its change, and a dependency graph showing the packages the app uses directly or through other packages.",
       "Dependency review settings and the branch rule for main",
       "Access to the alert and an appropriately restricted Jira work item for sensitive evidence"
     ],

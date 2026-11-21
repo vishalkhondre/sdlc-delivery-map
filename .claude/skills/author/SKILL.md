@@ -15,3 +15,5 @@ description: "Write a practical, self-contained reference lesson."
 A schema-valid lesson with sources and a traceable worked example.
 
 Use numbered lesson files. Apply the twelve-item depth standard in the lesson template and plan §5. Use typed text, list, table, code, figure and callout blocks. Include a worked-failure section and what transfers. Every lesson explaining Kiwi behavior must name the checked version and state the documentation and source basis and absence of a live Kiwi–Jira demonstration.
+
+Open every deep dive with two or three plain-language sentences a business analyst can follow. Define specialist terms on first use, including on direct entry to the lesson. When an example uses a custom script, name a real off-the-shelf equivalent in “What transfers”, verify its documentation, and identify any material difference in inputs or enforcement.
