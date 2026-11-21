@@ -1243,7 +1243,7 @@
           },
           {
             "type": "text",
-            "value": "Activate the project’s Python environment before installing or invoking the hook. Here requirements-ci.txt pins Ruff 0.11.13 and pytest 8.3.5, and the example uses pre-commit 4.4.0. The unsupported language setting tells pre-commit to use the executable already available in that environment. Install the hook once in each new working copy. A teammate who downloads the settings still needs to run the installation command."
+            "value": "Activate the project’s Python environment before installing or invoking the hook. Here requirements-ci.txt pins Ruff 0.11.13 and pytest 8.3.5, and the example uses pre-commit 4.4.0. The setting language: unsupported tells pre-commit to use the executable from that environment. Before version 4.4.0, the same setting was called language: system. Install the hook once in each new working copy. A teammate who downloads the settings still needs to run the installation command."
           },
           {
             "type": "code",

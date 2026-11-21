@@ -762,7 +762,7 @@
           },
           {
             "type": "text",
-            "value": "In this fictional decision the team chooses synchronous lookup because AC-01 asks for automatic assignment at submission. A queue would change the promise to “accepted now, assigned later.” The Product Owner would need to agree to that change before moving to the queued design. Neither a receipt nor a message placed in a queue demonstrates that the correct group received a purchase."
+            "value": "In this fictional decision the team chooses synchronous lookup because AC-01 asks for automatic assignment at submission. In the later cohort, the 92 recorded correct assignments took 3 to 19 minutes after submission, so the Service Owner investigates why the observed timing differs from this design. A queue would change the promise to “accepted now, assigned later.” The Product Owner would need to agree to that change before moving to the queued design. Neither a receipt nor a message placed in a queue demonstrates that the correct group received a purchase."
           }
         ]
       },
