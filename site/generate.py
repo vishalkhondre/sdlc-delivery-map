@@ -257,7 +257,13 @@ def tour_page(topics):
         if slug == "qualification" and "hold" in topics:
             items.append(topic_link(topics,"hold",label="Failure path: hold and requalify"))
             keys = (*keys, "hold")
-        children = [topic_link(topics, child) for key in keys for child in child_ids(topics, key)]
+        # Define lessons share this tour stop, including the Jira and design lessons
+        # reached from tool and phase overviews on the map.
+        if slug == "intent":
+            children = [topic_link(topics, key) for key, item in topics.items()
+                        if item.get("kind") == "deep-dive" and item["phase"] == "Define"]
+        else:
+            children = [topic_link(topics, child) for key in keys for child in child_ids(topics, key)]
         deeper = f'<div class="tour-deeper"><strong>Go deeper</strong><div class="topic-links">{"".join(children)}</div></div>' if children else ""
         parts.append(f'<li id="{slug}" class="phase-{PHASE_BANDS[topics[keys[0]]["phase"]][0]}"><div class="phase-name">{e(phase)}</div><h2>{e(name)}</h2><p>{e(intro)}</p><div class="topic-links">{"".join(items)}</div>{deeper}<details><summary>{e(prompt)}</summary><p>{e(answer)}</p></details></li>')
     parts.append('</ol><a href="index.html#map" class="primary">Return to the map</a></main>')
@@ -365,6 +371,8 @@ def topic_page(key, topics, area_by_id):
             branches=[(keys[ordinal+1],"Continue reading")]
     choices=''.join(f'<li><span>{e(label)}</span>{topic_link(topics,other,prefix)}</li>' for other,label in branches if other in topics)
     tour_id = next((s[0] for s in TOUR if map_key in s[4]), None)
+    if t.get("kind") == "deep-dive" and phase == "Define":
+        tour_id = "intent"
     result.append(section("next-decision","Follow the workflow",
                           (f'<ul class="handoffs">{choices}</ul>' if choices else '')+
                           (f'<a href="../tour.html#{tour_id}">Open this stop in the guided tour</a> · ' if tour_id else '')+

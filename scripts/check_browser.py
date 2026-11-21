@@ -146,6 +146,10 @@ def main(integration=False):
                     t["phase"] == phase and t.get("kind", "overview") == "overview" for t in lessons)
                 page.goto(base + "tour.html")
                 assert page.locator("#tour-stops a").count() > 1
+                define_links = page.locator("#intent .tour-deeper a")
+                expected = [f"topics/{item['id']}.html" for item in lessons
+                            if item.get("kind") == "deep-dive" and item["phase"] == "Define"]
+                assert define_links.evaluate_all("(links) => links.map(a => a.getAttribute('href'))") == expected
                 page.set_viewport_size({"width": 375, "height": 812})
                 for route in ("index.html", "topics.html", "tour.html", target, "topics/uat-decision.html"):
                     page.goto(base + route)

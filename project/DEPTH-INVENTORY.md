@@ -194,7 +194,7 @@ The labels in the inventory identify research topics, not quotations of source t
 [jr]: https://support.atlassian.com/jira-cloud-administration/docs/what-are-issue-statuses-priorities-and-resolutions/
 [scrum]: https://scrumguides.org/scrum-guide.html
 [disc]: https://www.gov.uk/service-manual/agile-delivery/how-the-discovery-phase-works
-[adr]: https://docs.aws.amazon.com/prescriptive-guidance/latest/architectural-decision-records/welcome.html
+[adr]: https://docs.aws.amazon.com/prescriptive-guidance/latest/architectural-decision-records/adr-process.html
 [retry]: https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/
 [metrics]: https://www.gov.uk/service-manual/measuring-success/how-to-set-performance-metrics-for-your-service
 [wcag]: https://www.w3.org/TR/WCAG22/

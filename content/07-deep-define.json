@@ -1,0 +1,1300 @@
+[
+  {
+    "id": "jira-issue-types",
+    "kind": "deep-dive",
+    "parent": "tool-jira",
+    "audience": [
+      "Business Analyst",
+      "Developer",
+      "Product Owner"
+    ],
+    "title": "Choose the Jira record and link that fit the work",
+    "phase": "Define",
+    "summary": "The business wants faster approval decisions. One Jira record holds that goal, another describes automatic assignment, and a third can track a fault that puts the change on hold. Choosing the right relationship helps a colleague see what belongs together and what must wait.",
+    "owner": "The Product Owner owns the objective on CC-100. The Business Analyst maintains the feature on CC-123 and hands it to the people who will refine it. The QA Lead, who leads quality assurance, records the impact of a confirmed defect with the Product Owner.",
+    "inputs": [
+      "The current two-day median time from submission to decision and the target of one day. The median is the midpoint of the decision times.",
+      "A description of the affected requests, the expected routing behavior and the people allowed to decide.",
+      "Access to the team's Jira space and permission to create or edit the appropriate records, choose their parent and link work items."
+    ],
+    "steps": [
+      "Start with the objective. Open CC-100 and read the measure before creating work beneath it.",
+      "Choose the work type and parent, give the change a testable description, and identify who will answer scope questions.",
+      "Read each saved relationship from both records. Have the recipient follow the path to the objective or blocking decision before handing over the work."
+    ],
+    "evidence": "Keep the parent key, acceptance criteria, planned version and links with their purpose visible. A defect also needs the failing test execution, affected software, observed result, responsible person and decision about promotion.",
+    "example": "CC-123 is a story under the epic CC-100. The independently tracked bug CC-131 blocks CC-123 while the team investigates an unauthorized approval.",
+    "failure": "A label shared by a story and a bug leaves the release decision ambiguous. The QA Lead checks the failed execution, records the dependency in both directions through one Jira link, and records the promotion hold.",
+    "measure": "Give a reviewer the story key alone. Can they find the objective, identify the blocking bug and reach the test result that justified the hold? Record which missing or misleading field stopped them.",
+    "detail": [
+      {
+        "id": "pick-a-type",
+        "title": "Choose a record by the decision it carries",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "A Jira work item, also called an issue, has a key such as CC-123. At intake, the analyst spends a few minutes in the Jira work item view comparing a request with the objective and existing work. A question about which requests qualify can take longer to settle. Record that question and its owner, so the person reviewing scope can tell what still needs a decision."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "Jira Cloud's default hierarchy places epics above standard work items, with subtasks beneath standard work. Stories, tasks and bugs are standard work types. Check the types enabled in your space. In this company-managed example, the team uses the Story type for the change it calls a feature."
+          },
+          {
+            "type": "table",
+            "caption": "Work types in the approval example",
+            "columns": [
+              "Type",
+              "Why open it?",
+              "Connection to other work"
+            ],
+            "rows": [
+              [
+                "Epic",
+                "Track the larger objective of reducing the wait for a decision.",
+                "CC-100 can contain more than one change."
+              ],
+              [
+                "Story",
+                "Deliver behavior a user can experience, such as correct assignment on submission.",
+                "CC-123 has CC-100 as its parent."
+              ],
+              [
+                "Task",
+                "Track a piece of work with its own deliverable, such as reviewing group ownership across the service.",
+                "Can sit alongside a story under an epic."
+              ],
+              [
+                "Subtask",
+                "Give someone a bounded part of a standard item, such as preparing test inputs specifically for CC-123.",
+                "Its parent would be the standard item whose work it contributes to."
+              ],
+              [
+                "Bug",
+                "Investigate and repair a departure from expected behavior, with a reporter, owner and retest.",
+                "CC-131 has its own workflow and a dependency link to CC-123."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "Ask three questions before choosing a relationship. Is this work part of the larger piece? Does one item need to wait for the other? Or would a reader simply benefit from finding the other record?"
+          }
+        ]
+      },
+      {
+        "id": "objective-fields",
+        "title": "Read the objective on CC-100",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "Illustrative Jira field settings for the objective",
+            "columns": [
+              "Field",
+              "CC-100",
+              "How to read it"
+            ],
+            "rows": [
+              [
+                "Type and summary",
+                "Epic · Reduce the time to an approval decision",
+                "The Product Owner can test several changes against this objective."
+              ],
+              [
+                "Parent",
+                "Empty",
+                "This is the top of the example hierarchy."
+              ],
+              [
+                "Component",
+                "Approvals",
+                "A component groups work by an area of responsibility in this space."
+              ],
+              [
+                "Labels",
+                "decision-time",
+                "A label is a searchable tag. Other records can share it."
+              ],
+              [
+                "Fix versions",
+                "Empty",
+                "The objective spans experiments and has no single planned delivery version."
+              ],
+              [
+                "Children and purpose",
+                "CC-123 · automatic assignment",
+                "The child describes one change intended to shorten the wait."
+              ],
+              [
+                "Measure",
+                "Median submission-to-decision time, from two days to one",
+                "The owner needs observations after release to assess the objective."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "Read the population and the clock with the objective. Finding the approver is one part of the interval. The request may still wait for the approver to decide. This distinction gives the Product Owner somewhere to record a later experiment, such as the proposed CC-140 for better supporting details, without rewriting the shipped routing story."
+          }
+        ]
+      },
+      {
+        "id": "feature-fields",
+        "title": "Set up the change on CC-123",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "Illustrative Jira fields on the story, including links added as delivery progresses",
+            "columns": [
+              "Field",
+              "CC-123",
+              "What the next owner can check"
+            ],
+            "rows": [
+              [
+                "Type and summary",
+                "Story · Automatically assign eligible approval requests",
+                "The user receives an assignment without a clerk choosing an approver."
+              ],
+              [
+                "Parent",
+                "CC-100",
+                "Open the epic and check the objective."
+              ],
+              [
+                "Component and labels",
+                "Approvals · automatic-routing",
+                "Use the component to find the responsible area and the label to search related work."
+              ],
+              [
+                "Fix versions",
+                "1.3.0",
+                "The team plans to deliver this story in version 1.3.0."
+              ],
+              [
+                "Acceptance criteria",
+                "AC-01 automatic assignment at submission. AC-02 only an authorized approver can record a decision.",
+                "Acceptance criteria are observable conditions the change must satisfy."
+              ],
+              [
+                "Linked work",
+                "is blocked by CC-131 during the authorization repair",
+                "Open the linked bug to find the hold and its owner."
+              ],
+              [
+                "Evidence links",
+                "PR-42, the pull request proposing the code change, and qa-204, the integrated test run",
+                "Open the source records to see the revision and results."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "The person receiving the story reads the two conditions aloud against a concrete request. If a clerk has already assigned the request, seeing the right recipient tells them little about automatic routing. If the request ends with an approval, they also need to know who made it. These questions make the story precise enough for refinement, where the team will agree the smaller decisions and test examples."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The Product Owner and analyst hand this example to refinement when the objective is linked, the beneficiary and intended change are clear, and both conditions have an owner for open questions. A missing parent returns the item to the analyst. This intake check governs the refinement handoff. Merge and deployment have their own controls."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Repair a defect relationship that exists only as a label",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Suppose CC-131 initially shares the automatic-routing label with CC-123. The release reviewer sees several matching items and cannot tell which one holds promotion. The QA Lead first opens the failed test execution. In the fictional maintenance run qa-196 on build-422, test case TC-04 attempts a decision as an unrelated employee. The expected result is a denial with the request still pending. The early software records the decision."
+          },
+          {
+            "type": "text",
+            "value": "The QA Lead and Product Owner assess the impact, classify severity as High, prioritize the repair before qualification and hold promotion. The QA Lead moves CC-131 from New to Triaged, assigns the Developer and adds the failed execution reference to the bug. From CC-131 select the configured blocks link and choose CC-123. Read the result from the story as is blocked by CC-131. Use relates to when two items provide context without requiring a wait. Keep Parent on the story pointing to CC-100. Neither creating this link nor triaging the bug changes the story status."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative record after the separate maintenance retest",
+            "value": "CC-131 · Bug · Closed · Resolution: Fixed\nAC-02 / TC-04 · failure qa-196 on build-422 retained\nRepair PR-47 · retest qa-198 on build-423\nCC-131 blocks CC-123 · original hold and retest recorded\nCC-123 · Parent: CC-100 · integrated PR-42 / build-418\nIntegrated qualification: qa-204, AC-01 and AC-02"
+          },
+          {
+            "type": "text",
+            "value": "The maintenance retest checks both the denial and the authorized path. The triage owner can now close the defect with resolution Fixed, the recorded reason for closure. The story still needs evidence for its integrated release build. A link back to the original hold explains the sequence to a reader who finds both records months later."
+          }
+        ]
+      },
+      {
+        "id": "pitfalls",
+        "title": "Two ways a field can mislead the next owner",
+        "blocks": [
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              "Putting the defect under the story as a subtask would classify it as work contained in that story. A reader could miss the independently owned failure that held promotion. Keep the Bug type and record the dependency and release decision.",
+              "Assigning fix version 1.3.0 identifies planned release scope. Announcing deployment from that field could send users to an unavailable feature. Follow the deployment record to the actual production revision and its checks."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "transfer",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In another tracker, find the fields that express scope, dependency and a reference to evidence. Ask a second person to start at the defect, reach the delivery decision and then explain which larger outcome the change was meant to affect."
+          }
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "Atlassian · What are work types?",
+        "url": "https://support.atlassian.com/jira-cloud-administration/docs/what-are-issue-types/"
+      },
+      {
+        "title": "Atlassian · Link work items",
+        "url": "https://support.atlassian.com/jira-software-cloud/docs/link-issues/"
+      },
+      {
+        "title": "Atlassian · What are Jira components?",
+        "url": "https://support.atlassian.com/jira-software-cloud/docs/what-are-jira-components/"
+      },
+      {
+        "title": "Atlassian · Enable releases and versions",
+        "url": "https://support.atlassian.com/jira-software-cloud/docs/enable-releases-and-versions/"
+      }
+    ]
+  },
+  {
+    "id": "jira-workflow",
+    "kind": "deep-dive",
+    "parent": "tool-jira",
+    "audience": [
+      "Business Analyst",
+      "QA Lead",
+      "Developer",
+      "Release Manager"
+    ],
+    "title": "Decide when to move a story or reopen a bug",
+    "phase": "Define",
+    "summary": "A reviewer wants to know whether the approval change can move forward and who gets the next decision. The story follows the change toward release, while a separate bug records a fault and its repair. Each move in Jira has a person who can explain the evidence behind it.",
+    "owner": "The workflow owner maintains the permitted moves with the Jira administrator. The person named at each handoff checks the evidence and updates the work item. The QA Lead owns defect triage, the review that establishes impact, priority and the next owner, with input from the Product Owner.",
+    "inputs": [
+      "The current story or bug, its status, the next decision and permission to view, comment and transition the item.",
+      "A reference to the relevant change, test run or approval. For a software candidate, identify the build, the packaged software produced from a revision.",
+      "The applicable workflow and the role authorized by this team to make the move."
+    ],
+    "steps": [
+      "Read the current status and identify the permitted next move in the workflow for that work type.",
+      "Open the evidence, verify that it applies to this candidate and record the decision with its owner. If evidence is missing, keep the hold visible.",
+      "Make the move in Jira, then reread the status, resolution and linked item. Tell the next owner what remains to be checked."
+    ],
+    "evidence": "The story history connects each handoff to its supporting record. The bug keeps the failing execution, repair, fresh retest, closure or reopening decision and its link to the affected story.",
+    "example": "The team closes CC-131 after it verifies the repair on the maintenance build. CC-123 still needs its own integrated test and business acceptance before the release decision.",
+    "failure": "A reopened bug with a populated Resolution field can disappear from an unresolved-work report. The QA Lead flags the discrepancy and the workflow owner corrects the reopen action and the affected record.",
+    "measure": "Sample recent moves and count how many have evidence for the named candidate. Look separately for reopened or deferred bugs with a populated resolution and ask the triage owner to reconcile them.",
+    "detail": [
+      {
+        "id": "read-a-transition",
+        "title": "Read a status as a handoff",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "A status names where work stands. A transition is an allowed move between statuses. A resolution records the reason work has been settled, such as Fixed. In a company-managed Jira Cloud space, a workflow scheme maps work types to workflows. Check which one applies before using a board column as a guide. Here Story is the work type for feature CC-123, and Bug is the type for defect CC-131."
+          },
+          {
+            "type": "text",
+            "value": "A handoff starts when the responsible person receives new evidence. Allow a few minutes in the Jira work item view to read it, check the candidate, add a link and select the permitted move. The test or business review itself can take much longer. Keep those times separate when investigating a long wait. A reviewer needs access to the evidence as well as the Jira record."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "Read the source of a decision before accepting its status. A test result belongs to a particular build and environment. A business acceptance belongs to a particular scenario and signatory."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "A workflow can restrict transitions, validate fields and perform an action during a move. Jira Cloud uses the Resolution field in reporting resolved work. An administrator can configure a transition to clear that field when work reopens."
+          }
+        ]
+      },
+      {
+        "id": "story-handoffs",
+        "title": "Follow CC-123 from development to release",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "All moves below are manual in this example. A pull request (PR) is a proposal to merge code. An image digest identifies the exact packaged software. Quality assurance (QA) checks the candidate against agreed conditions. In user acceptance testing (UAT), a designated business representative decides whether the business scenario is acceptable. That representative and the approver inside the application have different responsibilities."
+          },
+          {
+            "type": "table",
+            "caption": "Seven story statuses in order under the example team policy",
+            "columns": [
+              "Status",
+              "Who moves the story",
+              "Evidence for the handoff"
+            ],
+            "rows": [
+              [
+                "In development",
+                "Developer",
+                "Link the feature branch, the line of development containing the feature changes, to CC-123."
+              ],
+              [
+                "In review",
+                "Developer",
+                "Link PR-42 and its checks for the proposed change."
+              ],
+              [
+                "Ready for QA",
+                "Developer",
+                "Identify the integrated source revision and the packaged image digest from build-418."
+              ],
+              [
+                "In QA",
+                "QA Lead",
+                "Record the candidate and its QA execution. In qa-204, qa-r17 with qa-routing-3 verifies automatic assignment (AC-01) and authorized decisions (AC-02)."
+              ],
+              [
+                "In UAT",
+                "Business Analyst",
+                "Use the qualifying QA evidence. Keep the business rejection uat-80 visible, recheck the corrected mapping in qa-209, then record the representative's acceptance uat-82."
+              ],
+              [
+                "Ready for release",
+                "Release Manager",
+                "Verify accepted digest, target version 1.3.0, tag v1.3.0 identifying the source revision, and production authorization."
+              ],
+              [
+                "Released",
+                "Release Manager",
+                "Preserve the failed prod-r41 rollout. Record the prod-r42 smoke check, a short test of the running service, and its observation before moving the story."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "The same digest can behave differently under different settings. In uat-80, purchasing unit B reached unit A's approver on uat-r8 with uat-routing-5. The analyst keeps the story In UAT, records the reason for the hold and has the affected mapping and permissions rechecked. The designated representative accepts the corrected scenario on uat-r9 with uat-routing-6 in uat-82. A release owner reviewing that history can identify both the failure and the basis for lifting the hold."
+          },
+          {
+            "type": "figure",
+            "src": "assets/figures/jira-workflow.svg",
+            "alt": "Independent story and bug workflows, with a business acceptance hold and paths for deferring or reopening a defect.",
+            "caption": "Manual moves for CC-123 and CC-131 under the example workflow",
+            "text_equivalent": "CC-123 moves from In development to In review, Ready for QA, In QA, In UAT, Ready for release and Released. At In UAT it stays in place through the uat-80 rejection and qa-209 recheck until uat-82 acceptance. CC-131 moves from New to Triaged, In progress, Ready for retest and Closed with resolution Fixed. Triaged can go to Deferred and back to Triaged, keeping resolution unset. A failed retest can take Ready for retest to Reopened, then In progress. Closed can also go to Reopened, clearing resolution. The bug blocks the story through a separate link. Moving either record leaves the other in its current status."
+          }
+        ]
+      },
+      {
+        "id": "bug-handoffs",
+        "title": "Follow the bug on its own candidate",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The QA Lead and Product Owner decide whether a defect holds promotion, the decision to advance the candidate to the next delivery stage. Here a failed permission check holds it. The QA Lead records that CC-131 blocks CC-123. From the story this reads is blocked by CC-131. The story's Parent field still points to objective CC-100. The team uses relates to for an association that carries no dependency."
+          },
+          {
+            "type": "table",
+            "caption": "Illustrative bug transitions, roles and evidence",
+            "columns": [
+              "From → to",
+              "Who acts",
+              "What to record"
+            ],
+            "rows": [
+              [
+                "Create → New",
+                "QA Engineer",
+                "Failed TC-04 execution, expected denial and pending state, actual recorded decision, environment and candidate."
+              ],
+              [
+                "New → Triaged",
+                "QA Lead with Product Owner",
+                "Severity High, priority Fix before qualification, Developer assigned, promotion held."
+              ],
+              [
+                "Triaged → In progress",
+                "Developer",
+                "Accept the repair and refer to the failure in the work for PR-47."
+              ],
+              [
+                "In progress → Ready for retest",
+                "Developer",
+                "Provide PR-47 and maintenance build-423 to QA."
+              ],
+              [
+                "Ready for retest → Closed",
+                "QA Lead as triage owner",
+                "Review qa-198 on build-423. TC-04 denies the unrelated employee and leaves the request pending. The authorized path works. Set resolution Fixed."
+              ],
+              [
+                "Ready for retest or Closed → Reopened",
+                "QA Lead",
+                "Record the failed retest or recurrence, candidate and expected state. Leave resolution empty, clearing any previous value."
+              ],
+              [
+                "Reopened → In progress",
+                "Developer",
+                "Accept the new evidence and investigate the affected revision."
+              ],
+              [
+                "Triaged → Deferred → Triaged",
+                "QA Lead with Product Owner",
+                "If postponing another defect is acceptable, record impact, owner and revisit trigger. Reassess it on that trigger. Resolution remains empty. CC-131 required repair before qualification."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The named person chooses each transition. The configured close action sets Fixed, and the reopen action clears it. A linked run or a passing maintenance repair does not move the story, authorize production or close the product experiment."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative Jira workflow settings and expected results",
+            "value": "Bug / Ready for retest → Closed\n  QA Lead verifies the repair run; transition action sets Resolution = Fixed\nBug / Closed → Reopened\n  QA Lead records new failure; transition action clears Resolution\nAfter reopening: Status = Reopened | Resolution = empty"
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Recover a reopened bug that still looks resolved",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Start from the fictional failure trail. On March 5, TC-04 in qa-196 on maintenance build-422 records an unrelated employee's decision. PR-47 repairs it. QA retests on build-423 in qa-198 on the maintenance path, giving the triage owner evidence to close CC-131. The later integrated build-418 comes from PR-42 on the main release path. It has its own digest and qualifies in qa-204. The two build numbers come from separate run sequences."
+          },
+          {
+            "type": "text",
+            "value": "Now consider a hypothetical recurrence after closure. The QA Lead records the fresh failure, chooses Reopened and finds that the card still says Resolution: Fixed. A report selecting unresolved bugs can miss this record. First inspect both fields and confirm the issue history shows a transition out of Closed. Attach the new failure alongside qa-196 and qa-198. The QA Lead restores a promotion hold for the affected candidate and assigns the Developer. None of these hypothetical events changes the recorded qa-204 result."
+          },
+          {
+            "type": "text",
+            "value": "The workflow owner checks the active Bug workflow with the administrator. Configure the reopen transition to clear Resolution, publish the corrected workflow, and exercise the path on a sample bug. Existing records also need correction. Use an authorized corrective transition on the affected reopened item that clears the field while retaining its status and history. Verify the empty value on CC-131 and its inclusion in the unresolved-work report. The next closure requires a fresh retest on the affected candidate."
+          }
+        ]
+      },
+      {
+        "id": "pitfalls",
+        "title": "Spot two tempting early moves",
+        "blocks": [
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              "Closing CC-131 when a developer delivers PR-47 skips the retest. The team could release a fix that denies everyone, including the designated approver. Ready for retest gives QA a candidate and a clear next action.",
+              "Moving CC-123 to Released when the first production deployment starts hides a failed rollout. The wrong recipient in prod-r41 triggered incident INC-7. The accepted record follows the corrected prod-r42 checks and observation."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "transfer",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In any work tracker, map each status change to a decision, a person and evidence that identifies the candidate. Exercise the return path as well as closure, then check that reopened work reaches the report used to plan repairs."
+          }
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "Atlassian · What are Jira workflows?",
+        "url": "https://support.atlassian.com/jira-software-cloud/docs/what-are-jira-workflows/"
+      },
+      {
+        "title": "Atlassian · What are work item statuses, priorities, and resolutions?",
+        "url": "https://support.atlassian.com/jira-cloud-administration/docs/what-are-issue-statuses-priorities-and-resolutions/"
+      },
+      {
+        "title": "Atlassian · Edit a workflow's rules",
+        "url": "https://support.atlassian.com/jira-cloud-administration/docs/edit-an-issue-workflow/"
+      },
+      {
+        "title": "Atlassian · Clear the resolution field when an issue is reopened in Jira Cloud",
+        "url": "https://support.atlassian.com/jira/kb/clear-the-resolution-field-when-an-issue-is-reopened-in-jira-cloud/"
+      },
+      {
+        "title": "Atlassian · Link work items",
+        "url": "https://support.atlassian.com/jira-software-cloud/docs/link-issues/"
+      }
+    ]
+  },
+  {
+    "id": "refinement-ready",
+    "kind": "deep-dive",
+    "parent": "define",
+    "title": "Decide when the routing story is ready",
+    "phase": "Define",
+    "audience": [
+      "Business Analyst",
+      "Product Owner",
+      "Developer",
+      "QA Engineer"
+    ],
+    "summary": "A purchase request can sit untouched while someone looks for its approver. Before a developer starts, the team needs to agree which purchases to route, who should receive them and what to do when the recipient is unclear. That agreement gives a tester a way to tell whether the change worked.",
+    "owner": "The business analyst gathers examples. The people doing the work size it, and the Product Owner decides with them when CC-123 is ready to select.",
+    "inputs": [
+      "The objective CC-100 and its baseline of two days from submission to decision for the middle request when decision times are ordered",
+      "Example purchasing requests for two units, each unit’s designated group and a business representative who can confirm the expected recipients",
+      "Permission to read the routing examples and update CC-123 in Jira, the team’s work tracker"
+    ],
+    "steps": [
+      "Trace an eligible request from submission through assignment to decision. Mark the point where this feature changes what someone has to do.",
+      "Fill in the checklist on CC-123, then ask the developer and tester to explain how they would deliver and check that slice.",
+      "Record the team’s sizing assumptions, the Product Owner’s decision and any blocking dependency. Hand a ready story to design and test planning."
+    ],
+    "evidence": "CC-123 records its parent CC-100, the in-scope purchase, the excluded reminders, named owners, two contrasting unit examples, the size assumption and the readiness decision.",
+    "example": "The receiving group depends on the purchasing unit. A tester can start with an unassigned unit B submission and compare the recipient chosen by the routing rule with the group the business representative named in advance.",
+    "failure": "If nobody can confirm the unit-to-group mapping, the analyst marks the dependency on CC-123 and asks the purchasing representative to identify its owner. Implementation waits.",
+    "measure": "At the next review, count stories returned to refinement because their recipient, scope or permission rule was unresolved. Read the reason on each returned story before changing the checklist.",
+    "detail": [
+      {
+        "id": "bound-the-story",
+        "title": "Where does the change end?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Refinement is the recurring conversation that makes a proposed piece of work small and clear enough to select. Start when CC-100 makes the wait for purchase decisions a priority. The analyst, developer and quality assurance (QA) tester can walk through one purchase in a short working session with the Product Owner, using CC-123 on their shared board. Allow about half an hour for this example when a purchasing representative and the assignment rules are available. Record unresolved questions before ending the session."
+          },
+          {
+            "type": "text",
+            "value": "Ask the requester who finds an approver today and ask the approver when they first know there is work to do. Mark submission, first correct assignment and final decision separately. CC-100 aims to move the median time to decision from two days to one. Automatic assignment changes the first handoff. A reminder would contact somebody who already has the work and would need its own trigger, recipient, stopping rule and evidence. Leave it as a separate proposal for the Product Owner to prioritize."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "Choose a boundary someone can observe. A purchase can reach the right person automatically even if that person takes another day to decide."
+          }
+        ]
+      },
+      {
+        "id": "ready-checklist",
+        "title": "A checklist someone can use at the meeting",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "Illustrative CC-123 readiness checklist. Read each question aloud and put the answer and owner on the story.",
+            "columns": [
+              "Question",
+              "Answer needed for this slice",
+              "Who confirms it"
+            ],
+            "rows": [
+              [
+                "What starts the rule?",
+                "Submission of an eligible purchase for a participating unit. The example includes purchasing units A and B. Eligibility is determined before looking for a recipient.",
+                "Product Owner and business analyst"
+              ],
+              [
+                "Where does each purchase go?",
+                "The purchasing representative supplies the designated group for each unit. QA keeps these expected recipients separately from the settings under test.",
+                "Routing-rule owner and purchasing representative"
+              ],
+              [
+                "What can each person do?",
+                "A requester submits. The designated approver may record a decision. An unrelated employee’s attempt is denied and the request stays pending.",
+                "Business analyst and QA tester"
+              ],
+              [
+                "What if the mapping is missing?",
+                "Keep the eligible request pending, flag it for the Service Owner, and retain its original submission time.",
+                "Service Owner"
+              ],
+              [
+                "What demonstrates completion?",
+                "Acceptance criterion AC-01 requires correct automatic assignment at submission. AC-02 restricts decision recording to an authorized approver. Show both on the selected change.",
+                "Developer and QA tester"
+              ],
+              [
+                "What is still open?",
+                "The two-minute timing criterion AC-03 is proposed. Record its status and owner separately. Reminders are outside this story.",
+                "Product Owner"
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "Read access to the approved examples is sufficient for the analyst. Ask whether the tester can submit for both units and exercise authorized and unrelated test identities in a test environment. Record the person who can arrange that access. A spreadsheet containing group names alone cannot answer which unit those groups should serve."
+          }
+        ]
+      },
+      {
+        "id": "sizing-and-handoff",
+        "title": "Size the whole slice and record the decision",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The developer compares the work with a previous change that selected a group at submission. The tester adds the cost of setting up two different recipients, checking a denied decision and demonstrating recovery from an absent match. Ask whether those pieces fit within one normal planning cycle together. An illustrative sizing note reads “Small enough for one cycle if the approved mapping and test identities are available. Revisit size if access requires a separate directory integration.” That note gives the next planner a reason to trust or revisit the estimate."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The Product Owner marks the story ready for selection when the checklist has evidence, the people doing the work agree it fits, and each remaining question has an owner and can wait. An unresolved routing or authorization rule blocks selection for implementation."
+          },
+          {
+            "type": "text",
+            "value": "Use Parent = CC-100 on CC-123. Record “Ready for selection” as the example readiness decision in the story. The developer moves CC-123 to In development when work starts. If another work item must supply the missing mapping first, record “CC-123 is blocked by” that item. Keep the reason visible on CC-123 until the representative confirms the examples."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "Jira Cloud lets people link related work items, including a directional “is blocked by” relationship. The Scrum Guide assigns sizing to the developers doing the work. This example’s checklist and readiness wording are local team choices."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Worked failure · Two units share the wrong recipient",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The later user acceptance test, a business check of the whole journey, shows the cost of an incomplete example. In uat-80 the unit B purchase reached unit A’s approver. A check that merely asked whether a purchase had any assignee would have passed. Use that failure to rehearse refinement: ask a representative to name unit B’s expected group without reading the application’s routing settings. If nobody can, mark CC-123 “Needs refinement” in the readiness note and identify who can resolve the dependency."
+          },
+          {
+            "type": "text",
+            "value": "Once the owner supplies the expected recipients, QA can prepare the contrasting unit B case TC-02. In the recorded example the team corrected the acceptance environment’s mapping, ran the affected checks in qa-209 and secured business acceptance in uat-82. Keep the original rejection alongside the later result so a reader can see which assumption failed."
+          },
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "Including reminders in the estimate makes a small routing change depend on a second set of delivery and cancellation rules. Another mistake is to define eligible as “requests that found a match.” A missing recipient then disappears from the count precisely when someone needs to investigate it."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "A shared document or card can carry the eligible example, exclusion, dependency owner and decision just as a Jira story can. Give a new developer and tester the card and ask each to predict the outcome for a unit B request with no match. A disagreement identifies the next refinement question."
+          }
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "The 2020 Scrum Guide",
+        "url": "https://scrumguides.org/scrum-guide.html"
+      },
+      {
+        "title": "How the discovery phase works",
+        "url": "https://www.gov.uk/service-manual/agile-delivery/how-the-discovery-phase-works"
+      },
+      {
+        "title": "Link work items",
+        "url": "https://support.atlassian.com/jira-software-cloud/docs/link-issues/"
+      }
+    ]
+  },
+  {
+    "id": "design-decision",
+    "kind": "deep-dive",
+    "parent": "phase-build",
+    "title": "Choose when a purchase request gets its approver",
+    "phase": "Define",
+    "audience": [
+      "Business Analyst",
+      "Developer",
+      "Technical Lead",
+      "Service Owner"
+    ],
+    "summary": "When someone submits a purchase, should the screen wait for the correct approver or confirm receipt while the system looks? The answer affects what the requester sees when nobody can find a match. A short decision record tells the developer what to build and the tester what should happen if the lookup fails or runs twice.",
+    "owner": "The technical lead owns the design decision. The routing-rule owner confirms the unit-to-group mapping, the Product Owner confirms the promise to requesters, and the Service Owner takes unresolved requests.",
+    "inputs": [
+      "CC-123 and acceptance criteria AC-01 (automatic assignment at submission) and AC-02 (only an authorized approver may decide)",
+      "Eligible purchase examples, each unit’s approved group and permission to read the directory that lists group membership",
+      "An agreed display for a pending request, an owner for exceptions and a way to retain submission and assignment times"
+    ],
+    "steps": [
+      "Walk through the successful purchase, a directory outage and a repeat submission with the purchasing representative.",
+      "Compare looking up the recipient during submission with doing it later. Record the choice, the reason, who can change the mapping and the safe state for each failure.",
+      "Give QA, the quality assurance team, the cases and the expected results. Link the decision and its review conditions to CC-123 before the developer begins."
+    ],
+    "evidence": "CC-123 links to the accepted design record for the teaching example. It names the alternatives, settings, decision owner, recovery owner and evidence needed to revisit the choice.",
+    "example": "For request R-17, the proposed design looks up the expected Purchasing approver during submission. A second delivery of the same submission must show the existing assignment and emit no second assignment.",
+    "failure": "On an absent or ambiguous match, preserve the request as pending and unassigned. The Service Owner checks the unit and mapping with the routing-rule owner before authorizing recovery.",
+    "measure": "Compare original submission time with first correct automatic assignment time. Count eligible submissions without a correct assignment at the deadline and check for more than one assignment for the same initial operation.",
+    "detail": [
+      {
+        "id": "compare-the-options",
+        "title": "What does the requester see?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Hold the design review after refinement has identified eligible purchases and their intended recipients, before coding the rule. Use the team’s shared design record and Jira work item CC-123. For this example, allow about half an hour when the directory owner can answer questions. Give the developer read access to a test directory and give the tester distinct identities for the requester, designated approver and unrelated employee. Ask the representative to supply the expected recipient independently of the directory lookup."
+          },
+          {
+            "type": "table",
+            "caption": "Illustrative design alternatives for an eligible purchase",
+            "columns": [
+              "Choice",
+              "Normal submission",
+              "If the directory is slow or unavailable"
+            ],
+            "rows": [
+              [
+                "Synchronous lookup (the submission waits for an answer)",
+                "The handler that accepts the request can show the assigned group immediately after saving it.",
+                "Waiting adds to screen response time. End the wait after a configured timeout and tell the requester whether the purchase was saved as pending."
+              ],
+              [
+                "Queued lookup (save work for a background process)",
+                "The requester sees a receipt first. A worker later records the assignment.",
+                "A backlog can grow. The team needs to store the purchase and the work to be done reliably, recognize repeat deliveries, measure the oldest wait and own missed deadlines."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "In this fictional decision the team chooses synchronous lookup because AC-01 asks for automatic assignment at submission. A queue would change the promise to “accepted now, assigned later.” The Product Owner would need to agree to that change before moving to the queued design. Neither a receipt nor a message placed in a queue demonstrates that the correct group received a purchase."
+          }
+        ]
+      },
+      {
+        "id": "decision-record",
+        "title": "The one-page decision record",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "Illustrative settings and decision for CC-123. This is a proposed architecture for the lesson. The historical test and rollout records establish observed behavior only.",
+            "columns": [
+              "Record field",
+              "Decision"
+            ],
+            "rows": [
+              [
+                "Context and state",
+                "A purchasing unit determines its own approver. Synchronous lookup accepted for this design example by the technical lead with the routing-rule owner."
+              ],
+              [
+                "Where the rule lives",
+                "The submission handler in the application contains the routing logic. A separately versioned mapping assigns each participating unit to its approved group. Record both the software version and mapping revision in a test result."
+              ],
+              [
+                "Who may change what",
+                "Developers propose reviewed code changes. Only the designated configuration maintainer may apply a reviewed mapping change after the routing-rule owner approves the recipient. The application’s lookup identity can read the mapping. Requesters cannot edit or approve it."
+              ],
+              [
+                "Permission to decide",
+                "At decision time the application rechecks that the request is pending and the acting user is authorized for its designated group. An assignment event alone gives no user permission to approve."
+              ],
+              [
+                "Timing and exceptions",
+                "Measure from original submission to first correct automatic assignment. A timeout, no match or multiple matches leaves the saved request pending and unassigned, with a visible exception owned by the Service Owner."
+              ],
+              [
+                "Cost and review trigger",
+                "Directory delay now affects submitters. Reopen the design if measurements show a sustained wait the business cannot accept, and compare the resulting experience with queue-based assignment."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The technical lead accepts the design for implementation only when the Product Owner confirms the submission promise, the routing-rule owner confirms mapping permissions, and QA can describe a repeat, a no-match and a denied decision. An unanswered condition holds implementation. Later qualification and release require their own evidence."
+          },
+          {
+            "type": "text",
+            "value": "Keep CC-100 as the parent of CC-123. Put a document link to the reviewed record in the feature’s description, with its decision state and owner. Record a hold there while the decision is unresolved. The developer changes the feature status to In development when work begins. A later change in approach gets a new decision linked to the earlier one so a reader can still understand the original tests."
+          }
+        ]
+      },
+      {
+        "id": "repeat-and-recover",
+        "title": "What if the same submission arrives twice?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "A requester who loses the response may press Submit again. Idempotency means repeating the same intended operation has the same business effect as performing it once. The example has the caller reuse the same operation identifier on a retry. The server scopes that identifier to the caller and checks that the purchase details still match. Conflicting details require clarification. Two genuinely separate purchases from the same unit need different identifiers."
+          },
+          {
+            "type": "text",
+            "value": "Save the initial assignment and the record that its operation completed together, in one indivisible database update. If two copies arrive at once, allow only one to commit the first assignment. Return the recorded outcome to the other caller. For an unresolved purchase, keep its saved pending state visible. The Service Owner can request a separate, recorded recovery after the mapping is repaired. Recovery may assign only a still-pending, unassigned request and preserves its original submission time."
+          },
+          {
+            "type": "table",
+            "caption": "Expected output from a design walkthrough using R-17, separate from any recorded test run",
+            "columns": [
+              "Action",
+              "What QA should observe"
+            ],
+            "rows": [
+              [
+                "Submit R-17 with a valid mapping",
+                "One purchase. First assignment actor routing-rule. Recipient Purchasing approver. Decision pending."
+              ],
+              [
+                "Repeat the same completed operation after losing the response",
+                "The same purchase and existing recipient. The count of initial assignment events stays at one."
+              ],
+              [
+                "Try an unrelated employee’s decision",
+                "The application denies the attempt. Reopening the purchase shows a pending decision."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "The AWS Builders’ Library describes a caller-supplied operation identifier and the need to save that identifier and the corresponding changes together. Those mechanics inform this design. The example does not depend on an AWS queue or directory."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Worked failure · A successful lookup returns the wrong group",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In business acceptance run uat-80, a unit B purchase reached unit A’s approver under mapping uat-routing-5. The business representative rejected that configuration. Retrying the lookup against the same mapping could reproduce the error. First hold promotion and preserve the observed recipient and active mapping. The routing-rule owner checks the expected group with purchasing and approves the correction. The Service Owner would also reconcile affected requests before authorizing reassignment in a live incident."
+          },
+          {
+            "type": "text",
+            "value": "The fictional record shows the affected mapping and permissions rechecked in qa-209, then the business scenario accepted in uat-82 with uat-routing-6. The application image stayed the same. These observations can guide a design review without identifying the lookup architecture used in those runs. Proposed timing criterion AC-03 would count a correct assignment at exactly two minutes as on time. A wrong assignment by then still misses, and the earlier qa-204 pass covered only AC-01 and AC-02."
+          },
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "Counting any assignee as success hides a wrong recipient like the one in uat-80. Creating a fresh operation identifier on every retry makes a lost response look like another purchase and can create duplicate work."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "Keep an uncertain purchase visible and preserve the facts needed for recovery. Record who was selected, which mapping the rule read, and who actually made any decision."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "A form workflow, business rules engine or background worker needs the same agreement about the submission receipt, current recipient and authority to decide. Take the original, duplicate and no-match examples into the new tool and ask its owner to show where each outcome is stored and who can recover pending work."
+          }
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "title": "Architectural decision record process",
+        "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/architectural-decision-records/adr-process.html"
+      },
+      {
+        "title": "Making retries safe with idempotent APIs",
+        "url": "https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/"
+      }
+    ]
+  },
+  {
+    "id": "nonfunctional-criteria",
+    "kind": "deep-dive",
+    "parent": "criteria",
+    "audience": [
+      "Business Analyst",
+      "QA Engineer",
+      "Product Owner",
+      "Service Owner"
+    ],
+    "title": "Decide what counts as prompt assignment",
+    "phase": "Define",
+    "summary": "A purchaser submits a request and waits for the right person to receive it. How much waiting is acceptable? The team can test its answer once people agree when the clock starts, which assignment stops it and what to count if nobody receives the request.",
+    "owner": "The Product Owner decides whether to adopt the proposed time limit with the Service Owner. The business analyst writes the rule on the feature. The quality assurance (QA) engineer designs checks for it.",
+    "inputs": [
+      "The feature CC-123 and its accepted criteria, AC-01 for automatic routing and AC-02 for authority to make a decision.",
+      "The eligible request type, the purchasing unit’s designated approver, the routing rules in effect and access to read the service’s submission and assignment history.",
+      "The pilot observation and the separate set of eligible requests followed for a day. Keep both populations identifiable."
+    ],
+    "steps": [
+      "During refinement, before committing to a deadline, ask a requester what they are waiting for. Receiving an acknowledgement, reaching the correct approver and obtaining a decision are three different events.",
+      "With the Service Owner, specify how to recognize a single eligible submission, its first correct automatic assignment and the actor responsible. Agree how to observe those events in a test environment.",
+      "Write the proposed limit on CC-123. Have QA classify the last passing example and the first late example, then ask the Product Owner which future release decision should depend on this check."
+    ],
+    "evidence": "Keep the wording, owner and proposal status alongside the timing examples. When the team exercises a candidate, keep the request, event times, actor, expected and actual recipient, software version and active mapping with the result.",
+    "example": "An eligible request can reach the wrong purchasing group immediately. Its clock keeps running until the routing rule assigns the correct recipient. Preserve the wrong assignment too, since prompt recovery can still conceal a routing error.",
+    "failure": "If the observations disagree about the start time or recipient, QA checks the original events and the applicable mapping. If the event history is incomplete, the team records the evidence gap and arranges another observation.",
+    "measure": "For each defined population, report eligible submissions, those with a correct automatic assignment by the deadline and those still without one. Assess time to a business decision separately.",
+    "sources": [
+      {
+        "title": "GOV.UK Service Manual · How to set performance metrics for your service",
+        "url": "https://www.gov.uk/service-manual/measuring-success/how-to-set-performance-metrics-for-your-service"
+      },
+      {
+        "title": "W3C · Web Content Accessibility Guidelines (WCAG) 2.2",
+        "url": "https://www.w3.org/TR/WCAG22/"
+      }
+    ],
+    "detail": [
+      {
+        "id": "agree-on-the-clock",
+        "title": "What starts the two-minute clock?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "A nonfunctional criterion sets a condition on how a service behaves. Here, the condition is elapsed time. Submission must trigger the routing in AC-01. Proposed AC-03 adds a deadline for reaching the right person. It applies separately to every eligible submission, including those that never get assigned."
+          },
+          {
+            "type": "table",
+            "caption": "Illustrative AC-03 proposal on CC-123",
+            "columns": [
+              "Setting",
+              "Proposed definition"
+            ],
+            "rows": [
+              [
+                "Start",
+                "Time the service records the eligible submission. Count one request once, even if the service retries routing it."
+              ],
+              [
+                "Stop",
+                "First recorded automatic assignment to the approver designated by the active rule for that request. A manual edit or an assignment to another unit leaves the clock running."
+              ],
+              [
+                "Compare",
+                "Subtract submission time from first correct automatic assignment time using comparable service timestamps. Use the available precision before rounding any display value."
+              ],
+              [
+                "Threshold",
+                "Pass a request at or before 120 seconds. A complete event history with no correct assignment through the deadline gives a miss."
+              ],
+              [
+                "Decision",
+                "Proposed. Product Owner and Service Owner to agree scope and enforcement before using it in qualification."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The corrected production pilot used a two-minute operational window. The team proposes the same limit for a future acceptance check. The proposal currently blocks neither merge nor promotion and cannot change the criteria on a historical run."
+          }
+        ]
+      },
+      {
+        "id": "read-boundaries",
+        "title": "What would the tester see at the boundary?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In the QA environment, use an account allowed to submit a fresh eligible request and a separate read-only view of its recorded events. Let the clock run for two minutes and observe through the next second for the late example. Allow a few additional minutes to retrieve the history. The tester records the expected recipient before submission and leaves assignment controls untouched."
+          },
+          {
+            "type": "table",
+            "caption": "Illustrative boundary output for proposed cases",
+            "columns": [
+              "Case",
+              "First correct automatic assignment",
+              "Decision under AC-03"
+            ],
+            "rows": [
+              [
+                "TC-05",
+                "At 120 seconds",
+                "Pass. The endpoint is included."
+              ],
+              [
+                "TC-06",
+                "At 121 seconds",
+                "Miss. Keep the late event and the outcome at the deadline."
+              ],
+              [
+                "Missing assignment",
+                "Complete observation through 120 seconds, no qualifying event",
+                "Miss. Retain the eligible request in the count."
+              ],
+              [
+                "Missing history",
+                "Collection stopped before the deadline",
+                "Unverified. Restore the missing evidence or rerun with complete collection."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "A correct recipient entered by a tester can make a screen look right. Only a recorded action by the routing rule establishes automatic assignment."
+          }
+        ]
+      },
+      {
+        "id": "controls",
+        "title": "Who can decide, and who can read the evidence?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In the approver view, have the designated approver reach the named decision control by keyboard, see where focus is and hear the result with a screen reader. Have a requester try the same decision and check that the service denies it and the request stays pending. For this example the audit trail records request, actor, time, action, outcome and resulting state. Grant the designated reviewer read access, keep other people’s requests out of the requester’s view and keep the ability to change routing separate from the ability to inspect its history."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "A screen reader uses the name and role that a control exposes. WCAG 2.2 also covers keyboard operation, visible focus and status messages that assistive technology can present without moving focus. These checks let the team examine the decision journey even when nobody is using a mouse."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Why did the pilot pass while the later requests missed?",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "What each fictional record actually measured",
+            "columns": [
+              "Record and population",
+              "What the evidence shows"
+            ],
+            "rows": [
+              [
+                "qa-204 on build-418",
+                "QA recorded an automatic purchasing assignment and the expected decisions under AC-01 and AC-02. The record has no elapsed assignment time for AC-03."
+              ],
+              [
+                "Corrected pilot on prod-r42",
+                "24 of 24 distinct eligible pilot requests received correct assignment within two minutes. Two controlled smoke submissions, quick checks by the team, were excluded."
+              ],
+              [
+                "Later cohort on prod-r42",
+                "All 100 eligible submissions had a full day of follow-up. Of these, 92 reached the correct recipient in 3–19 minutes and eight still lacked a correct assignment. Zero of 100 were within two minutes."
+              ],
+              [
+                "Decision outcome for that later cohort",
+                "40 of 100 reached a decision and 60 remained open at one day. The median, the halfway point in the ordered decision times, had not yet been reached."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "The Service Owner first follows the eight unassigned requests, EX-093 through EX-100, from submission to their last recorded routing attempt. These requests belong to the later cohort. INC-7 concerns an earlier pilot incident with a different eight requests. Check the mapping and assignment history for the late requests too. The Product Owner keeps routing, investigates delayed and missing assignments and examines what approvers still need to decide."
+          },
+          {
+            "type": "text",
+            "value": "On CC-123, record AC-03 as proposed and attach the draft and its boundary cases as evidence references. Keep CC-100 as the parent objective and put the later cohort finding there for its outcome review. Drafting the proposal creates no status transition. In this example CC-123 reached Released after the corrected rollout. An investigation can proceed without rewriting that delivery record."
+          }
+        ]
+      },
+      {
+        "id": "mistakes",
+        "title": "Two ways a timing report can mislead",
+        "blocks": [
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              "Starting at the first successful assignment attempt drops time spent waiting or retrying. The report can claim a prompt service while the requester has already waited several minutes.",
+              "Counting just the 92 eventually assigned requests removes the eight hardest cases. Keeping all 100 eligible submissions makes the missed deadline visible even when the stop event never arrives."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "transfer",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "A service log, a queue history or a test register can all support the same decision if they preserve a request identity, comparable timestamps and the actor and recipient. Agree the population and decision rule before collecting results so another team can reproduce the count when the delivery tool changes."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "criteria-to-tests",
+    "kind": "deep-dive",
+    "parent": "criteria",
+    "audience": [
+      "Business Analyst",
+      "QA Engineer"
+    ],
+    "title": "Trace a business rule to the test that proved it",
+    "phase": "Define",
+    "summary": "A tester can put the right name on a request by hand. To show that the service chose the approver, follow the business rule to the instructions for testing it, then to the result for the version the team intends to release.",
+    "owner": "The business analyst agrees the examples with the Product Owner. The quality assurance (QA) lead maintains the links and decides whether the recorded tests support handing the candidate to business users.",
+    "inputs": [
+      "Feature CC-123 and its accepted criteria, AC-01 for automatic assignment and AC-02 for authorized decisions. AC-03 is a proposed time limit.",
+      "The exact candidate (the packaged software under consideration), the active routing configuration and the expected purchasing recipient for each unit.",
+      "A fresh unassigned request, separate requester, designated approver and unrelated employee identities, and permission to read the assignment and decision history."
+    ],
+    "steps": [
+      "During refinement, turn each criterion into a reusable test case with a starting state, an action and an observable outcome. Put the criterion identifier on each case so a reader can find its companions.",
+      "When the candidate reaches QA, choose the relevant cases, record the deployed software and configuration and submit new requests in that environment. Allow a few minutes per manual example in this exercise, including time to reopen the request and inspect its history.",
+      "Before handing the candidate to user acceptance testing (UAT), compare the actual observations against every required criterion. Record missing, invalid or failed evidence explicitly and identify who will supply it."
+    ],
+    "evidence": "The trace pairs the criterion and case with an execution, meaning one recorded attempt on a specific candidate. Retain expected and actual values, participant, run, environment and configuration. In this guide the qualification record supplies criterion-level observations.",
+    "example": "On request R-17, the routing rule assigned the expected purchasing approver. The requester’s attempt to decide was denied, the request stayed pending, and the authorized approver then recorded a decision. QA captured these observations in qa-204.",
+    "failure": "If a person assigned the approver before the observation, QA records the intervention and repeats the case from a fresh submission. The earlier attempt remains available to explain why its result could not support promotion.",
+    "measure": "For the selected software and configuration, a reviewer should be able to identify which accepted criteria have passing evidence, which roles or scenarios still lack evidence and which proposed criteria have never been exercised.",
+    "sources": [
+      {
+        "title": "Cucumber · Gherkin Reference",
+        "url": "https://cucumber.io/docs/gherkin/reference/"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Test Plans",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/guide/testplan.html"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Test Runs",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/guide/testrun.html"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Source code for tcms.rpc.api.testexecution",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/_modules/tcms/rpc/api/testexecution.html#add_link"
+      },
+      {
+        "title": "Atlassian Support · Link work items",
+        "url": "https://support.atlassian.com/jira-software-cloud/docs/link-issues/"
+      }
+    ],
+    "detail": [
+      {
+        "id": "find-the-cases",
+        "title": "Where do the AC-01 cases live?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In the teaching example, open the CC-123 Test Plan in Kiwi TCMS, the test management tool. Look among its linked cases for AC-01. TC-01 covers automatic assignment and TC-02 covers the alternate purchasing unit. The criterion labels and TC numbers are the team’s proposed case references. Open the test run for the target build to inspect the actual results. A list of cases in the plan tells you which checks someone intended to make."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "In Kiwi a Test Run records results for selected cases against a build. A tester opens a case’s execution row to record a comment and status. A defect link belongs to a particular execution. Kiwi TCMS 17.2 behavior is drawn from its documentation and published source code. This example has not been demonstrated on a live Kiwi TCMS and Jira setup."
+          }
+        ]
+      },
+      {
+        "id": "specify-observations",
+        "title": "What should a tester actually do?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Gherkin is a way to write examples in shared language. Given establishes the starting state, When names the action and Then states what someone can observe. Here these examples specify the intended checks. Running them as automated tests would also require code that carries out each step."
+          },
+          {
+            "type": "code",
+            "language": "gherkin",
+            "caption": "Illustrative Gherkin examples for CC-123",
+            "value": "Feature: Route a purchasing request and protect its decision\n\n  Scenario: AC-01 assigns the designated approver automatically\n    Given a new unassigned eligible request for a known purchasing unit\n    And I have recorded the designated approver from the active rule\n    When the requester submits it without choosing an approver\n    Then the first assignment names that designated approver\n    And the recorded assignment actor is the routing rule\n\n  Scenario: AC-02 permits the designated approver to decide\n    Given a pending request assigned to its designated approver\n    When that approver approves the request\n    Then reopening it shows the recorded approval\n\n  Scenario: AC-02 rejects an unrelated employee's decision\n    Given a pending request and an employee with no approval rights for it\n    When that employee attempts to approve the request\n    Then the service denies the attempt\n    And reopening the request shows it is still pending"
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "Choose the expected recipient before submitting. Reading the active assignment and then copying it into the expected column makes the comparison meaningless."
+          }
+        ]
+      },
+      {
+        "id": "trace-matrix",
+        "title": "Which results belong to this candidate?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The integrated release candidate is build-418 from pull request PR-42, the proposal to integrate the feature’s code. Its digest is a content identifier for the packaged image. Match the full digest across records, then check the environment’s running revision and configuration. The same image produced different routing results when unit mappings changed."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Candidate recorded in the fictional qualification record",
+            "value": "build-418\nsha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c\nqa-204   qa-r17   qa-routing-3   R-17"
+          },
+          {
+            "type": "table",
+            "caption": "Proposed case references compared with recorded observations",
+            "columns": [
+              "Criterion and case",
+              "Actor or path",
+              "Candidate and configuration",
+              "Run and evidence"
+            ],
+            "rows": [
+              [
+                "AC-01 · TC-01",
+                "Requester submits, routing-rule assigns",
+                "build-418 · qa-r17 · qa-routing-3",
+                "qa-204 passed AC-01. R-17 reached the expected purchasing approver automatically. No individual case execution ID is supplied."
+              ],
+              [
+                "AC-01 · TC-02",
+                "Purchasing unit B should reach its own group",
+                "build-418 · uat-r8 / uat-routing-5, then uat-r9 / uat-routing-6",
+                "uat-80 rejected the wrong unit. qa-209 rechecked purchasing mapping and permissions. uat-82 accepted the repeated scenario. No named TC-02 execution or separate QA configuration for qa-209 is supplied."
+              ],
+              [
+                "AC-02 · TC-03",
+                "Designated approver decides",
+                "build-418 · qa-r17 · qa-routing-3",
+                "qa-204 records the authorized approval on R-17. No individual TC-03 execution is identified."
+              ],
+              [
+                "AC-02 · TC-04",
+                "Unrelated employee tries to decide",
+                "build-418 · qa-r17 · qa-routing-3",
+                "qa-204 passed AC-02 using a requester denial and unchanged pending state. An unrelated-employee execution on this build is not identified."
+              ],
+              [
+                "Proposed AC-03 · TC-05 and TC-06",
+                "Routing rule at 120 and 121 seconds",
+                "build-418 · no timing configuration or execution recorded",
+                "No candidate-specific timing result. At 120 seconds the first correct automatic assignment would pass. At 121 it would miss."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "The published record supports both accepted criteria on the integrated QA candidate. It leaves gaps at the individual case level and for the proposed timing criterion. Report the criterion results and the case gaps together. To prove coverage case by case, QA would have to retrieve or perform each missing execution against the selected digest and settings."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "When should QA reject an apparent pass?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Suppose a tester selects the purchasing approver by hand and then records the right recipient. QA first checks who made the assignment. Label that attempt invalid for AC-01, preserve the events, and repeat from an unassigned request on the same identified candidate. If the rule chooses the wrong recipient on a clean attempt, record a failed result, including the expected unit and actual recipient."
+          },
+          {
+            "type": "text",
+            "value": "There is also an earlier, separate worked failure. In the maintenance example, TC-04 in qa-196 on build-422 let the unrelated employee record a decision. QA preserves that failed execution and attaches a defect reference to Jira bug CC-131. Triage records in Jira that CC-131 blocks CC-123. This work-item link records the delivery impact separately from the defect link on the failed test. The repair went into build-423. In qa-198, QA checked the denial and the authorized path. Neither maintenance candidate supplies the missing unrelated-employee execution for build-418."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The QA lead keeps CC-123 In QA while a required result fails or lacks evidence, records a link to the run on the feature and holds promotion. Once the agreed QA checks pass the business analyst moves it to In UAT. The maintainer of the linked bug reviews its separate retest before changing that bug’s status."
+          }
+        ]
+      },
+      {
+        "id": "interpret-the-run",
+        "title": "Two ways to overstate a run",
+        "blocks": [
+          {
+            "type": "list",
+            "ordered": false,
+            "items": [
+              "A rejected action can still change a request. Capture the denial and reopen the request to verify it stayed pending. A screenshot of the error alone could pass a broken permission check.",
+              "A build number on a later record can tempt a reviewer to copy a pass across configurations. Keep uat-80 and its rejected mapping beside the affected qa-209 recheck and the new uat-82 decision. Preserve each decision in context."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "transfer",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "A different test tool or a small register can carry the same relationships. Give each reusable case a stable reference, and create a separate result for every attempt with its candidate, configuration, actor and actual observation. That structure lets a reviewer find both the pass and its limits."
+          }
+        ]
+      }
+    ]
+  }
+]
