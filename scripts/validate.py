@@ -23,13 +23,13 @@ CORRECTION_PROBES = {"rollback": "recover", "median": "measure",
                      "feature flag": "rollout", "security": "qa-tests"}
 PILOT_PROBES = {"unit test": "ci-unit-tests", "lint": "ci-lint-format", "coverage": "ci-coverage",
                 "SonarQube": "ci-static-analysis", "quality gate": "ci-static-analysis"}
-INTEGRATION_PROBES = {"bug": "defect-report", "severity": "defect-lifecycle",
-                      "regression": "regression-scope", "test case": "test-case-design",
-                      "Jira status": "flow-jira-status", "hotfix": "hotfix-flow"}
+PROVE_PROBES = {"bug": "defect-report", "severity": "defect-lifecycle",
+                      "regression": "regression-scope", "test case": "test-case-design"}
+INTEGRATION_PROBES = {"Jira status": "flow-jira-status", "hotfix": "hotfix-flow"}
 
 
 def search_probes(integration):
-    probes = {**CORRECTION_PROBES, **PILOT_PROBES}
+    probes = {**CORRECTION_PROBES, **PILOT_PROBES, **PROVE_PROBES}
     if integration:
         probes.update(INTEGRATION_PROBES)
     return probes

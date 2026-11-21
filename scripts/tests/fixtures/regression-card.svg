@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 650 636">
+  <!-- Original regression-scope card geometry. Its last baseline is inside
+       the card, but its rendered descenders leave insufficient bottom padding. -->
+  <g data-label-box="">
+    <rect x="22" y="198" width="293" height="111"/>
+    <text x="36" y="304" font-family="Arial,sans-serif" font-size="17">with a new image digest.</text>
+  </g>
+</svg>

@@ -73,6 +73,11 @@ BRANCHES = {
     "notes": [("alert", "Operate the feature"), ("measure", "Assess the outcome")],
     "criteria": [("branch", "Criteria agreed"), ("define", "Objective needs work")],
     "ci": [("merge", "Checks pass"), ("branch", "Checks fail")],
+    "test-management-structure": [("evidence-record", "Inspect the downloadable qualification record")],
+    "defect-report": [("defect-lifecycle", "Hand the failed execution to triage")],
+    "regression-scope": [("uat-planning", "Return the qualified candidate to business testing")],
+    "uat-planning": [("policy", "Hand accepted UAT evidence to the release authority")],
+    "config-change-qualification": [("rollout", "Deploy the authorized configuration"), ("smoke", "Verify routing after the change")],
     "qa-tests": [("uat-promotion", "QA passes"), ("hold", "QA fails"), ("digest", "Trace the candidate backwards"), ("evidence-record", "Inspect a worked record")],
     "uat-decision": [("validation-summary", "Business accepts"), ("hold", "Business rejects")],
     "hold": [("branch", "Repair the change"), ("qa-tests", "Requalify the candidate")],
@@ -261,11 +266,11 @@ def tour_page(topics):
         if slug == "qualification" and "hold" in topics:
             items.append(topic_link(topics,"hold",label="Failure path: hold and requalify"))
             keys = (*keys, "hold")
-        # Define lessons share this tour stop, including the Jira and design lessons
-        # reached from tool and phase overviews on the map.
-        if slug == "intent":
+        # These stops also teach lessons whose map parents are tools or policies.
+        if slug in {"intent", "qualification"}:
+            section_phase = "Define" if slug == "intent" else "Prove"
             children = [topic_link(topics, key) for key, item in topics.items()
-                        if item.get("kind") == "deep-dive" and item["phase"] == "Define"]
+                        if item.get("kind") == "deep-dive" and item["phase"] == section_phase]
         else:
             children = [topic_link(topics, child) for key in keys for child in child_ids(topics, key)]
         deeper = f'<div class="tour-deeper"><strong>Go deeper</strong><div class="topic-links">{"".join(children)}</div></div>' if children else ""
@@ -337,7 +342,9 @@ def topic_page(key, topics, area_by_id):
     elif kind == "flow":
         nav_name = "Flows"
         same_phase = [topics[k] for k in keys]
-    if key in BUILD_READING_ORDER:
+    if kind == "deep-dive" and phase == "Prove":
+        keys = [k for k, item in topics.items() if item.get("kind") == kind and item["phase"] == phase]
+    elif key in BUILD_READING_ORDER:
         keys = [topic_id for topic_id in BUILD_READING_ORDER if topic_id in topics]
     elif parent:
         keys = [topic_id for topic_id in keys if topic_id not in BUILD_READING_ORDER]
@@ -381,6 +388,8 @@ def topic_page(key, topics, area_by_id):
     tour_id = next((s[0] for s in TOUR if map_key in s[4]), None)
     if t.get("kind") == "deep-dive" and phase == "Define":
         tour_id = "intent"
+    elif kind == "deep-dive" and phase == "Prove":
+        tour_id = "qualification"
     result.append(section("next-decision","Follow the workflow",
                           (f'<ul class="handoffs">{choices}</ul>' if choices else '')+
                           (f'<a href="../tour.html#{tour_id}">Open this stop in the guided tour</a> · ' if tour_id else '')+

@@ -16,9 +16,11 @@ def label(x, y, text, size=16, bold=False):
 
 
 def status(x, y, text, width=158):
+    parts.append('<g data-label-box="">')
     parts.append(f'<rect x="{x}" y="{y}" width="{width}" height="36" rx="6" '
                  'fill="white" stroke="#98adbe"/>')
     label(x + 10, y + 24, text, 16, True)
+    parts.append("</g>")
 
 
 def arrow(path):

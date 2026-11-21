@@ -17,9 +17,11 @@ def text(x, y, words, size=16, bold=False, color="#173251"):
 
 def card(y, title, record, decision=False):
     color = "#deefec" if decision else "white"
+    parts.append('<g data-label-box="">')
     parts.append(f'<rect x="22" y="{y}" width="319" height="66" rx="7" fill="{color}" stroke="#9aafbd"/>')
     text(36, y + 26, title, 19, True)
     text(36, y + 51, record)
+    parts.append("</g>")
 
 
 def arrow(path):
@@ -40,7 +42,7 @@ for i, (title, record) in enumerate(rows):
     if i:
         arrow(f"M173 {y - 24} V{y - 5}")
 arrow("M342 183 H377")
-parts.append('<rect x="383" y="132" width="260" height="223" rx="7" fill="#eef1f6" stroke="#b2c1d0"/>')
+parts.append('<g data-label-box=""><rect x="383" y="132" width="260" height="223" rx="7" fill="#eef1f6" stroke="#b2c1d0"/>')
 text(397, 161, "Evidence about the image", 17, True)
 for i, (label, answer) in enumerate([
         ("Scan", "Which known risks were found?"),
@@ -49,6 +51,7 @@ for i, (label, answer) in enumerate([
     y = 198 + 60 * i
     text(397, y, label, 16, True)
     text(397, y + 22, answer, 15)
+parts.append("</g>")
 text(22, 513, "The test result links the running image and its configuration to what QA observed.", 15)
 parts.append("</svg>")
 Path(__file__).with_suffix(".svg").write_text("\n".join(parts) + "\n")
