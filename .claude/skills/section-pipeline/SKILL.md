@@ -9,4 +9,4 @@ The orchestrator carries the brief across roles. Start the architect, then the s
 
 Start the confidentiality, accuracy and editorial reviewers in separate contexts when the runtime supports it. Provide the published-facing artifacts, sources and rubric. The author resolves findings and the reviewer checks the corrections. Record who performed each review and any combined roles accurately. Repeat until the section passes or a concrete blocker requires an owner decision.
 
-For this project, an accepted section advances immediately to the next section. The owner requested one final review of the assembled site. The final source-bound edition review and live site are the handoff. Capture unresolved exceptions explicitly; never generate an acceptance from the absence of a test failure.
+At Gate 1 present the inventory. At Gate 2 present the built six-lesson CI pilot. At Gate 3 submit each section separately. Stop for the owner at each gate. Use the nine-part report in project/DEPTH-PLAN.md §11 and include actual reviewer findings and CI results. Bind the integrated edition only after Gate 4 approval.

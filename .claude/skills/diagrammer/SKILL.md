@@ -13,3 +13,5 @@ description: "Make the approved swimlane navigable and maintain its text equival
 ## Return
 
 Updated map assets or hotspot records with a tested equivalent navigation route.
+
+Commit each instructional figure as SVG alongside its editable source (.mmd or generation script). Supply alt text and a text equivalent that names each decision and route. Inspect readability at phone width.

@@ -73,3 +73,42 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,su
 .crumb { flex-wrap: wrap; margin-bottom: 12px; }
 .crumb .phase-name:hover { text-decoration: underline; }
 .lesson code { font-family: var(--mono); font-size: .91em; overflow-wrap: anywhere; }
+
+.tour-deeper { border-top: 1px solid var(--line); padding-top: 12px; }
+.tour-deeper .topic-links { margin-top: 4px; }
+.detail-section { overflow-wrap: anywhere; }
+.detail-section :is(.code-sample, .detail-figure, .table-scroll, .detail-callout) { margin: 1rem 0; }
+.table-scroll, .code-sample pre { max-width: 100%; overflow-x: auto; }
+.table-scroll table { width: 100%; border-collapse: collapse; font-size: .96rem; }
+.table-scroll caption, .code-sample figcaption, .detail-figure figcaption {
+  text-align: left; color: var(--ink-2); line-height: 1.45;
+}
+.table-scroll caption { padding-bottom: .5rem; font-weight: 700; }
+.table-scroll :is(td, th) { padding: 8px 10px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+.table-scroll th { background: var(--bg-3); }
+.table-scroll td { min-width: 8em; }
+.code-sample { border: 1px solid var(--line); border-radius: 6px; background: var(--paper); }
+.code-sample figcaption { padding: 9px 14px; border-bottom: 1px solid var(--line); }
+.code-sample figcaption strong { color: var(--accent-ink); margin-right: .5em; }
+.code-sample pre { padding: 12px 14px; margin: 0; line-height: 1.45; tab-size: 4; }
+.code-sample pre code { white-space: pre; overflow-wrap: normal; }
+.detail-figure img { display: block; margin: 0 auto .5em; }
+.figure-description { margin: -.4em 0 1em; }
+.figure-description summary, .mobile-contents summary { cursor: pointer; color: var(--link); font-weight: 700; }
+.detail-callout { padding: 12px 16px; border-left: 3px solid var(--accent); background: var(--accent-bg); }
+.detail-callout strong { color: var(--accent-ink); }
+.detail-callout p { margin: 3px 0 0; }
+.mobile-contents { display: none; }
+@media screen and (max-width: 1200px) {
+  .mobile-contents { display: block; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+  .mobile-contents ul { list-style: none; padding: 0; margin: .35em 0 0; }
+  .mobile-contents a { display: block; padding: .25em 0; }
+}
+@media screen and (max-width: 960px) {
+  .docs .lesson { width: 100%; }
+}
+@media print {
+  .table-scroll, .code-sample pre { overflow: visible; }
+  .code-sample pre code { white-space: pre-wrap; overflow-wrap: anywhere; }
+  .table-scroll td { min-width: 0; }
+}

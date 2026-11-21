@@ -13,3 +13,5 @@ description: "Independently review the learning experience for clarity and cover
 ## Return
 
 Editorial verdict with reader tasks, findings and observed results.
+
+Answer the applicable questions in DEPTH-PLAN.md §10 as a learner using only the built pages. Record the question number, answer, page and any inference required. Recheck corrected pages.

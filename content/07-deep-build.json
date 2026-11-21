@@ -1,0 +1,1165 @@
+[
+  {
+    "id": "ci-pipeline-anatomy",
+    "kind": "deep-dive",
+    "parent": "ci",
+    "audience": [
+      "Business Analyst",
+      "Developer",
+      "CI Maintainer"
+    ],
+    "title": "Read a pull request’s CI pipeline",
+    "phase": "Build",
+    "activity": "Dev",
+    "summary": "On PR-42, five checks can pass while the change is still blocked. Read the checks beside the proposed revision, find the result the merge rule is waiting for, and follow it back to the job that produced it.",
+    "owner": "The change author investigates code and tests. The CI maintainer handles the workflow, runner and reporting failures. The repository maintainer configures the required checks on main.",
+    "inputs": [
+      "PR-42 for CC-123, targeting main",
+      "The workflow in .github/workflows/, its event and checked-out revision",
+      "Pinned test dependencies, synthetic routing data and the required check names on main"
+    ],
+    "steps": [
+      "Open PR-42’s Checks tab and select the run for the current proposal. Confirm the event and tested revision in its log.",
+      "Compare the named results with the rule for main. Open the first unsatisfied requirement and inspect its job steps or report.",
+      "After repair, follow the new push through the same checks. Record the qualifying run on CC-123 and hand the PR to its reviewer."
+    ],
+    "evidence": "Keep the PR link, tested revision, run URL, named check conclusions and any retained report needed to explain a failure. An older run still explains its own revision.",
+    "example": "For CC-123 the unit suite passes, yet only 31 of 50 new executable lines ran. The custom new-line coverage check blocks PR-42 under the team’s 80% rule.",
+    "failure": "A red required check holds the merge. A missing result also needs investigation. The author checks the current event, checkout and job name before deciding whether code or workflow needs repair.",
+    "measure": "Measure the interval from a PR update to the first actionable failure. Compare runner queue time with execution time so a slow queue is visible.",
+    "sources": [
+      {
+        "title": "Workflow syntax for GitHub Actions",
+        "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax"
+      },
+      {
+        "title": "Events that trigger workflows",
+        "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows"
+      },
+      {
+        "title": "About protected branches",
+        "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches"
+      },
+      {
+        "title": "Dependency caching",
+        "url": "https://docs.github.com/en/actions/concepts/workflows-and-actions/dependency-caching"
+      },
+      {
+        "title": "Store and share data with workflow artifacts",
+        "url": "https://docs.github.com/en/actions/tutorials/store-and-share-data"
+      }
+    ],
+    "detail": [
+      {
+        "id": "read-the-run",
+        "title": "Which change did the team test?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Opening a pull request or pushing another commit to its branch starts the example workflow. A runner is the machine that does a job. Reading the pull request tells a reviewer what the developer proposes. Reading the run tells them which combination of application code, tests and base branch the machine actually exercised. Allow minutes for fast checks on this small service, plus any time spent waiting for an available runner. Use the run’s timestamps for the actual wait."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "A check belongs to a revision. A passing run beside an earlier version of the proposal cannot answer a question about the version now awaiting review."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "On an open, mergeable pull request the pull_request event supplies a temporary merge commit. The default checkout in this workflow tests the proposed head combined with the event’s base. The head SHA identifies the author’s tip. The merge SHA identifies the combination CI examined."
+          },
+          {
+            "type": "text",
+            "value": "The example records the checkout with git rev-parse HEAD. Compare it with the run’s event SHA, and keep the base and head from that event when diagnosing changed files. GitHub can construct a different temporary merge when either side changes. The integrated source subsequently used by build-418 is 3ab862b…; the earlier PR check does not establish the identity of the eventual release image."
+          }
+        ]
+      },
+      {
+        "id": "jobs-and-steps",
+        "title": "What can run in parallel?",
+        "blocks": [
+          {
+            "type": "figure",
+            "src": "assets/figures/ci-pipeline.svg",
+            "alt": "PR-42 check dependencies, showing which revisions the checks inspect and which results control merge.",
+            "caption": "Checks on PR-42 under the example team policy",
+            "text_equivalent": "Opening or updating PR-42 starts five parallel checks. Unit tests, lint and the informational type check use the test merge revision. The quality gate analyzes the PR head against the target. Dependency review compares PR revisions. Unit tests produce coverage.json for the new-line coverage check. Merge requires unit tests, lint, new-line coverage, quality gate and dependency review."
+          },
+          {
+            "type": "text",
+            "value": "Within one job, steps run in order on the same runner. Independent jobs can use different runners, so the lint job need not wait for tests. The changed-line calculation needs the execution data collected by those tests. Its job depends on unit tests and downloads their report. The new-bug condition can be evaluated independently by SonarQube. The repository rule consumes named check results as they arrive. The scanner checks out the PR head with full history and the target branch available so it can compare them. Dependency review inspects the change in dependencies between the PR revisions. These jobs record the inputs they compared."
+          }
+        ]
+      },
+      {
+        "id": "workflow-file",
+        "title": "Read the workflow from event to report",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "This excerpt shows the producing side of the coverage handoff. A runner checks out the event revision, installs the service’s pinned test tools and runs pytest under coverage.py. The example project configures pytest to discover its unit suite, and .coveragerc enables branch measurement for src/routing. The resulting JSON includes executed and missing executable lines for the service."
+          },
+          {
+            "type": "code",
+            "language": "yaml",
+            "caption": "Illustrative Python workflow excerpt · .github/workflows/pr-checks.yml",
+            "value": "name: PR checks\non:\n  pull_request:\n    branches: [main]  # target branch\npermissions:\n  contents: read\njobs:\n  unit:\n    name: unit tests  # check selected by the rule on main\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: git rev-parse HEAD\n      - uses: actions/setup-python@v5\n        with:\n          python-version: '3.12'\n          cache: pip\n          cache-dependency-path: requirements-ci.txt\n      - run: python -m pip install -r requirements-ci.txt\n      - run: coverage run -m pytest\n      - run: coverage json -o coverage.json\n      - uses: actions/upload-artifact@v4\n        with:\n          name: unit-coverage-${{ github.sha }}\n          path: coverage.json\n          if-no-files-found: error"
+          },
+          {
+            "type": "text",
+            "value": "The consumer job declares needs: unit and downloads the artifact named for this run’s test merge SHA. It checks that identity against its checkout. The custom checker compares the recorded target base with the tested tree, matches changed lines to the report’s executed and missing lines, and counts the executed share. It fails if an in-scope file is missing from the report. Each job declares the repository access it requires. The unit job only needs read access to the source and no production credentials."
+          },
+          {
+            "type": "text",
+            "value": "A cache avoids repeated package downloads. Installation still uses the pinned requirements after a cache hit or miss. The JSON report is a run artifact. It carries measurements from one job to the next and can be retained for inspection. Reusing the last run’s coverage report after a new push would attach old evidence to different code."
+          }
+        ]
+      },
+      {
+        "id": "merge-decision",
+        "title": "Read the checks list on the pull request",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "Illustrative PR-42 checks after a push, before the coverage gap is repaired",
+            "columns": [
+              "Check on the PR",
+              "Example result",
+              "Effect under the team's main-branch rule"
+            ],
+            "rows": [
+              [
+                "unit tests",
+                "Passed",
+                "Required. The unit suite completed successfully."
+              ],
+              [
+                "lint",
+                "Passed",
+                "Required. The configured lint and format checks passed."
+              ],
+              [
+                "new-line coverage",
+                "Failed · 31/50 (62%)",
+                "Required. The measured share of new executable lines fell below 80%."
+              ],
+              [
+                "quality gate",
+                "Passed",
+                "Required. SonarQube reported a passing gate for the change, including its condition on new bugs."
+              ],
+              [
+                "dependency review",
+                "Passed",
+                "Required. Dependency review found no newly introduced vulnerability of High or Critical severity."
+              ],
+              [
+                "type check",
+                "Passed",
+                "Informational. The author reads mypy’s diagnostics. A failed type check alone does not prevent merge."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "In this example the repository maintainer requires the five named results on main. Each required check is designed to execute and pass on an applicable PR. The type check has its own visible result. Its advisory role comes from its absence from the required list."
+          },
+          {
+            "type": "text",
+            "value": "GitHub branch protection can accept successful, skipped or neutral conclusions for a required check. A workflow that never starts can instead leave its required result pending. If a check under this policy unexpectedly says skipped, inspect the job conditions even if the merge control is available. A report that never ran supplies no evidence for the associated criterion."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Work through a blocked PR-42",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The reviewer sees the failed new-line coverage row and opens its details. The calculation completed on the intended test merge. It found 50 new executable lines and matched execution hits to 31. This sends the change back to the author with uncovered file locations. Rerunning the same revision would repeat the calculation. The author follows an uncovered routing path, writes a test that submits an unassigned request and checks the first assignment, then pushes the change and inspects the fresh report."
+          },
+          {
+            "type": "text",
+            "value": "If the row is missing instead, check whether the workflow ran for this target branch, whether the named job matches the required check and whether its producer finished. A job that reports against an explicit checkout of an older SHA needs a workflow correction and a new run. The CI maintainer handles that repair. The developer keeps CC-123 In review and adds a web link to PR-42 and the failing run, including the tested revision, cause and next action. Add the replacement run when available. The move to Ready for QA follows integration and recording the build digest."
+          }
+        ]
+      },
+      {
+        "id": "pitfalls",
+        "title": "Two misleading shortcuts",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "A green workflow headline can conceal the difference between a required check and an unrelated success. Read the branch’s required names against the actual results on this PR. A package-cache hit can also look like qualification of a previously tested version. Check which revision ran the assertions and which run produced the coverage artifact before accepting the result."
+          }
+        ]
+      },
+      {
+        "id": "transfer",
+        "title": "Carry the decision to another CI system",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Find the event, the checkout and the producer of each named result. Trace the dependency only where one job consumes another’s output, then locate the repository rule that turns a result into a merge decision."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ci-unit-tests",
+    "kind": "deep-dive",
+    "parent": "ci",
+    "audience": [
+      "Developer",
+      "QA Engineer",
+      "Business Analyst"
+    ],
+    "title": "Read and repair a failing unit test",
+    "phase": "Build",
+    "activity": "Dev",
+    "summary": "A useful routing test can distinguish a rule that assigned a request from a person who happened to select the right approver. Follow a red unit tests check on PR-42 from the failing assertion to a repair that demonstrates AC-01.",
+    "owner": "The change author reads and repairs a failed test or the application behavior it exposed. The reviewer checks that the assertions still express CC-123’s agreed criteria.",
+    "inputs": [
+      "AC-01 and AC-02 on CC-123, with distinct requester, authorized approver and unrelated employee identities",
+      "The checked-out PR revision, pinned pytest dependencies, and clean per-test service fixtures",
+      "The failed unit tests job with its pytest output and run link"
+    ],
+    "steps": [
+      "Open PR-42 → Checks → unit tests. Open the failed pytest step and read the test name, assertion and reported values.",
+      "Match the assertion to the criterion. Inspect the starting state and the action before deciding whether the defect lies in the application, the test or its fixture.",
+      "Reproduce the named test locally with the same dependencies. Repair it, run its neighbors, then push and check the full suite on the new PR revision."
+    ],
+    "evidence": "The job log identifies the checked-out revision, test file, function and failed assertion. The follow-up run shows that the corrected test passed as part of the suite on the updated proposal.",
+    "example": "A preassigned fixture hid a missing assignment during submission. The corrected test starts unassigned and asks who made the first assignment and who received it. A separate permission test checks that a refused attempt left the request pending.",
+    "failure": "A required unit tests job that exits with an error holds the merge. The change author keeps CC-123 In review while repairing the test, the behavior or the fixture. An installation or runner failure goes to the CI maintainer.",
+    "measure": "Count intermittent failures separately from reproducible behavior defects. During review, check whether disabling automatic assignment would make the routing assertion fail.",
+    "sources": [
+      {
+        "title": "How to write and report assertions in tests",
+        "url": "https://docs.pytest.org/en/stable/how-to/assert.html"
+      },
+      {
+        "title": "Flaky tests",
+        "url": "https://docs.pytest.org/en/stable/explanation/flaky.html"
+      },
+      {
+        "title": "unittest.mock — mock object library",
+        "url": "https://docs.python.org/3/library/unittest.mock.html"
+      }
+    ],
+    "detail": [
+      {
+        "id": "what-runs",
+        "title": "Which question does a unit test answer?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The unit here is the Python service operation that receives a submission and applies the routing rule. The test calls it directly with a small set of values. It can tell the reviewer whether this operation selected the Purchasing approver for an eligible unassigned request. It leaves the real directory, database connection, browser and deployment configuration for tests that exercise those boundaries. A business analyst can judge the test by reading its starting condition, the action and the outcome it checks."
+          },
+          {
+            "type": "text",
+            "value": "The developer can run a single case on a laptop before pushing. On each update to PR-42 the CI runner installs the pinned test dependencies and runs all unit cases on the test merge revision. A focused in-memory case normally takes a fraction of a second in this example; allow seconds for pytest startup and minutes for a clean job including setup. No production account, network directory or deployment permission is needed."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "Arrange the facts that exist before the user acts. Act through the operation named by the criterion. Assert an outcome that could only have arisen through the behavior being tested."
+          }
+        ]
+      },
+      {
+        "id": "boundaries",
+        "title": "Choose what the test may set up",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "AC-01 begins with an eligible request that has no assignee. A directory may already contain a mapping from Purchasing to the Purchasing approver. That mapping is a legitimate input because it tells the rule what to look up. Writing the approver onto the request during setup would complete the very action the test is meant to observe. The expected recipient comes from the agreed example, independently of the service’s answer."
+          },
+          {
+            "type": "text",
+            "value": "AC-02 starts later in the journey. For that question a pending request may already have a designated approver. The separate facts are who tries to decide and whether the stored decision changes. Give the unauthorized actor their own identity. If the denial message looks correct but a fresh read shows an approval, the permission criterion failed."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "A Python Mock can stand in for a collaborator and return a configured answer when the service calls it. pytest reports the values involved in a failed Python assert. Read those values alongside the test setup before assigning the failure to application code."
+          }
+        ]
+      },
+      {
+        "id": "routing-case",
+        "title": "AC-01 · submit first, then read the assignment",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "This example uses the service’s real submission logic, a directory double with a fixed lookup result, and a fresh in-memory store supplied by the service_factory fixture. The fixture creates an empty store for each test. new_purchase creates an eligible, unassigned draft. assignments reads recorded assignment events in their original order, including the actor. Slicing the first event gives an empty list if the rule recorded nothing."
+          },
+          {
+            "type": "code",
+            "language": "python",
+            "caption": "Illustrative Python and pytest · tests/unit/test_routing.py",
+            "value": "from unittest.mock import Mock\n\n\ndef test_submission_assigns_purchasing(service_factory, new_purchase):\n    # Arrange\n    directory = Mock(spec_set=[\"approver_for\"])\n    directory.approver_for.return_value = \"Purchasing approver\"\n    service = service_factory(directory=directory)\n    draft = new_purchase(unit=\"Purchasing\", assignee=None)\n\n    # Act\n    request_id = service.submit(draft, actor=\"requester\")\n\n    # Assert the first assignment from the stored event history\n    events = service.assignments(request_id)\n    first = [(event.actor, event.recipient) for event in events[:1]]\n    assert first == [(\"routing-rule\", \"Purchasing approver\")]\n    directory.approver_for.assert_called_once_with(\"Purchasing\")"
+          },
+          {
+            "type": "text",
+            "value": "The final assertion checks the lookup argument as well as the visible outcome. The double would otherwise return the same answer for any unit, hiding a lookup against the wrong key. A directory integration test still has to verify that a real lookup for that key returns the intended group."
+          }
+        ]
+      },
+      {
+        "id": "permission-case",
+        "title": "AC-02 · inspect state after the denied attempt",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The permission test gives an unrelated employee a pending request to act on. Here pending_purchase creates a fresh stored request on the same service and grants the designated approver the decision role. The example service returns a denial outcome and exposes the stored status and decision history. Separate assertions preserve both pieces of evidence."
+          },
+          {
+            "type": "code",
+            "language": "python",
+            "caption": "Illustrative Python and pytest · tests/unit/test_permissions.py",
+            "value": "def test_unrelated_employee_cannot_decide(service, pending_purchase):\n    # Arrange\n    request_id = pending_purchase(service, approver=\"Purchasing approver\")\n\n    # Act\n    result = service.decide(request_id, actor=\"unrelated employee\",\n                            decision=\"approve\")\n\n    # Assert against the response and a fresh read of stored state\n    assert result.outcome == \"denied\"\n    stored = service.get_request(request_id)\n    assert stored.status == \"pending\"\n    assert stored.decisions == []"
+          },
+          {
+            "type": "text",
+            "value": "These examples focus on the routing and denial questions. A separate allowed-path case should show the authorized approver can record a decision. A service that refused every user would pass the denial case by itself."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Open the red unit tests check on PR-42",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "During review the developer finds that the old test set the assignee directly and then checked the final recipient. The reviewer asks what would happen if submission never called the rule. The developer removes the manual assignment, submits the draft and pushes the AC-01 test above. In this illustrative failure, the revised assertion exposes an empty history. PR-42’s Checks tab links to unit tests; expand the pytest step and read its final failure entry."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative pytest failure excerpt · assertion from the routing case",
+            "value": ">       assert first == [(\"routing-rule\", \"Purchasing approver\")]\nE       AssertionError: assert [] == [('routing-rule', 'Purchasing approver')]\nE         Right contains one more item: ('routing-rule', 'Purchasing approver')\nFAILED tests/unit/test_routing.py::test_submission_assigns_purchasing"
+          },
+          {
+            "type": "text",
+            "value": "The left side is the actual list of first assignments: empty. The expected list contains the routing-rule event and the Purchasing approver. Open tests/unit/test_routing.py, then follow service.submit into the service code. Verify the draft starts unassigned, the rule runs for this eligible unit, and its event is saved to the store the assertion reads. If the submission path omitted the rule, restore that call. Keep the corrected fixture so this defect will be detected again."
+          },
+          {
+            "type": "code",
+            "language": "shell",
+            "caption": "Illustrative Python command · reproduce the named assertion locally",
+            "value": "python -m pytest -q tests/unit/test_routing.py::test_submission_assigns_purchasing"
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The full unit suite must execute successfully for the current PR revision under this team’s main-branch rule. The developer records a web link on CC-123 to PR-42 and the failed run, with the criterion and test name. Keep the story In review, and append the passing replacement run after the push. Ready for QA follows integration and the recorded build digest."
+          }
+        ]
+      },
+      {
+        "id": "flaky-tests",
+        "title": "When the same revision both passes and fails",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Preserve both run links, the revision, dependencies, fixture inputs and execution order. Look for state that survives between tests: a module-level in-memory store might allow one case to see an assignment written by another. Run the case alone and after its usual predecessor on the same revision. Give each case a clean store, then repeat both sequences. If the failure happens before pytest starts, inspect the checkout or dependency step and involve the CI maintainer."
+          },
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "Retrying until the check turns green discards the timing or ordering clue. Stubbing service.submit in the routing test would also produce reassuring results even if the real submission path stopped invoking the rule. Keep the failed evidence and replace only the external collaborator."
+          }
+        ]
+      },
+      {
+        "id": "transfer",
+        "title": "Use the same test in another stack",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Identify the operation that owns the decision, make its external inputs controllable, and observe the effect through a fresh read. A different test runner can report the same three facts to a reviewer: the starting state, the action and the mismatch between actual and expected results."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ci-lint-format",
+    "title": "Resolve a lint or formatting failure",
+    "phase": "Build",
+    "activity": "Dev",
+    "kind": "deep-dive",
+    "parent": "ci",
+    "audience": [
+      "Developer",
+      "Reviewer",
+      "CI maintainer"
+    ],
+    "summary": "PR-42 flags an unused import in a file the author never edited. Read the diagnostic, decide who can safely change the file and find out whether the finding holds the merge. The same checks panel can also show a formatting difference or a type error, each calling for a different edit.",
+    "owner": "The PR author investigates the first failure. The module owner reviews changes outside the feature, and the CI maintainer owns the rule configuration and check scope.",
+    "inputs": [
+      "The PR’s tested revision, target revision, check name and command from the job log",
+      "A read-only checkout, the repository’s Python tool lockfile, pyproject.toml and the paths selected for checking"
+    ],
+    "steps": [
+      "Open the named check on the PR. Read the first diagnostic with its path, location and rule. Confirm the revision, installed tool version and command.",
+      "Reproduce the finding from the repository root. Compare the file and rule configuration with the target revision to find out why a whole-tree check reported it.",
+      "Make a scoped correction with the file owner, review the diff and run both Ruff commands. Push the fix and inspect the check on the new revision."
+    ],
+    "evidence": "PR-42 retains the failed lint run, the reviewed repair and the new result. On CC-123, the Developer records a web link to the PR and a comment linking the failed run and its replacement.",
+    "example": "The proposed automatic routing uses a Purchasing approver. A whole-tree lint check also visits an older routing helper where a removed audit statement left an unused import. The owner confirms that the import has no registration or public-export role.",
+    "failure": "The required lint check blocks PR-42 while either the linter or the formatter check fails. CC-123 stays In review. A separate type check reports a problem for investigation without blocking this example branch.",
+    "measure": "Measure time from the first red result to a reviewed correction. For recurring findings in unchanged files, group them by rule and checked path before deciding whether the team needs a separate cleanup.",
+    "sources": [
+      {
+        "title": "The Ruff Linter",
+        "url": "https://docs.astral.sh/ruff/linter/"
+      },
+      {
+        "title": "The Ruff Formatter",
+        "url": "https://docs.astral.sh/ruff/formatter/"
+      },
+      {
+        "title": "unused-import (F401)",
+        "url": "https://docs.astral.sh/ruff/rules/unused-import/"
+      },
+      {
+        "title": "Getting started",
+        "url": "https://mypy.readthedocs.io/en/stable/getting_started.html"
+      },
+      {
+        "title": "About protected branches",
+        "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches"
+      }
+    ],
+    "detail": [
+      {
+        "id": "read-the-check",
+        "title": "Read the check before changing code",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "When the pull request opens or receives a new commit, a clean CI runner installs the project’s locked tools and checks the proposed revision. For this small example, budget seconds for Ruff and up to a few minutes for runner setup and type checking. Those are planning estimates. The job log gives the actual timings. A Developer can run the same commands locally before pushing."
+          },
+          {
+            "type": "text",
+            "value": "Read the name of the check as well as the message. A diagnostic identifies something the tool can point to in source. The repository’s merge settings decide whether that result stops the PR. Frozen dependencies and a checkout that the tools can read suffice for these commands. Neither service credentials nor an approval-routing database are inputs."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "The author owns the next action on the proposal. When the finding crosses a code ownership boundary, involve the person who understands the consequences of changing that module."
+          }
+        ]
+      },
+      {
+        "id": "three-kinds-of-feedback",
+        "title": "Choose the repair that matches the finding",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "Three questions about the approval-routing change",
+            "columns": [
+              "Check",
+              "Example finding",
+              "What the author does"
+            ],
+            "rows": [
+              [
+                "Linter · Ruff",
+                "An import of pathlib.Path remains after a helper stopped using filesystem paths.",
+                "Read the F401 location and check why the import is there. Remove it if it has no purpose."
+              ],
+              [
+                "Formatter · Ruff",
+                "A call written as assign( request,approver ) differs from the agreed layout.",
+                "Run the formatter on the affected file. Its output uses assign(request, approver). Review the diff."
+              ],
+              [
+                "Type checker · mypy",
+                "A typed function expects an approver name as a string. A caller passes an integer.",
+                "Trace where the value came from. Correct the caller or the declared contract, then rerun the type check."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "The type checker can accept a perfectly well-typed string that names the wrong approver. The behavior test for AC-01 must still submit an eligible request and check the recipient. A formatter can normalize a call even when its arguments are wrong. These tools answer different questions about the same code."
+          }
+        ]
+      },
+      {
+        "id": "rule-scope",
+        "title": "Read the rules and the two Ruff invocations",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The selected lint rule family below includes checks for unused imports. The CLI arguments select the folders. The default formatter style applies here. Both commands must succeed in the lint job, so the second command runs after the first succeeds."
+          },
+          {
+            "type": "code",
+            "language": "toml",
+            "caption": "Illustrative Python stack · pyproject.toml excerpt",
+            "value": "[tool.ruff.lint]\nselect = [\"F\"]"
+          },
+          {
+            "type": "code",
+            "language": "sh",
+            "caption": "Illustrative Python stack · Required lint job after tool installation",
+            "value": "ruff check --output-format concise src tests &&\n  ruff format --check src tests"
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "Without auto-fix, Ruff check exits 1 for outstanding lint violations. Ruff format --check leaves the files untouched and exits 1 if any would be reformatted. Both return 0 for a clean check. An abnormal exit such as 2 calls for inspecting the options or configuration."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The repository maintainers require unit tests, lint, new-line coverage, quality gate and dependency review for merge. They publish type check as informational. A red lint result blocks this PR. An isolated type check failure is visible and assigned for investigation."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Worked failure · the file is outside the PR diff",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Open PR-42’s Checks view, select lint and open the first failing step. This excerpt identifies a problem in the routing helper. The compact diagnostic gives the source location in the tested checkout, even when the file has no changed line for a reviewer to annotate."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative Python stack · Excerpt from the PR-42 lint log",
+            "value": "src/routing/legacy.py:1:21: F401 [*] `pathlib.Path` imported but unused\nFound 1 error."
+          },
+          {
+            "type": "list",
+            "ordered": true,
+            "items": [
+              "Start at line 1, column 21 of src/routing/legacy.py. In this example the first line reads from pathlib import Path. F401 names the rule and the asterisk marks an available fix. The log’s nonzero exit explains the red required check.",
+              "Compare the tested tree with the target. The PR changed the submission handler, but the lint command examines all of src and tests. Reproduce on the target with the same configuration and version. If it also fails there, record that evidence so the owner can distinguish existing debt from a new regression.",
+              "Ask the module owner about the import. In this example it is an ordinary leftover. With the owner’s review, remove only that line on PR-42, run lint and formatter checks, and rerun the routing tests. For a broader cleanup, agree a separate tracked change and rerun PR-42 after the base is corrected. A ticket alone leaves the required failure in place.",
+              "Keep CC-123 In review and retain a web link to PR-42. Add the failed lint run and the corrected run to the issue comment. Merge becomes possible only when the current revision meets all required checks and review rules. Ready for QA follows integration and the identified build."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "safe-local-fixes",
+        "title": "Apply automatic fixes to a reviewable diff",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "A Developer can run ruff check --fix on the one file and inspect the resulting patch. Ruff applies fixes it classifies as safe by default. Confirm that the patch preserves the intended module interface, especially when an import is exposed for other callers. For a formatting-only difference, run ruff format on the affected file and inspect its edits before staging them."
+          },
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "Adding --exit-zero to silence an old violation can leave the job green while the violation still exists. Formatting the entire repository from a local editor can bury a one-line feature fix in unrelated changes and make its review harder."
+          },
+          {
+            "type": "text",
+            "value": "With another language, find the tool that reports rule violations, the one that normalizes layout and the one that checks type contracts. Reproduce the exact check on the tested revision and read the branch’s required-check list before deciding who can unblock the change."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ci-coverage",
+    "title": "Read coverage on the lines a PR changes",
+    "phase": "Build",
+    "activity": "Dev",
+    "kind": "deep-dive",
+    "parent": "ci",
+    "audience": [
+      "Developer",
+      "Reviewer",
+      "QA Engineer",
+      "CI maintainer"
+    ],
+    "summary": "PR-42 exercises 31 of its 50 new executable lines. The required new-line coverage check fails at 62% because the team set an 80% minimum. Read the report to locate untested behavior, then inspect what the tests actually prove about automatic assignment.",
+    "owner": "The Developer owns missing behavior tests. The reviewer checks their starting state and assertions. Repository maintainers set the merge policy, and the CI maintainer owns the collection and comparison jobs.",
+    "inputs": [
+      "The exact tested tree, its recorded target base, the proposed change and the service’s source paths",
+      "The unit test run for that tree, coverage.py data with executable, executed and missing lines, and the team’s new-line threshold"
+    ],
+    "steps": [
+      "Read the numerator, denominator and scope printed by new-line coverage. Follow the check to the report, then to the changed source lines it marked missing.",
+      "Choose a missing behavior and write a test that would fail if it were broken. Check the test’s starting state, action and observations against the acceptance criterion.",
+      "Push the revision, collect fresh data, and link the failed and replacement results to the PR. Review behavioral evidence separately from the arithmetic."
+    ],
+    "evidence": "The run retains the tested revision and base, line report, list of uncovered changed lines, check outcome and unit test output. A reviewer can repeat the calculation and inspect the assertions run on that revision.",
+    "example": "AC-01 requires automatic assignment at submission. A fixture that sets the Purchasing approver directly can turn every line of a small routing function green while hiding a missing or incorrect automatic assignment.",
+    "failure": "At 31 of 50, the required new-line coverage check holds the merge of PR-42. CC-123 stays In review. The loss of coverage evidence also requires investigation before an applicable change may pass.",
+    "measure": "Track what happened to the uncovered paths in review. A checked denial result and unchanged pending state provide stronger evidence for AC-02 than another execution of the already-covered successful approval path.",
+    "sources": [
+      {
+        "title": "Branch coverage measurement",
+        "url": "https://coverage.readthedocs.io/en/latest/branch.html"
+      },
+      {
+        "title": "Configuration reference",
+        "url": "https://coverage.readthedocs.io/en/latest/config.html"
+      },
+      {
+        "title": "JSON reporting: coverage json",
+        "url": "https://coverage.readthedocs.io/en/latest/commands/cmd_json.html"
+      },
+      {
+        "title": "Quality gates",
+        "url": "https://docs.sonarsource.com/sonarqube-server/2025.1/instance-administration/analysis-functions/quality-gates"
+      },
+      {
+        "title": "About protected branches",
+        "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches"
+      }
+    ],
+    "detail": [
+      {
+        "id": "what-coverage-observes",
+        "title": "Understand what the report counts",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "When PR-42 opens or receives a push, its unit tests run on a CI runner. A collector observes which statements execute while the tests exercise the service. For this small example, allow a few minutes for the suite and seconds for the comparison after results arrive. Those times are planning estimates. A Developer can repeat the collection locally using the same checkout, dependencies and selection of tests."
+          },
+          {
+            "type": "table",
+            "caption": "Three percentages a reviewer might encounter",
+            "columns": [
+              "Measure",
+              "Numerator and denominator",
+              "Question it answers"
+            ],
+            "rows": [
+              [
+                "Overall line coverage",
+                "Executed executable source lines divided by all executable source lines in scope.",
+                "How much of the measured service did this suite reach? A large stable module can dominate the total."
+              ],
+              [
+                "New-line coverage",
+                "Executed new executable lines divided by all new executable lines in the PR diff.",
+                "How much of this change did the suite reach? This is the example merge threshold."
+              ],
+              [
+                "Branch coverage",
+                "Taken branch destinations divided by possible branch destinations in scope.",
+                "Did execution leave each decision in the possible directions? A permission check exercised only by an authorized user misses the denial path."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "With branch measurement enabled, the main percentage in a coverage.py text report combines statements and branch destinations. Use the separate line counts for a line-only calculation. A whole-report fail_under setting applies to that report’s total."
+          }
+        ]
+      },
+      {
+        "id": "how-the-check-runs",
+        "title": "Collect once and compare the same tree",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The test job needs a read-only checkout, the locked Python dependencies and write access to its temporary report directory. It measures the service package, including eligible modules the suite never imports. It exports coverage.json with the tested revision as artifact metadata. The comparison job reads that artifact and Git history for the target and tested trees. Neither job needs production access."
+          },
+          {
+            "type": "code",
+            "language": "ini",
+            "caption": "Illustrative Python stack · Collection settings in .coveragerc",
+            "value": "[run]\nbranch = True\nsource = src/routing"
+          },
+          {
+            "type": "code",
+            "language": "sh",
+            "caption": "Illustrative Python stack · Commands in the unit test job",
+            "value": "coverage run -m pytest\ncoverage json -o coverage.json"
+          },
+          {
+            "type": "text",
+            "value": "The next command is the interface of this example team’s custom CI script. BASE_SHA is the target revision used to build this test merge, and TESTED_SHA is that test merge. The job checks out TESTED_SHA. It verifies that the report belongs to the same revision, so it can compare destination-side diff line numbers with measured line numbers in the same files."
+          },
+          {
+            "type": "code",
+            "language": "sh",
+            "caption": "Illustrative Python stack · Threshold setting in the required new-line coverage job",
+            "value": "python ci/new_line_coverage.py --base \"$BASE_SHA\" --tested \"$TESTED_SHA\" \\\n  --report coverage.json --minimum 80"
+          },
+          {
+            "type": "text",
+            "value": "For each measured source path, the script takes added-side lines, including replacements, from the base-to-tested diff. It intersects them with executed plus missing executable lines after exclusions, then counts how many of that set appear in executed lines. Deleted lines, comments and blank lines contribute nothing. A missing in-scope source file in the report or a revision mismatch fails the job as an input error. A valid comparison with zero new executable lines reports that the rule does not apply and exits successfully."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Worked failure · 31 of 50 new executable lines",
+        "blocks": [
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative Python stack · PR-42 comparison job summary",
+            "value": "check: new-line coverage\nexecuted new executable lines: 31\nall new executable lines:      50\nmissing new executable lines:  19\nresult: 62% (required minimum: 80%)\nFAIL — below threshold"
+          },
+          {
+            "type": "text",
+            "value": "The repository maintainers chose an inclusive 80% minimum. The script compares 100 times the executed count with 80 times the total before rounding for display. At an unchanged denominator of 50, at least 40 must execute. Nine more would reach the minimum. Open the missing-line list and identify why tests missed those lines before choosing which test to add."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The required checks are unit tests, lint, new-line coverage, quality gate and dependency review. Type check is informational. The custom new-line coverage job enforces this line-only threshold. SonarQube reports a separate quality gate with its configured conditions. A passing quality gate cannot clear this failed check."
+          },
+          {
+            "type": "text",
+            "value": "The Developer starts by matching one missing path to an acceptance criterion. If the changed path rejects an unauthorized decision, submit a pending request, attempt the decision as the unrelated employee, and check both the denial and the persisted pending state. Commit the test on PR-42 and inspect the counts for the new revision. On CC-123, keep the web link to PR-42, comment with the failed and replacement run links, and retain In review. An automatically improved number alone does not transition the story to Ready for QA."
+          }
+        ]
+      },
+      {
+        "id": "manual-assignment",
+        "title": "How 100% line coverage can miss AC-01",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Suppose submission calls this small routing function. The fixture manually assigns a recipient before submission, and the assertion accepts any assigned recipient. A run can execute every line of the function and pass that assertion even if the rule chooses the wrong group. It can also pass the same assertion if a later edit removes the automatic assignment entirely."
+          },
+          {
+            "type": "code",
+            "language": "python",
+            "caption": "Illustrative Python stack · A weak assertion after a manual assignment",
+            "value": "def route(request, lookup):\n    recipient = lookup(request.unit)\n    request.assign(recipient, actor=\"routing-rule\")\n\nrequest = purchasing_request()\nrequest.assign(\"Purchasing approver\", actor=\"manual\")\nsubmit(request)  # calls route\nassert request.assignee is not None"
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "Coverage tells the reviewer where to look. To establish AC-01, start with an unassigned request, submit it through the real entry point, then read the first assignment event. Its actor must be routing-rule and its recipient must be Purchasing approver."
+          },
+          {
+            "type": "text",
+            "value": "The unit tests lesson under Run CI checks shows the corrected test and its failing assertion. Ask whether changing the selected group or disabling the assignment would make that test fail. That is a useful review even when the report already reads 100%."
+          }
+        ]
+      },
+      {
+        "id": "common-reading-errors",
+        "title": "Recognize misleading results",
+        "blocks": [
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "Comparing a whole-service percentage with the PR’s line threshold can let a large body of old, well-tested code hide new gaps. Counting whether an if statement ran can also hide an untested exit from that decision."
+          },
+          {
+            "type": "text",
+            "value": "A second trap is pairing yesterday’s line report with today’s diff. Adding even a comment can move the measured lines. Preserve both revision identities and regenerate the report after a rebase or a change to the tested tree."
+          },
+          {
+            "type": "text",
+            "value": "In a different language, identify the tool that records execution and the component that decides which changed lines count. Keep their input revisions and pass rule visible, and ask which assertion would detect the business failure."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ci-static-analysis",
+    "title": "Read a failed SonarQube quality gate",
+    "kind": "deep-dive",
+    "parent": "ci",
+    "activity": "Dev",
+    "phase": "Build",
+    "audience": [
+      "Developer",
+      "Reviewer"
+    ],
+    "summary": "PR-42 shows a red quality gate. Follow the check to the new bug that caused it, decide whether the finding describes a defect, and give the reviewer the evidence needed to resume the merge decision.",
+    "owner": "The developer investigates the finding. The quality gate owner maintains the conditions. A reviewer with project-level Administer Issues permission can record a justified false positive.",
+    "inputs": [
+      "PR-42 source commit, target branch, Git history and corresponding SonarQube project",
+      "A Python quality profile, a custom quality gate, a scanner and a project analysis token",
+      "A GitHub repository bound to the SonarQube project for PR reporting, and a required Actions job named quality gate"
+    ],
+    "steps": [
+      "Open PR-42, select Checks and open quality gate. Match the source commit in the job to the PR head. Use the SonarQube report link to open this PR’s analysis.",
+      "Read the failed condition, measured value and threshold. Open the contributing issue and inspect the changed line alongside its surrounding logic.",
+      "Fix a confirmed defect and rerun analysis, or ask an authorized reviewer to resolve a demonstrably mistaken finding. Keep both the failed result and the eventual disposition."
+    ],
+    "detail": [
+      {
+        "id": "what-runs",
+        "title": "What the scanner reads",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "This example uses SonarQube Server 2025.1 Developer Edition in Standard Experience. Opening or updating a pull request starts the quality gate job on a GitHub Actions runner. The scanner analyzes the checked-out source with the project’s active rules and submits its report. The server processes it and evaluates the custom gate. For the small Python service, the team budgets roughly two to five minutes including server processing. Queue time can change that estimate."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "Pull request analysis is available from Developer Edition. For a PR, the comparison is between the source and target branches, and only new-code conditions participate in the gate. A configured GitHub integration can show the gate result on the PR and link to the analysis. The named Actions job provides the required result in this example."
+          }
+        ]
+      },
+      {
+        "id": "scanner-step",
+        "title": "Connect the scanner result to the merge rule",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The CI maintainer supplies a runner with the scanner CLI on its path, a reachable server, a project token with Execute Analysis permission, and an analyzed main branch. The checkout retains Git history and fetches the target. This job explicitly scans the PR source commit. When reading adjacent checks, inspect their own checkout instructions, since some may test GitHub’s proposed merge instead."
+          },
+          {
+            "type": "code",
+            "language": "yaml",
+            "caption": "Illustrative GitHub Actions job excerpt for the Python service",
+            "value": "quality:\n  name: quality gate\n  runs-on: ubuntu-latest\n  permissions:\n    contents: read\n  steps:\n    - uses: actions/checkout@v4\n      with:\n        ref: ${{ github.event.pull_request.head.sha }}\n        fetch-depth: 0\n    # Runner setup installs the scanner CLI before this step.\n    - name: Scan the PR and wait for the gate\n      env:\n        SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}\n        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}\n      run: >-\n        sonar-scanner -Dsonar.projectKey=approval-routing\n        -Dsonar.sources=src -Dsonar.qualitygate.wait=true"
+          },
+          {
+            "type": "text",
+            "value": "The wait option makes the scanner poll for the server’s verdict and exit unsuccessfully on a failed gate. The repository maintainer requires the exact Actions check name on main. A scanner upload, a link beside the diff and a required check perform three distinct jobs. If the server times out, the maintainer checks the task and runner logs before requesting a fresh run."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The quality gate owner sets the custom condition Bugs on new code greater than zero → fail. A single new bug of any severity blocks merge. Coverage has its own required new-line coverage job. The remaining required jobs are unit tests, lint and dependency review. The type check job is informational."
+          }
+        ]
+      },
+      {
+        "id": "issue-types",
+        "title": "Read the issue that contributes to the count",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In Standard Experience, a bug flags a reliability problem, a vulnerability flags a security problem, and a code smell flags a maintainability problem. Security hotspots identify sensitive code for review. Issue severity can be Info, Minor, Major, Critical or Blocker. Read the issue type before interpreting its severity. For the gate configured here, a Major bug contributes one to the count, while a Major code smell contributes zero."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "A rule points to a place to investigate. Trace the actual values reaching the line and the consequence for the request. Behavioral tests and the rule finding can corroborate each other."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "PR-42 compares the wrong recipients",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "On a hypothetical first revision, a new routing guard compares the proposed recipient ID with itself. The issue describes identical operands. Reading the caller reveals that the intended comparison was against the designated approver in the active mapping. With the mistaken guard, mismatched IDs appear equal. The developer confirms the defect by supplying different IDs and observing the guard’s decision."
+          },
+          {
+            "type": "table",
+            "caption": "Illustrative summaries of two PR-42 analyses",
+            "columns": [
+              "Source revision",
+              "New-code result",
+              "Required quality gate"
+            ],
+            "rows": [
+              [
+                "Before repair",
+                "1 Bug · Major · comparison has identical operands",
+                "Failed · 1 exceeds 0"
+              ],
+              [
+                "After repair",
+                "0 Bugs · corrected comparison tested with different recipients",
+                "Passed · 0 meets the limit"
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "The developer corrects the operand, adds the mismatched-ID case and checks the AC-01 submission test still observes both the actor and recipient of the first assignment. The push starts a new analysis. In Jira the developer keeps CC-123 In review, adds PR-42 and the two run URLs as web links, and records the issue URL and repair commit. The reviewer checks the later passing result belongs to the current head. Moving the story to Ready for QA occurs later, after merge and the integrated build."
+          }
+        ]
+      },
+      {
+        "id": "false-positive",
+        "title": "Record a false positive that another reviewer can verify",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Consider a different hypothetical finding on PR-42. The scanner suggests that the routing lookup could return an empty recipient, but the developer traces every caller to a validated rule constructor that rejects empty recipients before the lookup. The reviewer checks the constructor, the call sites and a focused rejection test. If the evidence covers every path to the line, a reviewer with Administer Issues on the project opens the issue, chooses False positive from the Open status menu, enters the rationale and selects Resolve."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative disposition in the SonarQube issue comment",
+            "value": "Disposition: False positive | reviewer: quality gate owner\nClaim checked: empty recipient can reach the lookup.\nEvidence: validator rejects an empty ID; all callers use validated rules.\nReferences: PR-42 source revision, validator lines and rejection-test run.\nReopen if a new caller bypasses this constructor."
+          },
+          {
+            "type": "text",
+            "value": "The team requires the comment although the product makes it optional. The reviewer links the issue and disposition from CC-123. SonarQube updates the affected measures and gate status. A failed Actions run still needs a fresh passing result on the current revision. Preserve the original failure so the next reviewer can distinguish a code repair from a human disposition."
+          }
+        ]
+      },
+      {
+        "id": "review-errors",
+        "title": "Two checks before handing the PR back",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Treating a green upload step as a passed quality gate can admit a revision while server processing is pending. Check that the required job waits and that its completed run matches the PR. Calling a genuine bug a false positive because it is expensive to fix removes it from reported measures and misleads future reviewers. Describe the acknowledged defect to the gate owner and follow the team’s decision process."
+          },
+          {
+            "type": "text",
+            "value": "With another analyzer, find its comparison baseline, the specific rule result, the configured threshold and the check that enforces it. Preserve the revision and reviewer’s reasoning so a later change to the tool does not erase the basis for the decision."
+          }
+        ]
+      }
+    ],
+    "evidence": "PR-42’s required check, the linked SonarQube analysis, the issue, the reviewed source commit and Jira web links identify the condition, the actor and the final decision.",
+    "example": "One new bug on PR-42 fails a zero-new-bugs condition for CC-123. A repair produces a new report with zero. A separate worked disposition shows when a reviewer can mark an analysis finding False positive.",
+    "failure": "The developer keeps CC-123 In review while a required result fails. A broken scanner or missing server response goes to the CI maintainer. Neither supplies a passing verdict.",
+    "measure": "Sample failed gates and trace each to the affected code, its disposition and a matching passing check on the final PR revision.",
+    "sources": [
+      {
+        "title": "SonarQube Server 2025.1 · Introduction to pull request analysis",
+        "url": "https://docs.sonarsource.com/sonarqube-server/2025.1/analyzing-source-code/pull-request-analysis/introduction"
+      },
+      {
+        "title": "SonarQube Server 2025.1 · Setting up the pull request analysis",
+        "url": "https://docs.sonarsource.com/sonarqube-server/2025.1/analyzing-source-code/pull-request-analysis/setting-up-the-pull-request-analysis"
+      },
+      {
+        "title": "SonarQube Server 2025.1 · Analysis parameters",
+        "url": "https://docs.sonarsource.com/sonarqube-server/2025.1/analyzing-source-code/analysis-parameters"
+      },
+      {
+        "title": "SonarQube Server 2025.1 · Quality gates",
+        "url": "https://docs.sonarsource.com/sonarqube-server/2025.1/instance-administration/analysis-functions/quality-gates"
+      },
+      {
+        "title": "SonarQube Server 2025.1 · Metrics definition",
+        "url": "https://docs.sonarsource.com/sonarqube-server/2025.1/user-guide/code-metrics/metrics-definition"
+      },
+      {
+        "title": "SonarQube Server 2025.1 · Rules overview",
+        "url": "https://docs.sonarsource.com/sonarqube-server/2025.1/user-guide/rules/overview"
+      },
+      {
+        "title": "SonarQube Server 2025.1 · Editing issues",
+        "url": "https://docs.sonarsource.com/sonarqube-server/2025.1/user-guide/issues/managing"
+      },
+      {
+        "title": "GitHub Docs · About protected branches",
+        "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches"
+      }
+    ]
+  },
+  {
+    "id": "ci-security-checks",
+    "title": "Triage a vulnerable dependency on a pull request",
+    "kind": "deep-dive",
+    "parent": "ci",
+    "activity": "Dev",
+    "phase": "Build",
+    "audience": [
+      "Developer",
+      "Security reviewer"
+    ],
+    "summary": "When dependency review fails on PR-42, find the package version the change introduces, determine where the program uses it, and record who owns the fix. A merge rule and an alert queue answer different questions about the same proposed change.",
+    "owner": "The developer owns the dependency change. The designated security triager reviews exposure, assigns follow-up and verifies the evidence before closing the security work item.",
+    "inputs": [
+      "PR-42 base and head revisions, dependency graph and resolved Python requirements",
+      "Dependency review settings and the branch rule for main",
+      "Access to the alert and an appropriately restricted Jira work item for sensitive evidence"
+    ],
+    "steps": [
+      "Open PR-42 → Checks → dependency review. Read the comparison, follow the manifest change to its resolved dependency, and inspect severity and scope.",
+      "Ask the developer where the component runs, which path calls it and whether the proposed version has shipped. Record unanswered questions and the next person who can resolve them.",
+      "Decide whether merge is held by the stated policy. Assign the fix, record both runs and verify the corrected dependency and the affected routing behavior."
+    ],
+    "detail": [
+      {
+        "id": "three-signals",
+        "title": "Which scanner produced the finding?",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "Three distinct inputs and responses in this example",
+            "columns": [
+              "Signal and input",
+              "What the reader sees",
+              "Who acts and what it blocks"
+            ],
+            "rows": [
+              [
+                "Dependency review compares the PR’s dependency changes with known advisories.",
+                "A newly introduced package version, its severity, manifest and scope.",
+                "Developer fixes qualifying findings. A high or critical new finding fails the required dependency review job."
+              ],
+              [
+                "Secret scanning searches repository content and history for recognized credential patterns.",
+                "A restricted alert identifying a suspected credential and its location.",
+                "Security triager investigates immediately. This alert is informational to the PR merge rule. A confirmed credential goes to its owner for revocation or rotation."
+              ],
+              [
+                "Static application security testing analyzes source code, for example with CodeQL.",
+                "A code scanning alert identifies the rule, location and available context for a suspected flaw.",
+                "Security reviewer traces the finding in context. Code scanning alerts are informational for merge in this example."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "The dependency review action runs on a GitHub Actions runner when a PR opens or receives a new commit. Allow about one to three minutes for this small repository as a planning estimate. GitHub secret scanning runs as a repository service. The team schedules a separate code scanning analysis and also runs it on pull requests. Its alert review can continue after the dependency job has finished."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "Start with the scanner’s input. A package match says a version is in scope for an advisory. Whether the application calls the affected functionality and whether users have received that revision require separate evidence."
+          }
+        ]
+      },
+      {
+        "id": "configure-review",
+        "title": "Configure the required dependency review",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The repository has the dependency graph and dependency review available and enabled. The action needs a supported manifest or submitted dependency data for the base and head. Here the Python service commits resolved versions in requirements.txt. The workflow can read repository contents, and the branch administrator selects dependency review as a required check on main."
+          },
+          {
+            "type": "code",
+            "language": "yaml",
+            "caption": "Illustrative GitHub Actions workflow for the Python service",
+            "value": "name: PR dependency checks\non: [pull_request]\npermissions:\n  contents: read\njobs:\n  review:\n    name: dependency review\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/dependency-review-action@v4\n        with:\n          fail-on-severity: high\n          fail-on-scopes: runtime, development, unknown"
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The security lead and repository maintainer set the minimum blocking severity to high across the three configured scopes. Newly introduced high and critical findings therefore hold merge. Lower-severity findings go to a named triager. A newly discovered advisory on an unchanged dependency goes through repository alert triage. An informational alert still needs an owner, urgency decision and response."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "GitHub’s dependency review action evaluates the dependency difference for the PR. A required status check connects its outcome to merge eligibility. An alert appearing in the repository’s security view does not by itself create a required Actions job."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "PR-42 introduces a high-severity version",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Suppose PR-42 adds a helper for reading approval-routing definitions. The check displays the following training summary. Both the package and the advisory are fictional. The example describes a proposed change on the feature branch. The reviewer has evidence about that candidate only."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative dependency review summary · synthetic training data",
+            "value": "PR-42 · dependency review · FAILED\nChange: added training-routing-reader 1.4.0 in requirements.txt\nFinding: synthetic advisory on version 1.4.0 | severity HIGH\nScope: runtime | example corrected version: 1.4.1\nDecision: introduced dependency meets the high threshold; merge held"
+          },
+          {
+            "type": "text",
+            "value": "First the developer confirms the exact addition in the resolved requirements and follows its import to the service’s active-rule loader. It is a direct runtime dependency. The loader is called during routing, so the triager records a relevant application path. Production exposure is unknown until someone compares released inventories. Green unit tests give no evidence about which library version will be installed."
+          },
+          {
+            "type": "text",
+            "value": "The developer updates the requirements to 1.4.1, checks that the resolved graph no longer includes 1.4.0, then pushes the correction. The new dependency comparison reports no qualifying newly introduced findings. The developer also exercises an unassigned request with a known mapping and checks the actor and recipient of its first assignment. This catches a compatibility regression in the updated loader. If no fix were available, the developer could remove the dependency. Any proposed mitigation goes to the security lead for a recorded decision while the required job remains red."
+          }
+        ]
+      },
+      {
+        "id": "jira-triage",
+        "title": "What the security triager records in Jira",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "Illustrative triage record · linked to CC-123",
+            "columns": [
+              "Field",
+              "Entry"
+            ],
+            "rows": [
+              [
+                "Summary and link",
+                "Review training-routing-reader on PR-42. This separate hypothetical security work item blocks CC-123. Add web links to the restricted finding and original failed run."
+              ],
+              [
+                "Finding and exposure",
+                "High, runtime, direct, version 1.4.0 in requirements.txt. The active-rule loader imports it. Proposed revision confirmed. No conclusion about production yet."
+              ],
+              [
+                "Decision and ownership",
+                "Hold merge. Developer owns the upgrade. Security triager owns verification and checks released inventories separately if exposure is suspected."
+              ],
+              [
+                "Retest and disposition",
+                "Record the correction commit, PR-42’s new successful dependency review and the AC-01 regression run. Verify the graph contains 1.4.1 and no affected copy. Triager closes the security item as Fixed."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "In this workflow the triager moves the security item from New to Triaged, and the developer moves it through In progress to Ready for retest. CC-123 stays In review while the dependency check fails and while the PR awaits the other merge evidence. The later feature transition to Ready for QA needs the integrated build. CC-131 belongs to the separate QA authorization defect."
+          }
+        ]
+      },
+      {
+        "id": "compare-decisions",
+        "title": "Hand the result back to the reviewer",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "On PR-42, the reviewer checks the latest required results for unit tests, lint, new-line coverage, quality gate and dependency review. The type check job is informational. A passing dependency job clears this particular hold. It cannot clear a failing new-line coverage job or supply a missing code review."
+          },
+          {
+            "type": "text",
+            "value": "Two mistakes change the decision. Updating only a declared constraint can leave the affected resolved version in the build, so inspect the actual dependency graph. Treating an alert as harmless because it is informational can leave an exposed credential usable. If a suspected secret is confirmed, rotate or revoke it and record a restricted reference. Copying its value into a general Jira comment creates another exposure."
+          },
+          {
+            "type": "text",
+            "value": "Across tools, carry forward the affected component or location, candidate revision, evidence of exposure, enforcement rule and accountable responder. Verify the remediation on a new result and retain the original alert so another reviewer can reconstruct the decision."
+          }
+        ]
+      }
+    ],
+    "evidence": "The restricted alert reference, failed check, package and version, exposure assessment, Jira link, fix commit and successful retest connect the decision to the PR revision.",
+    "example": "In the hypothetical PR-42 failure, training-routing-reader 1.4.0 trips a high-severity dependency rule. The developer replaces it with the fictional corrected 1.4.1 and the security triager verifies the new run.",
+    "failure": "A qualifying finding or a missing required result holds merge. The developer addresses a package match, and the CI maintainer investigates missing comparison data or a broken job. CC-123 remains In review.",
+    "measure": "Sample both blocked and informational findings. Check whether a reviewer can identify the owner, the affected revision, the time to first decision and the evidence supporting closure.",
+    "sources": [
+      {
+        "title": "GitHub Docs · Dependency review",
+        "url": "https://docs.github.com/en/code-security/concepts/supply-chain-security/dependency-review"
+      },
+      {
+        "title": "GitHub Docs · Configuring the dependency review action",
+        "url": "https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/manage-your-dependency-security/configure-dependency-review-action"
+      },
+      {
+        "title": "GitHub Actions · Dependency review action configuration",
+        "url": "https://github.com/actions/dependency-review-action"
+      },
+      {
+        "title": "GitHub Docs · Secret scanning",
+        "url": "https://docs.github.com/en/code-security/concepts/secret-security/secret-scanning"
+      },
+      {
+        "title": "GitHub Docs · Code scanning",
+        "url": "https://docs.github.com/en/code-security/concepts/code-scanning/code-scanning"
+      },
+      {
+        "title": "GitHub Docs · About protected branches",
+        "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches"
+      },
+      {
+        "title": "Atlassian Support · Link work items",
+        "url": "https://support.atlassian.com/jira-software-cloud/docs/link-issues/"
+      }
+    ]
+  }
+]

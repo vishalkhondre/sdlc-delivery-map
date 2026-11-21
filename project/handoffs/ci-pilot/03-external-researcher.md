@@ -1,0 +1,5 @@
+# Primary source brief · 21 November 2026
+
+Opened the inventory's GitHub workflow syntax and protected-branch pages, pytest assertion and flaky-test pages, Python unittest.mock, Ruff Linter and Formatter, mypy Getting started, coverage.py branch measurement and configuration, SonarQube Server 2025.1 quality gates, PR analysis and issue management, and GitHub dependency review, secret scanning and code scanning. Links are in DEPTH-INVENTORY.md. Each author must match exact names and version-specific details to the relevant primary pages in the lesson sources.
+
+Use GitHub workflow semantics for the tested ref, branch policy for required checks, pytest for the failure display, Ruff for diagnostics and exit codes, and coverage.py for whole-report measurements. Name the component measuring changed lines separately. For SonarQube, state the edition and experience mode, distinguish a scanner completing from a passing quality gate, and check the permission for marking a false positive. Security samples must be synthetic with no exploitable details, genuine credentials or fabricated public advisory.

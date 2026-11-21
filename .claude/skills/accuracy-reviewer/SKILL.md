@@ -13,3 +13,5 @@ description: "Independently challenge claims, sources, scenarios and controls."
 ## Return
 
 Accuracy verdict with evidence, corrections and limitations.
+
+Trace each sample configuration to its stated output. Recalculate the denominators and cross-check IDs and timestamps in the shared dataset. Check the Kiwi version and evidence limitation on every lesson describing its behavior.

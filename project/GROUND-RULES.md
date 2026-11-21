@@ -5,4 +5,4 @@
 3. Write original lessons. Link to primary sources for product behavior. Distinguish a documented mechanism, recommended practice and local governance decision.
 4. Every lesson has an owner, inputs, steps, evidence, example, failure path, measure and sources. Every interactive region resolves to a real lesson.
 5. Support direct links, a text route, keyboard access, mobile reading and return navigation. Add diagrams only where they help a reader make a decision.
-6. The maintainer completes internal milestones, reviews and corrections. The user reviews the finished release once.
+6. The owner approves the depth inventory, reviews the built pilot, and reviews each later section summary. Stop at the gates in DEPTH-PLAN.md.

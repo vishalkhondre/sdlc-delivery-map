@@ -1,6 +1,6 @@
 # Depth inventory for edition 1.1.0
 
-**Gate 1 decision draft · Architect pass · 21 November 2026**
+**Gate 1 approved · Architect inventory · 21 November 2026**
 
 The 53 overview pages remain the entry points for the map's 139 regions. This inventory adds 40 deep dives (6 Define, 12 Build, 9 Prove, 7 Release, 6 Learn) and six flows. The map still has seven numbered steps. A new reader can enter through an overview and its “Go deeper” list. A reader tracking a particular record can enter a flow from the index or a linked lesson. The proposed total is 99 pages of lesson content.
 
@@ -121,7 +121,7 @@ Commit authored SVGs with their source and meaningful alt text, caption and a co
 
 | Gate or section | Authoring order | Evidence required to leave the section |
 |---|---|---|
-| Gate 1 | Owner confirms this inventory and answers the three remaining questions. Decision 2 is settled. | Agreed scope and stack; no deep dives are authored at this gate. Bring the owner-merged 1.0.2 corrections forward before pilot authoring. |
+| Gate 1 | Owner approved the inventory and all four decisions. | Agreed scope and stack; no deep dives are authored at this gate. Bring the owner-merged 1.0.2 corrections forward before pilot authoring. |
 | Gate 2 · model and CI pilot | `ci-pipeline-anatomy` → `ci-unit-tests` → `ci-lint-format` → `ci-coverage` → `ci-static-analysis` → `ci-security-checks`. | First learner journey: enter through `ci`, open the red unit check, locate the failing assertion on PR-42, repair the bypassing fixture, read new-code coverage, identify blocking vs informational results and the actor who can move the PR forward. Return through the parent. Exercise the five pilot probes, keyboard/small-screen route and all seven Build questions. |
 | Gate 3 · Define | Issue types → workflow → ready feature → design decision → nonfunctional criteria → criteria to tests. | The reader can connect CC-100 to a bounded CC-123 story and distinguish proposed AC-03 from recorded qa-204 evidence. |
 | Gate 3 · remaining Build | `local-dev-loop`, `branch-commit-conventions`, `code-review-practice`, `ci-integration-tests`, `merge-rules`, `image-build`. | From branch and proposed revision, locate a reviewed integrated commit and the artifact QA actually receives. |
@@ -175,9 +175,9 @@ These are intended answer pages for [the 20 acceptance questions](DEPTH-PLAN.md#
 | Six-lesson CI pilot | Each returns at least one relevant topic: **unit test**, **lint**, **coverage**, **SonarQube**, **quality gate**. Exercise the index as a reader and follow the result to its detail. |
 | Integration | Retain the five pilot probes and add **bug**, **severity**, **regression**, **test case**, **Jira status**, **hotfix**, **rollback**, **feature flag**, **median**. All 14 must return a topic. Test the 20 questions separately; a search hit alone cannot pass a question. |
 
-## Decisions for the owner
+## Approved owner decisions
 
-| Question | Recommended default |
+| Decision | Approved choice |
 |---|---|
 | 1. Which technology stack should the code, test and configuration samples use? | A Python service with pytest, Ruff and coverage.py. Label each stack-dependent sample illustrative. |
 | 2. Test management example (settled) | The owner selected **Kiwi TCMS**. Keep “Test Management Tool” on the map. |
