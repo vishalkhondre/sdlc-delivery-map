@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 650 636" role="img" aria-labelledby="title desc">
+<title id="title">Choose the evidence to collect after a failure</title>
+<desc id="desc">A code repair creates a new candidate. A mapping repair retains the image and changes configuration. Both paths require fresh observations before promotion.</desc>
+<defs><marker id="tip" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#296474"/></marker></defs>
+<rect width="650" height="636" rx="12" fill="#f3f6f8"/>
+<text x="22" y="39" font-family="Arial,sans-serif" font-size="25" font-weight="700" fill="#183452">What changed after the failure?</text>
+<rect x="22" y="62" width="606" height="90" rx="9" stroke="#99aeba" fill="white"/>
+<text x="36" y="92" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#183452">Hold promotion</text>
+<text x="36" y="120" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">Record the failed observation, image and configuration.</text>
+<text x="36" y="144" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">Identify the cause before choosing the scope.</text>
+<path d="M324 152V174H168V195" fill="none" stroke="#296474" stroke-width="2.5" marker-end="url(#tip)"/>
+<path d="M324 174H481V195" fill="none" stroke="#296474" stroke-width="2.5" marker-end="url(#tip)"/>
+<rect x="22" y="198" width="293" height="111" rx="9" stroke="#99aeba" fill="#e7effa"/>
+<text x="36" y="228" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#183452">Code changed</text>
+<text x="36" y="256" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">TC-04 failed in qa-196.</text>
+<text x="36" y="280" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">PR-41 creates build-415</text>
+<text x="36" y="304" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">with a new image digest.</text>
+<rect x="335" y="198" width="293" height="111" rx="9" stroke="#99aeba" fill="#e5f3ef"/>
+<text x="349" y="228" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#183452">UAT mapping changed</text>
+<text x="349" y="256" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">uat-80 rejected unit B routing.</text>
+<text x="349" y="280" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">Keep the build-418 digest.</text>
+<text x="349" y="304" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">Correct the mapping.</text>
+<path d="M168 309V342" fill="none" stroke="#296474" stroke-width="2.5" marker-end="url(#tip)"/>
+<path d="M481 309V342" fill="none" stroke="#296474" stroke-width="2.5" marker-end="url(#tip)"/>
+<rect x="22" y="345" width="293" height="134" rx="9" stroke="#99aeba" fill="white"/>
+<text x="36" y="375" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#183452">Confirm and check nearby</text>
+<text x="36" y="403" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">qa-198 retests TC-04 and</text>
+<text x="36" y="427" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">authorized decisions. Later,</text>
+<text x="36" y="451" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">qualify the integrated</text>
+<text x="36" y="475" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">build-418 in qa-204.</text>
+<rect x="335" y="345" width="293" height="134" rx="9" stroke="#99aeba" fill="white"/>
+<text x="349" y="375" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#183452">Recheck affected behavior</text>
+<text x="349" y="403" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">qa-209 checks mapping and</text>
+<text x="349" y="427" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">permissions. Repeat in uat-r9</text>
+<text x="349" y="451" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">with uat-routing-6. The new</text>
+<text x="349" y="475" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">decision is uat-82: accepted.</text>
+<path d="M168 479V503H324V526" fill="none" stroke="#296474" stroke-width="2.5" marker-end="url(#tip)"/>
+<path d="M481 479V503H324" fill="none" stroke="#296474" stroke-width="2.5" marker-end="url(#tip)"/>
+<rect x="22" y="530" width="606" height="90" rx="9" stroke="#99aeba" fill="white"/>
+<text x="36" y="560" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#183452">Business handoff</text>
+<text x="36" y="588" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">Qualified changes can enter or resume business testing.</text>
+<text x="36" y="612" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">Retain earlier results and record each decision on its own evidence.</text>
+</svg>
