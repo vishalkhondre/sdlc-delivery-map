@@ -17,7 +17,7 @@
       "Hand the test lead the observed revision, reachable endpoint and relevant configuration version. Agree how long that target will remain stable, especially when several releases share a QA environment."
     ],
     "evidence": "A rollout request identifies the requested digest, configuration and job. The completion record adds the actual target, revision, readiness and time.",
-    "example": "Build 418 contains automatic approval routing. QA asks to deploy that build with the test routing rule for the purchasing team. A delayed deployment leaves the old revision serving for several minutes. The test lead begins the run after checking the new revision.",
+    "example": "In a separate practice scenario, build-418 contains automatic approval routing. QA asks to deploy that build with the test routing rule for the purchasing team. A delayed deployment leaves the old revision serving for several minutes. The test lead begins the run after checking the new revision.",
     "failure": "If the registry pull or configuration fails, record the deployment error and hold the test run. A deployment failure and a failed feature test have different owners and produce different evidence.",
     "measure": "Track elapsed time from a candidate becoming available to a verified QA endpoint. Separate queue time from deployment time when investigating delays.",
     "sources": [
@@ -26,7 +26,7 @@
         "url": "https://dora.dev/capabilities/deployment-automation/"
       },
       {
-        "title": "Microsoft Learn · Azure Container Apps revisions",
+        "title": "Microsoft Learn · Update and deploy changes in Azure Container Apps",
         "url": "https://learn.microsoft.com/en-us/azure/container-apps/revisions"
       }
     ]
@@ -48,7 +48,7 @@
       "Supply environment settings during deployment. If someone rebuilds the application for UAT, capture the new digest and treat that build as a separate candidate."
     ],
     "evidence": "A registry reference, content digest, build run and, where relevant, platform identify the package available for deployment. Test and acceptance evidence is recorded separately.",
-    "example": "QA pulls the approval application published by build 418. Build 419 later moves the team's integration tag. UAT can still retrieve build 418 by the digest recorded in QA's deployment record.",
+    "example": "QA records the image digest from build-418. Suppose a later build moves the same tag before UAT starts. UAT can still pull the QA-tested image by its recorded digest.",
     "failure": "If a pinned artifact is missing, pause promotion and investigate retention or retrieval. Substituting whichever image currently has the release tag breaks the link to the test results.",
     "measure": "For a sample release, follow the digest from the build output to the QA, UAT and production deployment records. Count unresolved differences.",
     "sources": [
@@ -57,7 +57,7 @@
         "url": "https://docs.docker.com/dhi/explore/security-concepts/digests/"
       },
       {
-        "title": "Docker · Pull an image by digest",
+        "title": "Docker · docker image pull",
         "url": "https://docs.docker.com/reference/cli/docker/image/pull/"
       },
       {
@@ -84,12 +84,12 @@
       "Bind the test run to the observed revision. If another rollout occurs mid-run, separate the affected cases and repeat them against a known target."
     ],
     "evidence": "The QA run references its actual revision, candidate digest, endpoint and relevant configuration identity. Keep secret values outside the test evidence.",
-    "example": "The general QA URL points partly to the previous revision. The engineer gives the test lead a route to the candidate revision and records the routing table used for the purchasing rule. A repeat run can now isolate code changes from configuration changes.",
+    "example": "Suppose the general QA URL points partly to the previous revision. The engineer gives the test lead a route to the candidate revision and records the routing table used for the purchasing rule. A repeat run can now isolate code changes from configuration changes.",
     "failure": "A successful response from a health endpoint confirms reachability. If the team cannot identify the serving revision, an application-level result remains ambiguous and cannot qualify the candidate in this example.",
     "measure": "Track test cases repeated because the target changed during execution. Repeated ambiguity can justify isolated test targets or more reliable deployment records.",
     "sources": [
       {
-        "title": "Microsoft Learn · Azure Container Apps revisions",
+        "title": "Microsoft Learn · Update and deploy changes in Azure Container Apps",
         "url": "https://learn.microsoft.com/en-us/azure/container-apps/revisions"
       },
       {
@@ -161,7 +161,7 @@
         "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments"
       },
       {
-        "title": "Azure Well-Architected Framework · Safe deployment practices",
+        "title": "Azure Well-Architected Framework · Architecture strategies for safe deployment practices",
         "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
       }
     ]
@@ -184,7 +184,7 @@
       "Check the environment immediately before the exercise. If a role mapping, feature flag or dependency changes afterwards, identify the affected scenarios and repeat them before relying on the decision."
     ],
     "evidence": "The UAT entry record identifies the revision, digest, scenario, participants' roles, test data and known environment limitations.",
-    "example": "A requester submits a purchase approval and a purchasing approver receives it. Both users see familiar workspace names in UAT. A test mailbox catches the notification, so the signatory records that mailbox handling separately from real email delivery.",
+    "example": "In a separate practice scenario, a requester submits a purchase approval and a purchasing approver receives it. Both users see familiar workspace names in UAT. A test mailbox catches the notification, so the signatory records that mailbox handling separately from real email delivery.",
     "failure": "When an expected role cannot sign in, classify the session as blocked and resolve the environment issue. A blocked exercise provides no acceptance evidence for the missing steps.",
     "measure": "Review how much scheduled UAT time is lost to missing accounts, unavailable dependencies or stale data. Use the recurring causes to improve preparation.",
     "sources": [
@@ -193,7 +193,7 @@
         "url": "https://istqb.org/wp-content/uploads/2024/11/ISTQB-CT-AcT_Syllabus_v1.0_2019.pdf"
       },
       {
-        "title": "Microsoft Learn · Azure Container Apps revisions",
+        "title": "Microsoft Learn · Update and deploy changes in Azure Container Apps",
         "url": "https://learn.microsoft.com/en-us/azure/container-apps/revisions"
       },
       {
@@ -229,7 +229,7 @@
         "url": "https://istqb.org/wp-content/uploads/2024/11/ISTQB-CT-AcT_Syllabus_v1.0_2019.pdf"
       },
       {
-        "title": "Azure Well-Architected Framework · Safe deployment practices",
+        "title": "Azure Well-Architected Framework · Architecture strategies for safe deployment practices",
         "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
       }
     ]

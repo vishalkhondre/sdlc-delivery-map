@@ -2196,7 +2196,7 @@
                 "The Service Owner investigates changed exposure, workload, mapping and event capture. The eight later purchases without a correct assignment need individual tracking. They are separate from the eight earlier INC-7 cases already reconciled."
               ],
               [
-                "Approvers reported unclear supporting information. The later export has submission-to-assignment and submission-to-decision times.",
+                "The export records elapsed times for observed assignments and decisions. It has no field for a request for more information. Unclear supporting details are one possible explanation to test with approvers.",
                 "The analyst asks where useful information was missing, when the approver noticed and when it arrived. The CSV cannot identify what delayed any one decision."
               ]
             ]

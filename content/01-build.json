@@ -147,7 +147,7 @@
       "Inspect each failed check and its logs. Distinguish a reproducible product defect from broken infrastructure or an unstable test. Keep evidence tied to the run that produced it."
     ],
     "evidence": "The run records a tested revision, named jobs, outcomes and logs. A build performed to validate a pull request can be temporary. The downstream release candidate is built from integrated main in this map.",
-    "example": "A routing test passes for the designated approver. A permission test shows that a second user can record a decision. The required test job fails, and the developer fixes the permission check on the same pull request.",
+    "example": "On PR-42 the coverage check reports that tests reached 31 of 50 new lines. The repository requires 80%, so 62% holds the merge. The developer inspects the untested behavior, adds meaningful tests and checks the result on the revised pull request.",
     "failure": "A missing required result or a failed job leaves the proposal unqualified under this example policy. Investigate repeated intermittent results before treating a retry as evidence of a fix.",
     "measure": "Track time to actionable feedback and the frequency of unstable jobs. Faster runs are useful when they still exercise meaningful behavior.",
     "sources": [
@@ -183,7 +183,7 @@
       "Pass the integrated commit to the candidate-build workflow. Capture the pull request link so the path back to discussion, acceptance criteria and review evidence survives."
     ],
     "evidence": "The merged pull request and the resulting main commit connect the reviewed proposal with the source that can be packaged. Release evidence should identify that integrated revision.",
-    "example": "One developer changes the approver role's representation while another implements routing. The combined check catches the mismatch. The team updates the lookup, reruns the check and builds from the resulting main revision.",
+    "example": "Suppose one developer changes the approver role's representation while another implements routing. The combined check catches the mismatch. The team updates the lookup, reruns the check and builds from the resulting main revision.",
     "failure": "If an applicable required review or check is missing, pause the ordinary merge. If integrated tests fail after merge, stop candidate promotion and repair or revert the affected change.",
     "measure": "For a sample release build, follow its source commit back to the merged pull request and verify how the repository satisfied each applicable merge rule.",
     "sources": [
@@ -219,7 +219,7 @@
       "Publish the candidate, capture the registry digest, and link it to the source revision and build run. Request promotion only when publication and required checks have succeeded. Where provenance is needed, record and verify the build attestation for the artifact."
     ],
     "evidence": "The candidate record connects source commit, build run, registry repository, immutable digest and test or scan evidence. Deployment jobs consume the published candidate by identity.",
-    "example": "The routing change and a peer's schema compatibility fix are integrated on main. One build produces the candidate for QA. UAT later selects the digest that QA tested, using its own directory configuration.",
+    "example": "In a separate practice scenario, the routing change and a peer's schema compatibility fix are integrated on main. One build produces the candidate for QA. UAT later selects the digest that QA tested, using its own directory configuration.",
     "failure": "If publication fails after the image builds locally, the deployment job has no confirmed candidate. Recover the build or publication and verify the actual registry identity before scheduling QA.",
     "measure": "Pick a running candidate and trace its registry digest back to one integrated commit. Record and investigate any environment that silently rebuilds the approved source.",
     "sources": [

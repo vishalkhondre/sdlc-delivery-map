@@ -1,5 +1,5 @@
 {
-  "purpose": "Canonical fictional fixtures for the depth edition. Existing values are transcribed from the qualification record and cohort. New records below are proposed teaching fixtures pending Gate 1. No system or job was executed to produce them.",
+  "purpose": "Canonical fictional fixtures for the depth edition. Existing values are transcribed from the qualification record and cohort. Additional records illustrate the teaching scenarios for edition 1.1.0. Hypothetical examples are identified separately. No system or job was executed to produce them.",
   "source_records": {
     "qualification": "site/assets/examples/qualification-record.json",
     "cohort": "site/assets/examples/one-day-cohort.csv",
@@ -261,12 +261,12 @@
         "new_code_lines_total": 50,
         "percent": 62,
         "example_policy_minimum_percent": 80,
-        "effect": "The proposed team policy blocks the required check. Product defaults remain a research question."
+        "effect": "The example repository requires at least 80 percent coverage on new lines. The 62 percent result fails the required check."
       },
       "ci_story": "A test sets the assignee directly, reaches the tested lines, and can pass without demonstrating AC-01. The corrected test starts with an unassigned submission and observes the assignment actor and recipient."
     },
     "workflow_policy": {
-      "status": "Illustrative workflow choices for Gate 1, independent of Jira defaults. A linked bug has its own status and resolution. Production deployment does not close the product experiment.",
+      "status": "Illustrative workflow choices for CC-123, independent of Jira defaults. A linked bug has its own status and resolution. Production deployment does not close the product experiment.",
       "feature_issue": "CC-123",
       "target_fix_version": "1.3.0",
       "status_by_map_step": [

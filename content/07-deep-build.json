@@ -217,7 +217,7 @@
     "parent": "ci",
     "audience": [
       "Developer",
-      "QA Engineer",
+      "Quality assurance (QA) engineer",
       "Business Analyst"
     ],
     "title": "Read and repair a failing unit test",
@@ -227,7 +227,7 @@
     "owner": "The change author reads and repairs a failed test or the application behavior it exposed. The reviewer checks that each assertion (a test’s statement of the expected result) matches the agreed rules for feature CC-123.",
     "inputs": [
       "The feature’s acceptance criteria (AC-01 and AC-02) describe the routing and authorization rules. Use separate requester, approver and unrelated employee identities.",
-      "The test merge revision, GitHub’s temporary combination of the proposal and its target branch. Use the team’s fixed versions of pytest (the test runner) and fresh starting data for each test.",
+      "The test merge revision is GitHub’s temporary combination of pull request PR-42 and its target branch. The continuous integration (CI) runner is the machine that tests it. Use the team’s fixed versions of pytest (the test runner) and fresh starting data for each test.",
       "The failed unit tests job with its pytest output and run link"
     ],
     "steps": [
@@ -400,7 +400,7 @@
     "audience": [
       "Developer",
       "Reviewer",
-      "CI maintainer"
+      "Continuous integration (CI) maintainer"
     ],
     "summary": "A check can flag a problem in a file the developer never touched. Here, a tool finds a line that brings in something the program never uses. Follow the finding to decide who should fix it and whether the proposed change can go ahead.",
     "owner": "The developer who proposed the change investigates the first failure. The module owner reviews changes outside the feature, and the maintainer of the automated checks owns the rule configuration and check scope.",
@@ -576,7 +576,7 @@
   },
   {
     "id": "ci-coverage",
-    "title": "Read coverage on the lines a PR changes",
+    "title": "Read test coverage for the lines a pull request changes",
     "phase": "Build",
     "activity": "Dev",
     "kind": "deep-dive",
@@ -584,13 +584,13 @@
     "audience": [
       "Developer",
       "Reviewer",
-      "QA Engineer",
-      "CI maintainer"
+      "Quality assurance (QA) engineer",
+      "Continuous integration (CI) maintainer"
     ],
     "summary": "The team wants to know how much of the changed code its tests actually ran. In this example the tests reach 31 of 50 new lines, below the team’s minimum. Even reaching every line would leave a second question: did the test check that the right person received the request?",
     "owner": "The developer writes tests for behavior the existing tests missed. The reviewer checks their starting state and the results the tests expect. Repository maintainers set the merge policy, and the maintainer of the automated checks owns the collection and comparison jobs.",
     "inputs": [
-      "The test merge tree, the snapshot made by temporarily combining the proposed change with its target branch. Record both that tested version and the target version so the comparison can be repeated.",
+      "The continuous integration (CI) check on pull request PR-42 compares the test merge tree with its target branch. The test merge tree is the snapshot GitHub makes by temporarily combining the proposed change and its target. Record both revisions so someone can repeat the comparison.",
       "The unit test run for that tree, coverage.py data with executable, executed and missing lines, and the team’s new-line threshold"
     ],
     "steps": [
@@ -1549,7 +1549,7 @@
         "url": "https://support.atlassian.com/jira-cloud-administration/docs/what-development-data-can-i-view-in-jira-software/"
       },
       {
-        "title": "Atlassian · Reference work items in development work",
+        "title": "Atlassian · Reference work items in your development spaces",
         "url": "https://support.atlassian.com/jira-software-cloud/docs/reference-issues-in-your-development-work/"
       },
       {
@@ -1764,7 +1764,7 @@
     "audience": [
       "Business Analyst",
       "Developer",
-      "QA Engineer"
+      "Quality assurance (QA) engineer"
     ],
     "title": "Test who actually receives a submitted request",
     "phase": "Build",
@@ -1772,7 +1772,7 @@
     "summary": "A buyer submits a request without choosing an approver. Can the reviewer see who received it, and whether the routing rule made the assignment? This check answers those questions by reading what the application saved.",
     "owner": "The developer supplies the check and investigates failures. The reviewer reads its evidence alongside the other results on the pull request (PR), the proposal to merge a change into the shared code.",
     "inputs": [
-      "The tested revision of PR-42 for CC-123, the application’s database setup instructions, its pinned test dependencies and a Linux runner (the machine running the automated job).",
+      "The tested revision of PR-42 for CC-123, the application’s database setup instructions, its pinned test dependencies and a Linux continuous integration (CI) runner, the machine running the automated job.",
       "A disposable PostgreSQL database (temporary storage for this test), a fictional unit-to-group mapping and the approved expected recipient for acceptance criterion AC-01."
     ],
     "steps": [

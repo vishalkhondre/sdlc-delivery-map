@@ -2,3 +2,6 @@
 "1.0":
   section: "The complete feature delivery learning map"
   pages: [index.html, "**/*.html"]
+"1.1":
+  section: "Feature delivery in depth, from definition to production feedback"
+  pages: [index.html, "**/*.html"]

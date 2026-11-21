@@ -19,7 +19,7 @@
       "Reconcile scope with the accepted candidate before publishing. A feature added after acceptance changes what the team is about to ship. Obtain evidence for the new scope."
     ],
     "evidence": "A version entry links the intended issues, candidate, acceptance evidence, release owner and rollout conditions. Actual deployment is recorded later.",
-    "example": "The release includes automatic assignment for one request category. The team defers a second category because its approver mapping is still under review. The release notes and initial audience reflect that boundary.",
+    "example": "Suppose the release includes automatic assignment for one request category. The team defers a second category because its approver mapping is still under review. The release notes and initial audience reflect that boundary.",
     "failure": "If two teams assign different meanings to the same version, reconcile the included issues and candidate identity before issuing the release.",
     "measure": "Pick an included issue and a deferred issue. A colleague should be able to explain the difference from the plan and identify the owner of each prerequisite.",
     "sources": [
@@ -28,7 +28,7 @@
         "url": "https://support.atlassian.com/jira-cloud-administration/docs/manage-versions/"
       },
       {
-        "title": "Microsoft Azure Well-Architected Framework · Safe deployment practices",
+        "title": "Microsoft Azure Well-Architected Framework · Architecture strategies for safe deployment practices",
         "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
       }
     ]
@@ -169,11 +169,11 @@
     "measure": "Compare intended and observed exposure at each step. Verify that a representative request can reach the new version before drawing conclusions from error rates.",
     "sources": [
       {
-        "title": "Microsoft Azure Well-Architected Framework · Safe deployment practices",
+        "title": "Microsoft Azure Well-Architected Framework · Architecture strategies for safe deployment practices",
         "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
       },
       {
-        "title": "Microsoft Learn · Revisions in Azure Container Apps",
+        "title": "Microsoft Learn · Update and deploy changes in Azure Container Apps",
         "url": "https://learn.microsoft.com/en-us/azure/container-apps/revisions"
       },
       {
@@ -202,12 +202,12 @@
       "Compare with the healthy reference and record a decision to proceed, hold or recover. Investigate unrelated shifts in traffic and dependency failures before assigning a cause."
     ],
     "evidence": "The observation record names the actual revision, the exposed population, the interval, the signal values and sample sizes, the smoke result and the rollout decision.",
-    "example": "In a small rollout, the API accepted 25 distinct eligible purchase requests. After the normal processing window, the owner matches each request ID to its first correct assignment. Seventeen are accounted for; eight need investigation. Expansion pauses while the owner reconciles those request IDs.",
+    "example": "During the corrected prod-r42 pilot, all 24 eligible requests reached the correct approver within two minutes. Two additional controlled smoke requests passed and were counted separately. The Service Owner used the pilot observations from 11:00 to 13:00 UTC on 13 March to decide whether to expand.",
     "failure": "If telemetry stops arriving, treat health as unknown. Check collection and obtain independent evidence before expanding exposure.",
     "measure": "Can the on-call engineer explain how much real use occurred, which user-visible behavior was observed and why that evidence justified the next traffic increment?",
     "sources": [
       {
-        "title": "Microsoft Azure Well-Architected Framework · Safe deployment practices",
+        "title": "Microsoft Azure Well-Architected Framework · Architecture strategies for safe deployment practices",
         "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
       },
       {
@@ -240,12 +240,12 @@
       "Record the revision and configuration now serving, the unresolved exceptions and their owners. Assign follow-up work for the cause after the service is stable."
     ],
     "evidence": "A recovery record links the failed attempt, decision, action, serving state, recovery checks and disposition of affected requests.",
-    "example": "A production role mapping is wrong. The team restores the last verified mapping, confirms a fresh request reaches its expected approver and checks the disposition of each request routed during the affected interval.",
+    "example": "When a controlled request reached the wrong recipient on prod-r41, the team halted expansion. It kept the same image, corrected the mapping to prod-routing-11 and checked it on prod-r42. A fresh smoke test passed. The responder also accounted for each of the eight affected requests from INC-7.",
     "failure": "A functional rollback can leave an old backlog or duplicate notifications behind. Confirm each affected request has one valid assignment or an explicitly owned follow-up.",
     "measure": "Track time to safe service restoration and the count of affected requests awaiting disposition. These measures distinguish restored traffic from completed recovery.",
     "sources": [
       {
-        "title": "Microsoft Azure Well-Architected Framework · Safe deployment practices",
+        "title": "Microsoft Azure Well-Architected Framework · Architecture strategies for safe deployment practices",
         "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
       },
       {
@@ -274,12 +274,12 @@
       "Finish or clean up the test request using an agreed procedure. Record the outcome against the deployed revision. On a mismatch, hold further exposure and start recovery."
     ],
     "evidence": "The result identifies the deployed revision, expected and actual routing, the observed automatic assignment event, the test request and its disposition.",
-    "example": "A test purchase request should reach the regional approver. It lands in a general queue despite normal API health. The failed smoke result blocks expansion and points the team toward the production mapping.",
+    "example": "On prod-r41 a controlled purchase request reached the wrong approver. The team halted the pilot and opened INC-7. After correcting the mapping, a fresh submission on prod-r42 reached the designated test approver.",
     "failure": "If a test account always bypasses routing, redesign the test fixture. A passing bypassed path offers no evidence about the rule used by real requesters.",
     "measure": "Ask whether the check would detect a healthy application pointing at the wrong approver group. If the answer is unclear, refine the expected business result.",
     "sources": [
       {
-        "title": "Microsoft Azure Well-Architected Framework · Safe deployment practices",
+        "title": "Microsoft Azure Well-Architected Framework · Architecture strategies for safe deployment practices",
         "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
       },
       {
@@ -308,7 +308,7 @@
       "Link the work item to the deployment record and the release notes. Keep the authoritative details in one place and cross-link them so a later update stays consistent."
     ],
     "evidence": "Link the approved digest to the actual Azure revision and digest, active configuration, exposure population, health observation and a controlled smoke test that routed to the expected approver. The feature issue should lead to this record and the runtime record should lead back to the qualified candidate.",
-    "example": "An approver reports a missing request during a pilot. The deployment record shows when the pilot received traffic and which configuration it used. The team can check whether that request belonged to the exposed group.",
+    "example": "Suppose an approver reports a missing request during a pilot. The deployment record shows when the pilot received traffic and which configuration it used. The team can check whether that request belonged to the exposed group.",
     "failure": "If the record contains only a target version, retrieve the actual deployed identity and traffic state. Mark unknown facts explicitly until an operator can substantiate them.",
     "measure": "Try a reverse trace using a timestamp and affected group. Estimate the time it takes to identify the candidate and its qualification evidence.",
     "sources": [
@@ -317,7 +317,7 @@
         "url": "https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/view-deployment-history"
       },
       {
-        "title": "Microsoft Learn · Revisions in Azure Container Apps",
+        "title": "Microsoft Learn · Update and deploy changes in Azure Container Apps",
         "url": "https://learn.microsoft.com/en-us/azure/container-apps/revisions"
       }
     ]
@@ -376,7 +376,7 @@
       "Exercise the alert and the recovery notification. Check what happens during a quiet period, when event collection stops or when only one category begins to fail."
     ],
     "evidence": "The owner can show the signal definition, its destination, the acknowledgment record and an incident or follow-up linked to the affected feature or deployment.",
-    "example": "Five eligible purchase requests first breach the unassigned-age threshold and trigger an alert. Investigation across the full affected interval finds eight requests to reconcile. The alert count and incident count have different observation windows.",
+    "example": "INC-7 began when a controlled purchase request reached the wrong approver. An alert that only counts unassigned requests could miss that error. Exercise the proposed wrong-recipient alert with a controlled mismatch, then verify who receives the notification and what they can investigate.",
     "failure": "A total assignment counter may rise while one group is stranded. Break down the signal by the smallest operationally meaningful group and inspect affected volume before paging.",
     "measure": "Review actionable alerts, delayed detection and recurring false positives with responders. Adjust thresholds when evidence shows a real mismatch with user impact.",
     "sources": [
@@ -410,7 +410,7 @@
       "Document impact, restoration time, remaining work and follow-up changes. Link the incident to relevant releases or configuration changes and to the feature issue for product review."
     ],
     "evidence": "A recoverable timeline explains who acted, which users were affected, how normal routing was verified and how each affected request was resolved or assigned for follow-up.",
-    "example": "New submissions route correctly after a mapping is restored. Of eight earlier requests, seven need reassignment and one was already decided by the authorized approver. The responder handles those cases differently.",
+    "example": "After the mapping correction, the responder verified routing on prod-r42 and accounted for the eight requests affected by INC-7. Seven were reassigned. One already had an authorized decision, which the team retained.",
     "failure": "Clearing a queue mechanically can repeat decisions or notifications. Reconcile business state before retrying side effects.",
     "measure": "Compare restored routing time with the time the last affected request received a disposition. A gap between them identifies unfinished recovery work.",
     "sources": [
@@ -491,7 +491,7 @@
       "Write the decision on the parent objective and link evidence and any follow-up work. Give a new improvement its own testable criterion and outcome measure so the next cycle can start on a clear question."
     ],
     "evidence": "A decision record names the observed outcome, its limitations, the selected action and the owner. Readers can navigate from follow-up work to the original objective and the release that supplied the evidence.",
-    "example": "In the later cohort, none of 100 requests met the two-minute correct-assignment window. Eight still lacked a correct assignment at 24 hours and 60 still awaited a decision. The Service Owner investigates delayed and missing assignments. Approvers report unclear supporting information. The Product Owner keeps routing and opens a separate improvement to test whether clearer request details reduce decision delay.",
+    "example": "In the later cohort, 60 of 100 requests were open after one day and eight had no recorded correct assignment. The Service Owner investigates delayed and missing assignments. The Product Owner keeps routing and takes proposed CC-140 into refinement to test whether clearer supporting details would shorten the wait. The CSV alone cannot establish why approvers waited.",
     "failure": "A faster median after launch can reflect an easier mix of requests. Report the competing explanation and investigate before crediting the feature with the whole change.",
     "measure": "At the next review, verify that the agreed action occurred and that its evidence addresses the question recorded in the previous decision.",
     "sources": [

@@ -118,7 +118,7 @@
         "url": "https://docs.docker.com/dhi/explore/security-concepts/digests/"
       },
       {
-        "title": "Docker Docs · Pull an image",
+        "title": "Docker Docs · docker image pull",
         "url": "https://docs.docker.com/reference/cli/docker/image/pull/"
       }
     ]
@@ -144,7 +144,7 @@
     "measure": "During a release, measure user-visible errors and routing delays alongside the share of traffic using the new revision.",
     "sources": [
       {
-        "title": "Microsoft Azure Well-Architected Framework · Safe deployment practices",
+        "title": "Microsoft Azure Well-Architected Framework · Architecture strategies for safe deployment practices",
         "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
       },
       {
@@ -238,7 +238,7 @@
         "url": "https://scrumguides.org/scrum-guide.html"
       },
       {
-        "title": "GOV.UK Service Manual · Set performance metrics for your service",
+        "title": "GOV.UK Service Manual · How to set performance metrics for your service",
         "url": "https://www.gov.uk/service-manual/measuring-success/how-to-set-performance-metrics-for-your-service"
       }
     ]
@@ -375,7 +375,7 @@
       "Coordinate the rollout and communicate actual availability after runtime checks. For phased exposure, distinguish the time deployment began from the time a particular user group gained access."
     ],
     "evidence": "The release record preserves scope, qualifying evidence, authorization if required, actual deployment status and links to the user-facing notes.",
-    "example": "A second build appears after UAT. The coordinator catches that the release tag and the suggested digest now refer to different candidates and selects the accepted candidate before rollout.",
+    "example": "Suppose a second build appears after UAT. The coordinator catches that the release tag and the suggested digest now refer to different candidates and selects the accepted candidate before rollout.",
     "failure": "The existence of a published release entry can be mistaken for a live deployment. Confirm the serving runtime record before announcing availability.",
     "measure": "Pick a past release and determine how quickly a second person can establish what was approved, what ran and what the team would restore.",
     "sources": [
@@ -414,7 +414,7 @@
         "url": "https://dora.dev/capabilities/deployment-automation/"
       },
       {
-        "title": "Microsoft Azure Well-Architected Framework · Safe deployment practices",
+        "title": "Microsoft Azure Well-Architected Framework · Architecture strategies for safe deployment practices",
         "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
       }
     ]
@@ -435,7 +435,7 @@
       "Verify that new requests reach the expected approver and reconcile requests affected during the incident. Link recovery evidence and follow-up work to the deployment or feature where appropriate."
     ],
     "evidence": "An incident record identifies affected users or requests, response actions, active revision and configuration, evidence of restored behavior, and ownership of follow-up actions.",
-    "example": "After a mapping correction, newly submitted requests route immediately. The responder then identifies the earlier unassigned requests, verifies their destinations and records their disposition before closing the incident.",
+    "example": "In INC-7 the responder paused exposure after a controlled request reached the wrong approver. The team reconciled eight eligible requests: seven were reassigned and one authorized decision was retained. After the mapping correction, all 24 eligible requests in the corrected pilot reached the right approver within two minutes.",
     "failure": "A green health endpoint after recovery can hide requests that were stranded earlier. Verify both the current user journey and the fate of previously affected work.",
     "measure": "Measure time from user impact to detection and recovery. Separately track unresolved affected requests and whether the alert led to an actionable response.",
     "sources": [
