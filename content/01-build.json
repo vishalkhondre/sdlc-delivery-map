@@ -1,0 +1,270 @@
+[
+  {
+    "id": "define",
+    "title": "Choose a feature worth delivering",
+    "phase": "Define",
+    "summary": "A feature earns its place in the backlog when the team can explain whose work will improve, why the change matters now, and how it will judge the result. A brief turns that decision into something developers and testers can act on.",
+    "owner": "The Product Owner owns the priority decision. A business analyst investigates the current workflow with requesters and approvers.",
+    "inputs": [
+      "A user need and examples of the current workflow",
+      "A product objective, baseline evidence and competing priorities"
+    ],
+    "steps": [
+      "Follow a real type of request from submission to decision. Separate the wait for an assignment from the wait for the approver to act. Talk to people on both sides before choosing which delay to address.",
+      "Compare plausible changes. A reminder could help a slow decision, while an assignment rule could remove time spent finding the right person. Choose one change that the team can deliver and evaluate independently.",
+      "Agree the first release boundary. List the request types included, the people responsible for the rule, and what the team will do about requests with no matching approver.",
+      "Record the baseline, target, eligible population and review window in the feature brief. Give the work item a parent objective so the team can return to the original reason for funding the change."
+    ],
+    "evidence": "A prioritized feature record links the user need, proposed change, exclusions, objective and evaluation plan. A developer can find both implementation scope and the person who can settle an open product question.",
+    "example": "In the fictional example, epic CC-100 targets a reduction in median submission-to-decision time from two days to one. Feature CC-123 delivers automatic assignment for eligible requests. Approver reminders remain a separate proposal.",
+    "failure": "If submissions already reach approvers promptly, reassess the choice before scheduling implementation. Record the evidence and reconsider the reminder or another intervention.",
+    "measure": "Track time to correct assignment alongside end-to-end decision time and the share of requests still open after one day. Keep the baseline and later review comparable.",
+    "sources": [
+      {
+        "title": "GOV.UK Service Manual · Understand users and their needs",
+        "url": "https://www.gov.uk/service-manual/service-standard/point-1-understand-user-needs"
+      },
+      {
+        "title": "GOV.UK Service Manual · How to set performance metrics for your service",
+        "url": "https://www.gov.uk/service-manual/measuring-success/how-to-set-performance-metrics-for-your-service"
+      }
+    ]
+  },
+  {
+    "id": "criteria",
+    "title": "Write acceptance criteria that distinguish success from coincidence",
+    "phase": "Define",
+    "summary": "An acceptance criterion describes an observable behavior the team can agree to demonstrate. It gives the developer a design constraint, the tester an expected result and the business signatory a basis for a decision.",
+    "owner": "A business analyst or Product Owner clarifies the rule with business users. Developers and QA engineers challenge its testability.",
+    "inputs": [
+      "The prioritized feature and its boundaries",
+      "The routing rule, example requests and application roles"
+    ],
+    "steps": [
+      "Describe the starting condition, the event the user triggers and the expected observable outcome. Identify which example data determines the expected approver before anyone runs the test.",
+      "Give independent behaviors separate identifiers. Automatic assignment and permission to record a decision can fail independently, even when the final screen displays the correct recipient.",
+      "Specify evidence that distinguishes alternative explanations. Capture how the assignment happened and who recorded the decision. Define a negative example using a person outside the authorized role.",
+      "Discuss boundary cases such as missing mappings and repeat submissions. Confirm the intended behavior with the business owner before turning a guess into a test assertion."
+    ],
+    "evidence": "The story contains individually identifiable criteria, examples and expected outcomes. The QA and UAT records can cite the same criteria later, even when the tests exercise different parts of the journey.",
+    "example": "AC-01 requires the submission event to select the approver from the active rule. AC-02 permits only an authorized approver to decide. The test starts with an unassigned request. A requester, a designated approver and an unrelated employee have distinct test identities.",
+    "failure": "A manually routed request might display the expected name. If the record cannot distinguish manual and automatic assignment, the team lacks evidence for AC-01 and should revise the test setup.",
+    "measure": "Ask whether a tester could construct both a passing and a failing example for each criterion and whether the result would explain which rule failed.",
+    "sources": [
+      {
+        "title": "Agile Alliance · Given, When, Then",
+        "url": "https://agilealliance.org/glossary/given-when-then/"
+      },
+      {
+        "title": "GOV.UK Service Manual · Understand users and their needs",
+        "url": "https://www.gov.uk/service-manual/service-standard/point-1-understand-user-needs"
+      }
+    ]
+  },
+  {
+    "id": "branch",
+    "title": "Design the change and commit it on a feature branch",
+    "phase": "Build",
+    "summary": "A short-lived branch gives a developer a place to implement one reviewable change. Its commits capture the design the team actually chose, along with the tests that explain the expected behavior.",
+    "owner": "The developer owns the change and consults the business analyst, QA engineer and relevant maintainers when a design choice affects the workflow.",
+    "inputs": [
+      "A current main branch and the feature key",
+      "Acceptance criteria, test examples and the existing application design"
+    ],
+    "steps": [
+      "Find the submission handler, the source of the routing policy, the assignment record and the decision-permission check. Sketch the path from a submitted request to its assigned approver.",
+      "Choose the smallest change that satisfies the criteria. Consider what happens when a submission is retried after a timeout, two users act close together, or a rule has no matching approver.",
+      "Create a branch from the current integration baseline. Implement the behavior with focused tests, using representative synthetic identities. Capture the assignment method so a later test can distinguish automated routing from operator action.",
+      "Review the diff locally, remove unrelated edits, run relevant checks and commit a coherent increment. Reference the feature key in the commit or pull request so a reviewer can recover the intent."
+    ],
+    "evidence": "A branch points to the latest proposed commit. The commit identifies a particular source snapshot, and its tests and message help the next reader understand the change.",
+    "example": "On a branch for CC-123, a developer adds a routing decision when a request is first submitted. A repeated submission reuses the existing assignment. Separate tests check automatic assignment and decision permission.",
+    "failure": "If the required behavior depends on a disputed role mapping, bring the concrete scenario back to the business analyst. Small, focused commits make it easier to revise the affected decision.",
+    "measure": "A reviewer should be able to connect each material code change to a criterion or implementation need and run the focused tests independently.",
+    "sources": [
+      {
+        "title": "GitHub Docs · GitHub flow",
+        "url": "https://docs.github.com/en/get-started/using-github/github-flow"
+      },
+      {
+        "title": "GitHub Docs · Pull requests",
+        "url": "https://docs.github.com/en/pull-requests/reference/pull-requests"
+      }
+    ]
+  },
+  {
+    "id": "pull-request",
+    "title": "Open a pull request and review the proposed behavior",
+    "phase": "Build",
+    "summary": "A pull request puts a proposed change in front of another person before it joins the shared codebase. The author supplies context and evidence. The reviewer evaluates both the implementation and what the evidence leaves uncertain.",
+    "owner": "The developer prepares the proposal. A peer with knowledge of the affected code reviews it under the team's repository policy.",
+    "inputs": [
+      "A source branch and the intended target branch",
+      "The work item, changed files, tests and any design decisions the reviewer needs"
+    ],
+    "steps": [
+      "Check the base and head branches. Explain the user-visible change, link the work item and identify which criteria the change addresses. Tell the reviewer where the routing decision is made.",
+      "Describe representative test results and remaining risk. Call attention to configuration or identity mappings that will vary by environment so a local pass is interpreted in context.",
+      "Review the diff from input to outcome. Look for behavior under missing mappings, repeated requests and denied decisions. Compare each claimed test with the assertion it actually makes.",
+      "Resolve consequential comments by changing the proposal or recording an agreed design decision. After a new push, review the changed revision and let required checks run again."
+    ],
+    "evidence": "The record links the proposed commits, discussion, files, check results and review decisions. Later readers can examine why a particular design was accepted.",
+    "example": "The reviewer notices that a test sets the approver directly before opening the request. The author replaces it with a submission that triggers the rule and asserts that the recorded assignment source is automatic.",
+    "failure": "Request changes when a required behavior is missing or the test cannot demonstrate it. An unresolved discussion that affects correctness should have an owner and a clear resolution.",
+    "measure": "Check whether the review found a gap the tests alone missed and whether the final review and checks apply to the revision being considered for merge.",
+    "sources": [
+      {
+        "title": "GitHub Docs · Pull requests",
+        "url": "https://docs.github.com/en/pull-requests/reference/pull-requests"
+      },
+      {
+        "title": "GitHub Docs · GitHub flow",
+        "url": "https://docs.github.com/en/get-started/using-github/github-flow"
+      },
+      {
+        "title": "GitHub Docs · About protected branches",
+        "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches"
+      }
+    ]
+  },
+  {
+    "id": "ci",
+    "title": "Run continuous integration checks on the proposed change",
+    "phase": "Build",
+    "summary": "Continuous integration gives the team repeatable feedback on a proposed revision. In this workflow, a pull request starts automated checks, and the configured merge rules use their results when deciding whether the change may enter main.",
+    "owner": "Developers own failed application checks. The team maintaining the build system owns runner, dependency and workflow reliability.",
+    "inputs": [
+      "The pull request event and the revision selected by the workflow",
+      "Version-controlled build instructions, dependencies, test data and required checks"
+    ],
+    "steps": [
+      "Record which revision the job actually checks. Depending on workflow configuration, it can be the feature head or a test merge that combines it with the target branch. Include that identity alongside the run.",
+      "Compile or package the proposed source, then run fast tests for routing and permissions. Add integration tests where the application crosses a boundary, such as writing an assignment to its data store.",
+      "Run the team's selected code and dependency checks with permissions appropriate to unreviewed changes. Keep sensitive production data and deployment credentials out of the test fixtures.",
+      "Inspect each failed check and its logs. Distinguish a reproducible product defect from broken infrastructure or an unstable test. Keep evidence tied to the run that produced it."
+    ],
+    "evidence": "The run records a tested revision, named jobs, outcomes and logs. A build performed to validate a pull request can be temporary. The downstream release candidate is built from integrated main in this map.",
+    "example": "A routing test passes for the designated approver. A permission test shows that a second user can record a decision. The required test job fails, and the developer fixes the permission check on the same pull request.",
+    "failure": "A missing required result or a failed job leaves the proposal unqualified under this example policy. Investigate repeated intermittent results before treating a retry as evidence of a fix.",
+    "measure": "Track time to actionable feedback and the frequency of unstable jobs. Faster runs are useful when they still exercise meaningful behavior.",
+    "sources": [
+      {
+        "title": "GitHub Docs · Understanding GitHub Actions",
+        "url": "https://docs.github.com/en/actions/get-started/understand-github-actions"
+      },
+      {
+        "title": "GitHub Docs · About protected branches",
+        "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches"
+      },
+      {
+        "title": "GitHub Docs · Pull requests",
+        "url": "https://docs.github.com/en/pull-requests/reference/pull-requests"
+      }
+    ]
+  },
+  {
+    "id": "merge",
+    "title": "Merge the reviewed change into main",
+    "phase": "Build",
+    "summary": "Merging integrates an approved change into the shared development line. It produces an identifiable state that the release build can consume. Other changes may have entered main since the author first opened the pull request.",
+    "owner": "A maintainer or authorized merge automation enforces the repository rules. The developer resolves integration conflicts with the relevant code owners.",
+    "inputs": [
+      "A reviewed pull request targeting main",
+      "The required check results and the branch protection policy"
+    ],
+    "steps": [
+      "Read the required review and status rules for the target branch. Check that the current proposal qualifies under the configured policy. Teams can use an up-to-date branch requirement or a merge queue to test changes alongside other pending work.",
+      "Resolve conflicts by considering the behavior on both sides. If a concurrent change renamed a role or altered a database field, rerun the related tests against the combined behavior.",
+      "Merge using the repository's chosen method. Record the resulting commit on main. Squashing or rebasing can produce a different commit identity from the feature branch, and an ordinary merge can create a merge commit.",
+      "Pass the integrated commit to the candidate-build workflow. Capture the pull request link so the path back to discussion, acceptance criteria and review evidence survives."
+    ],
+    "evidence": "The merged pull request and the resulting main commit connect the reviewed proposal with the source that can be packaged. Release evidence should identify that integrated revision.",
+    "example": "One developer changes the approver role's representation while another implements routing. The combined check catches the mismatch. The team updates the lookup, reruns the check and builds from the resulting main revision.",
+    "failure": "If an applicable required review or check is missing, pause the ordinary merge. If integrated tests fail after merge, stop candidate promotion and repair or revert the affected change.",
+    "measure": "For a sample release build, follow its source commit back to the merged pull request and verify how the repository satisfied each applicable merge rule.",
+    "sources": [
+      {
+        "title": "GitHub Docs · About protected branches",
+        "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches"
+      },
+      {
+        "title": "GitHub Docs · Pull requests",
+        "url": "https://docs.github.com/en/pull-requests/reference/pull-requests"
+      },
+      {
+        "title": "GitHub Docs · GitHub flow",
+        "url": "https://docs.github.com/en/get-started/using-github/github-flow"
+      }
+    ]
+  },
+  {
+    "id": "build",
+    "title": "Build and publish the release candidate once",
+    "phase": "Build",
+    "summary": "The release build packages one integrated source revision into a deployable candidate. The team records exactly what it produced so QA, UAT and production can request the same published object.",
+    "owner": "The developer owns application build correctness. The platform or DevOps engineer maintains the workflow, registry access and artifact retention.",
+    "inputs": [
+      "An integrated main commit and version-controlled build recipe",
+      "Dependency versions, a build environment and an image registry"
+    ],
+    "steps": [
+      "Check out the intended integrated commit, install the declared dependencies and run the integrated test suite. Preserve enough information about the build environment to investigate a later mismatch.",
+      "Build the application image. Keep deployment-specific values such as the approver-directory connection and environment-specific routing configuration outside the package. Assign the resulting image an understandable discovery tag.",
+      "Run the team's required image checks. Record the scan report and its policy decision against the candidate. A report provides evidence about the checks performed at its recorded time.",
+      "Publish the candidate, capture the registry digest, and link it to the source revision and build run. Request promotion only when publication and required checks have succeeded. Where provenance is needed, record and verify the build attestation for the artifact."
+    ],
+    "evidence": "The candidate record connects source commit, build run, registry repository, immutable digest and test or scan evidence. Deployment jobs consume the published candidate by identity.",
+    "example": "The routing change and a peer's schema compatibility fix are integrated on main. One build produces the candidate for QA. UAT later selects the digest that QA tested, using its own directory configuration.",
+    "failure": "If publication fails after the image builds locally, the deployment job has no confirmed candidate. Recover the build or publication and verify the actual registry identity before scheduling QA.",
+    "measure": "Pick a running candidate and trace its registry digest back to one integrated commit. Record and investigate any environment that silently rebuilds the approved source.",
+    "sources": [
+      {
+        "title": "DORA · Deployment automation",
+        "url": "https://dora.dev/capabilities/deployment-automation/"
+      },
+      {
+        "title": "GitHub Docs · Artifact attestations",
+        "url": "https://docs.github.com/en/actions/concepts/security/artifact-attestations"
+      },
+      {
+        "title": "Docker Docs · Image digests",
+        "url": "https://docs.docker.com/dhi/explore/security-concepts/digests/"
+      }
+    ]
+  },
+  {
+    "id": "digest",
+    "title": "Identify a container image by its digest",
+    "phase": "Build",
+    "summary": "A container registry stores packaged application content. A digest identifies content through a cryptographic hash. A readable tag helps people find versions, while a digest gives deployments an exact registry object to select.",
+    "owner": "The build workflow records the published digest. The registry maintainer manages availability and retention, and the deployment workflow checks the selected identity.",
+    "inputs": [
+      "The registry and repository containing the candidate",
+      "The digest returned for a published image manifest or image index"
+    ],
+    "steps": [
+      "Capture the complete registry reference after publication. A source commit identifies code, and a registry digest identifies a packaged object. Retain both, since a build also consumes dependencies and other inputs.",
+      "Use the digest in the environment's deployment request. A tag can be reassigned subject to repository policy. Persist the object selected at deployment time so release history remains interpretable if a tag changes.",
+      "Identify whether the recorded digest describes an image for one platform or an index referring to several platform images. Where platform differences matter, record the selected platform and resolved manifest along with the index.",
+      "Compare the requested and observed identities when recording the deployed revision. Record relevant configuration separately. An identical package can select a different approver if the production mapping differs."
+    ],
+    "evidence": "A qualification record links registry name, full digest, relevant platform, source and build. A runtime or deployment record identifies what the target environment actually received. Use comparable identity types when matching the records.",
+    "example": "QA and UAT use the same image. Production also resolves the approved digest, but a changed approver mapping sends a request to another team. The production routing smoke test detects the configuration problem.",
+    "failure": "Hold promotion if the digest is unavailable, differs from the qualified value, or belongs to an unexpected repository. A matching digest alone establishes neither business acceptance nor the authority of the publisher.",
+    "measure": "Starting with a deployed revision, verify that you can recover the full qualified package identity and the configuration associated with that environment.",
+    "sources": [
+      {
+        "title": "Docker Docs · Image digests",
+        "url": "https://docs.docker.com/dhi/explore/security-concepts/digests/"
+      },
+      {
+        "title": "GitHub Docs · Artifact attestations",
+        "url": "https://docs.github.com/en/actions/concepts/security/artifact-attestations"
+      },
+      {
+        "title": "DORA · Deployment automation",
+        "url": "https://dora.dev/capabilities/deployment-automation/"
+      }
+    ]
+  }
+]

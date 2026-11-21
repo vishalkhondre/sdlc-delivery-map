@@ -1,0 +1,83 @@
+[
+  {
+    "id": "glossary",
+    "title": "Glossary for reading the map",
+    "phase": "Reference",
+    "summary": "Follow the vocabulary as one feature changes hands. The terms below distinguish a business decision, a software artifact and an observation from a running service.",
+    "owner": "Each delivery role uses these terms when handing work to the next person.",
+    "inputs": [
+      "A label from the diagram or an identifier from a delivery record."
+    ],
+    "steps": [
+      "Epic and feature. An epic groups related work around a larger objective. A feature changes what someone can do. Here CC-100 owns the business outcome and CC-123 adds automatic assignment. The IDs are fictional.",
+      "Acceptance criterion (AC). A condition that can be checked. AC-01 concerns the rule selecting the expected approver. AC-02 concerns who may record a decision. A test run supplies observations against those conditions.",
+      "Pull request (PR), commit and build. A PR is the proposal that reviewers examine. A commit identifies a source snapshot within Git history. A build turns that source and its build inputs into an artifact. A green check on the proposal does not identify which artifact is running.",
+      "Registry, tag and digest. A registry stores images. A tag is a name for a version and can be reassigned unless protected. A digest identifies content. Record the digest type and platform when comparing an image index to a platform-specific manifest.",
+      "QA, UAT and production. Here QA is where the team verifies technical behavior. In user acceptance testing, representative users exercise the business scenario before a designated person accepts it. Production serves real users. The project chooses which environments and approvals it needs.",
+      "Revision, rollout and exposure. A runtime revision identifies a deployed configuration and software version in the target platform. A rollout introduces it to the environment. Feature flags and traffic routing can determine which users actually see a change.",
+      "Smoke test, alert and incident. A smoke test exercises a small but important path after deployment. An alert calls for investigation. An incident is a disruption being managed. Recovery includes checking the people and requests affected.",
+      "Cohort, baseline and median. A cohort is the group included under one eligibility rule. The baseline gives a comparison point using the same definitions. In the example, median time is the first elapsed time by which at least half the group has reached the event. Pending requests remain in the group."
+    ],
+    "evidence": "Use each record for the question it answers. Review decisions belong to the PR, test evidence belongs to the tested candidate, and runtime observations belong to the deployment and its configuration.",
+    "example": "Starting with prod-r42, use the deployment record to locate the digest. Use the qualification record to find the QA test run and business decision, then follow CC-123 back to the objective on CC-100.",
+    "failure": "A dashboard combines release publication with user exposure. A feature can be present in production behind a disabled flag. Record which users were eligible and when they first saw it.",
+    "measure": "Choose a release and count the handoffs you can follow in both directions using identifiers alone. Record any place where a stage name had to substitute for evidence.",
+    "sources": [
+      {
+        "title": "Docker · Image digests",
+        "url": "https://docs.docker.com/dhi/explore/security-concepts/digests/"
+      },
+      {
+        "title": "GitHub · Deployments and environments",
+        "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments"
+      },
+      {
+        "title": "DORA · Deployment automation",
+        "url": "https://dora.dev/capabilities/deployment-automation/"
+      },
+      {
+        "title": "GOV.UK · How to set performance metrics",
+        "url": "https://www.gov.uk/service-manual/measuring-success/how-to-set-performance-metrics-for-your-service"
+      }
+    ]
+  },
+  {
+    "id": "evidence-record",
+    "title": "Read a worked release record",
+    "phase": "Reference",
+    "summary": "Use two downloadable, fictional records to answer three different questions: which software was qualified, what actually served traffic, and whether the feature met its business objective.",
+    "owner": "The release owner links engineering records. The Product Owner interprets the outcome with users.",
+    "inputs": [
+      "The qualification record and one-day cohort linked on this page.",
+      "The original criteria on feature CC-123 and its one-day decision target."
+    ],
+    "steps": [
+      "Start in the qualification record at production.actual_digest. Compare it with the authorized digest and both tested digests. Read the runtime revision and configuration separately. Different configuration names are expected across environments. Look for evidence that the relevant role mapping was checked.",
+      "Follow the candidate back to the integrated commit and build run. Read the QA observations. The assignment actor identifies automatic routing; the actual recipient tests the rule. The negative decision attempt and resulting request state test authorization. UAT adds a business scenario and a designated decision maker.",
+      "Open the CSV. Each row is a different eligible submission observed for 1,440 minutes. Blank assignment and decision fields mean that event had not occurred by the end of observation. Filter open_at_one_day to true, count the rows and divide by all 100.",
+      "Trace in the opposite direction. Start at the feature objective, find the criteria, then the qualified version, smoke result and product review. Identify which decision you could still justify if the passing smoke test were the only production evidence."
+    ],
+    "evidence": "In this sample, 92 of 100 requests received a correct assignment during follow-up. Forty received a decision. A passing deployment and a missed product target are recorded separately.",
+    "example": "The first 40 decisions in the CSV each took less than one day. Sixty other records are open at 24 hours. A statistic calculated from those first 40 alone drops most of the eligible requests. The cohort median for decisions was not reached within the one-day window.",
+    "failure": "Matching digests cannot establish that the correct groups were configured in Prod. Conversely, the cohort cannot show which release handled a particular request without an exposure or revision link. Real teams record that link where it is needed for analysis.",
+    "measure": "After inspecting the files, explain why the team can report a successful rollout and still open follow-up work. Point to the smoke observation and the unresolved share as your two pieces of evidence.",
+    "sources": [
+      {
+        "title": "Docker · Image digests",
+        "url": "https://docs.docker.com/dhi/explore/security-concepts/digests/"
+      },
+      {
+        "title": "GitHub · Deployments and environments",
+        "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments"
+      },
+      {
+        "title": "DORA · Deployment automation",
+        "url": "https://dora.dev/capabilities/deployment-automation/"
+      },
+      {
+        "title": "GOV.UK · How to set performance metrics",
+        "url": "https://www.gov.uk/service-manual/measuring-success/how-to-set-performance-metrics-for-your-service"
+      }
+    ]
+  }
+]

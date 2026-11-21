@@ -1,0 +1,4 @@
+# Each major.minor edition names its scope and built HTML pages or glob patterns.
+"1.0":
+  section: "The complete feature delivery learning map"
+  pages: [index.html, "**/*.html"]

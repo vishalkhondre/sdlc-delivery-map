@@ -1,0 +1,1167 @@
+[
+  {
+    "id": "phase-define",
+    "label": "Decide & Define",
+    "x": 213,
+    "y": 123,
+    "w": 212,
+    "h": 32
+  },
+  {
+    "id": "phase-build",
+    "label": "Build & Prove",
+    "x": 441,
+    "y": 123,
+    "w": 1080,
+    "h": 32
+  },
+  {
+    "id": "phase-release",
+    "label": "Release & Learn",
+    "x": 1553,
+    "y": 123,
+    "w": 413,
+    "h": 32
+  },
+  {
+    "id": "environments",
+    "label": "Dev",
+    "x": 441,
+    "y": 167,
+    "w": 635,
+    "h": 29
+  },
+  {
+    "id": "environments",
+    "label": "QA",
+    "x": 1108,
+    "y": 167,
+    "w": 190,
+    "h": 29
+  },
+  {
+    "id": "environments",
+    "label": "UAT",
+    "x": 1330,
+    "y": 167,
+    "w": 190,
+    "h": 29
+  },
+  {
+    "id": "release-plan",
+    "label": "Release preparation",
+    "x": 1553,
+    "y": 167,
+    "w": 190,
+    "h": 29
+  },
+  {
+    "id": "environments",
+    "label": "Prod",
+    "x": 1775,
+    "y": 167,
+    "w": 190,
+    "h": 29
+  },
+  {
+    "id": "branch",
+    "label": "Commit a change",
+    "x": 441,
+    "y": 210,
+    "w": 190,
+    "h": 38
+  },
+  {
+    "id": "pull-request",
+    "label": "Check the feature PR",
+    "x": 663,
+    "y": 210,
+    "w": 190,
+    "h": 38
+  },
+  {
+    "id": "build",
+    "label": "Merge and build",
+    "x": 886,
+    "y": 210,
+    "w": 190,
+    "h": 38
+  },
+  {
+    "id": "qa-tests",
+    "label": "Verify in QA",
+    "x": 1108,
+    "y": 210,
+    "w": 190,
+    "h": 38
+  },
+  {
+    "id": "uat-decision",
+    "label": "Business acceptance",
+    "x": 1331,
+    "y": 210,
+    "w": 190,
+    "h": 38
+  },
+  {
+    "id": "release",
+    "label": "Publish GitHub release",
+    "x": 1553,
+    "y": 210,
+    "w": 190,
+    "h": 38
+  },
+  {
+    "id": "rollout",
+    "label": "Deploy to Prod",
+    "x": 1775,
+    "y": 210,
+    "w": 190,
+    "h": 38
+  },
+  {
+    "id": "tool-jira",
+    "label": "Jira",
+    "x": 236,
+    "y": 262,
+    "w": 194,
+    "h": 114
+  },
+  {
+    "id": "tool-github",
+    "label": "GitHub repository",
+    "x": 236,
+    "y": 385,
+    "w": 194,
+    "h": 114
+  },
+  {
+    "id": "tool-actions",
+    "label": "GitHub Actions",
+    "x": 236,
+    "y": 506,
+    "w": 194,
+    "h": 114
+  },
+  {
+    "id": "tool-registry",
+    "label": "Docker Hub",
+    "x": 236,
+    "y": 628,
+    "w": 194,
+    "h": 114
+  },
+  {
+    "id": "tool-azure",
+    "label": "Azure Cloud",
+    "x": 236,
+    "y": 750,
+    "w": 194,
+    "h": 240
+  },
+  {
+    "id": "tool-test",
+    "label": "Test Management Tool",
+    "x": 236,
+    "y": 999,
+    "w": 194,
+    "h": 132
+  },
+  {
+    "id": "tool-confluence",
+    "label": "Confluence",
+    "x": 236,
+    "y": 1139,
+    "w": 194,
+    "h": 115
+  },
+  {
+    "id": "role-product",
+    "label": "Product Owner",
+    "x": 46,
+    "y": 288,
+    "w": 172,
+    "h": 20
+  },
+  {
+    "id": "role-ba",
+    "label": "Business Analyst",
+    "x": 46,
+    "y": 309,
+    "w": 172,
+    "h": 20
+  },
+  {
+    "id": "role-release",
+    "label": "Release Manager",
+    "x": 46,
+    "y": 331,
+    "w": 172,
+    "h": 20
+  },
+  {
+    "id": "role-dev",
+    "label": "Developer",
+    "x": 46,
+    "y": 421,
+    "w": 172,
+    "h": 20
+  },
+  {
+    "id": "role-release",
+    "label": "Release Manager",
+    "x": 46,
+    "y": 442,
+    "w": 172,
+    "h": 20
+  },
+  {
+    "id": "role-dev",
+    "label": "Developer",
+    "x": 46,
+    "y": 531,
+    "w": 172,
+    "h": 20
+  },
+  {
+    "id": "role-ops",
+    "label": "DevOps Engineer",
+    "x": 46,
+    "y": 553,
+    "w": 172,
+    "h": 20
+  },
+  {
+    "id": "role-release",
+    "label": "Release Manager",
+    "x": 46,
+    "y": 575,
+    "w": 172,
+    "h": 20
+  },
+  {
+    "id": "role-ops",
+    "label": "DevOps Engineer",
+    "x": 46,
+    "y": 674,
+    "w": 172,
+    "h": 20
+  },
+  {
+    "id": "role-ops",
+    "label": "DevOps Engineer",
+    "x": 46,
+    "y": 785,
+    "w": 172,
+    "h": 20
+  },
+  {
+    "id": "role-service",
+    "label": "Service Owner",
+    "x": 46,
+    "y": 807,
+    "w": 172,
+    "h": 20
+  },
+  {
+    "id": "role-qa",
+    "label": "QA Engineer / QA Lead",
+    "x": 46,
+    "y": 1024,
+    "w": 172,
+    "h": 20
+  },
+  {
+    "id": "role-business",
+    "label": "Business User / SME",
+    "x": 46,
+    "y": 1046,
+    "w": 172,
+    "h": 20
+  },
+  {
+    "id": "role-business",
+    "label": "Business Acceptor",
+    "x": 46,
+    "y": 1068,
+    "w": 172,
+    "h": 20
+  },
+  {
+    "id": "role-ba",
+    "label": "Business Analyst",
+    "x": 46,
+    "y": 1164,
+    "w": 172,
+    "h": 20
+  },
+  {
+    "id": "role-qa",
+    "label": "QA Lead",
+    "x": 46,
+    "y": 1186,
+    "w": 172,
+    "h": 20
+  },
+  {
+    "id": "role-release",
+    "label": "Release Manager",
+    "x": 46,
+    "y": 1207,
+    "w": 172,
+    "h": 20
+  },
+  {
+    "id": "define",
+    "label": "Feature CC-123 and its parent epic",
+    "x": 441,
+    "y": 271,
+    "w": 635,
+    "h": 43
+  },
+  {
+    "id": "criteria",
+    "label": "AC-01 automatic assignment and AC-02 authorization",
+    "x": 441,
+    "y": 314,
+    "w": 635,
+    "h": 36
+  },
+  {
+    "id": "measure",
+    "label": "Outcome target and baseline",
+    "x": 441,
+    "y": 350,
+    "w": 635,
+    "h": 22
+  },
+  {
+    "id": "release-plan",
+    "label": "Plan the release",
+    "x": 1553,
+    "y": 271,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "release-plan",
+    "label": "Fix version",
+    "x": 1553,
+    "y": 348,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "deployment-record",
+    "label": "Record deployment",
+    "x": 1775,
+    "y": 271,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "deployment-record",
+    "label": "Deployment evidence",
+    "x": 1775,
+    "y": 348,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "branch",
+    "label": "Feature branch",
+    "x": 441,
+    "y": 392,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "branch",
+    "label": "Feature commit",
+    "x": 441,
+    "y": 469,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "pull-request",
+    "label": "Open pull request",
+    "x": 663,
+    "y": 392,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "pull-request",
+    "label": "Pull request event",
+    "x": 663,
+    "y": 469,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "merge",
+    "label": "Merge feature PR",
+    "x": 886,
+    "y": 392,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "merge",
+    "label": "Main commit",
+    "x": 886,
+    "y": 469,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "release",
+    "label": "Publish GitHub release",
+    "x": 1553,
+    "y": 392,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "release",
+    "label": "Published release",
+    "x": 1553,
+    "y": 469,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "ci",
+    "label": "Run CI checks",
+    "x": 663,
+    "y": 515,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "ci",
+    "label": "CI result",
+    "x": 663,
+    "y": 592,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "build",
+    "label": "Build candidate once",
+    "x": 886,
+    "y": 515,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "digest",
+    "label": "Commit and image digest",
+    "x": 886,
+    "y": 592,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "qa-rollout",
+    "label": "Request QA rollout",
+    "x": 1108,
+    "y": 515,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "qa-rollout",
+    "label": "QA deployment job",
+    "x": 1108,
+    "y": 592,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "uat-promotion",
+    "label": "Promote to UAT",
+    "x": 1331,
+    "y": 515,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "uat-promotion",
+    "label": "UAT deployment job",
+    "x": 1331,
+    "y": 592,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "policy",
+    "label": "Enforce Prod policy",
+    "x": 1553,
+    "y": 515,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "policy",
+    "label": "Authorized digest",
+    "x": 1553,
+    "y": 592,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "rollout",
+    "label": "Start Prod rollout",
+    "x": 1775,
+    "y": 515,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "rollout",
+    "label": "Prod deployment job",
+    "x": 1775,
+    "y": 592,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "registry",
+    "label": "Serve candidate",
+    "x": 1108,
+    "y": 637,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "digest",
+    "label": "Image digest",
+    "x": 1108,
+    "y": 714,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "registry",
+    "label": "Serve same image",
+    "x": 1775,
+    "y": 637,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "digest",
+    "label": "Same image digest",
+    "x": 1775,
+    "y": 714,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "qa-revision",
+    "label": "Deploy to QA",
+    "x": 1108,
+    "y": 758,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "qa-revision",
+    "label": "QA revision and URL",
+    "x": 1108,
+    "y": 835,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "uat-runtime",
+    "label": "Deploy to UAT",
+    "x": 1331,
+    "y": 758,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "uat-runtime",
+    "label": "UAT revision and URL",
+    "x": 1331,
+    "y": 835,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "observe",
+    "label": "Roll out and observe",
+    "x": 1775,
+    "y": 758,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "deployment-record",
+    "label": "Prod deployment record",
+    "x": 1775,
+    "y": 835,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "recover",
+    "label": "Recover service",
+    "x": 1775,
+    "y": 886,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "recover",
+    "label": "Recovery decision",
+    "x": 1775,
+    "y": 963,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "hold",
+    "label": "Hold release",
+    "x": 886,
+    "y": 1008,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "hold",
+    "label": "Requalification required",
+    "x": 886,
+    "y": 1085,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "qa-tests",
+    "label": "Verify AC-01 and AC-02",
+    "x": 1108,
+    "y": 1008,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "qa-tests",
+    "label": "QA run and digest",
+    "x": 1108,
+    "y": 1085,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "uat-decision",
+    "label": "Record UAT decision",
+    "x": 1331,
+    "y": 1008,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "uat-decision",
+    "label": "UAT decision and digest",
+    "x": 1331,
+    "y": 1085,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "smoke",
+    "label": "Record smoke test",
+    "x": 1775,
+    "y": 1008,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "smoke",
+    "label": "Prod test evidence",
+    "x": 1775,
+    "y": 1085,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "validation-summary",
+    "label": "Validation summary",
+    "x": 1331,
+    "y": 1147,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "validation-summary",
+    "label": "QA and UAT evidence",
+    "x": 1331,
+    "y": 1224,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "notes",
+    "label": "Publish release notes",
+    "x": 1775,
+    "y": 1147,
+    "w": 190,
+    "h": 77
+  },
+  {
+    "id": "notes",
+    "label": "Release notes URL",
+    "x": 1775,
+    "y": 1224,
+    "w": 190,
+    "h": 24,
+    "anchor": "evidence"
+  },
+  {
+    "id": "ci",
+    "label": "Fix and push again",
+    "x": 535,
+    "y": 532,
+    "w": 124,
+    "h": 26
+  },
+  {
+    "id": "uat-promotion",
+    "label": "QA passed",
+    "x": 1234,
+    "y": 954,
+    "w": 85,
+    "h": 28
+  },
+  {
+    "id": "release",
+    "label": "UAT accepted",
+    "x": 1452,
+    "y": 954,
+    "w": 90,
+    "h": 28
+  },
+  {
+    "id": "hold",
+    "label": "QA failed",
+    "x": 1149,
+    "y": 1110,
+    "w": 74,
+    "h": 20
+  },
+  {
+    "id": "hold",
+    "label": "UAT rejected",
+    "x": 1285,
+    "y": 1110,
+    "w": 86,
+    "h": 20
+  },
+  {
+    "id": "recover",
+    "label": "Health check failed",
+    "x": 1798,
+    "y": 859,
+    "w": 150,
+    "h": 26
+  },
+  {
+    "id": "recover",
+    "label": "Smoke test failed",
+    "x": 1798,
+    "y": 987,
+    "w": 150,
+    "h": 20
+  },
+  {
+    "id": "phase-release",
+    "label": "Release and learn after deployment",
+    "x": 36,
+    "y": 1264,
+    "w": 547,
+    "h": 31
+  },
+  {
+    "id": "role-service",
+    "label": "Service owner after rollout",
+    "x": 42,
+    "y": 1307,
+    "w": 360,
+    "h": 70
+  },
+  {
+    "id": "alert",
+    "label": "Alert on unassigned requests",
+    "x": 435,
+    "y": 1307,
+    "w": 485,
+    "h": 75
+  },
+  {
+    "id": "incident",
+    "label": "Respond to the alert",
+    "x": 962,
+    "y": 1307,
+    "w": 478,
+    "h": 75
+  },
+  {
+    "id": "recover",
+    "label": "Confirm recovery",
+    "x": 1491,
+    "y": 1307,
+    "w": 510,
+    "h": 75
+  },
+  {
+    "id": "role-product",
+    "label": "Product owner after release",
+    "x": 42,
+    "y": 1401,
+    "w": 360,
+    "h": 100
+  },
+  {
+    "id": "measure",
+    "label": "Measure the outcome",
+    "x": 435,
+    "y": 1401,
+    "w": 485,
+    "h": 105
+  },
+  {
+    "id": "measure",
+    "label": "Compare with the objective",
+    "x": 962,
+    "y": 1401,
+    "w": 476,
+    "h": 105
+  },
+  {
+    "id": "feedback",
+    "label": "Feed the result back to Jira",
+    "x": 1491,
+    "y": 1401,
+    "w": 510,
+    "h": 105
+  },
+  {
+    "id": "merge",
+    "label": "What blocks a merge?",
+    "x": 36,
+    "y": 1532,
+    "w": 650,
+    "h": 91
+  },
+  {
+    "id": "policy",
+    "label": "What blocks promotion?",
+    "x": 698,
+    "y": 1532,
+    "w": 650,
+    "h": 91
+  },
+  {
+    "id": "deployment-record",
+    "label": "What confirms deployment?",
+    "x": 1360,
+    "y": 1532,
+    "w": 650,
+    "h": 91,
+    "anchor": "evidence"
+  },
+  {
+    "id": "handoffs",
+    "label": "Connector types, evidence links and outputs",
+    "x": 34,
+    "y": 1640,
+    "w": 1450,
+    "h": 32
+  },
+  {
+    "id": "glossary",
+    "label": "PR, AC and image digest",
+    "x": 1470,
+    "y": 1691,
+    "w": 536,
+    "h": 40
+  },
+  {
+    "id": "branch",
+    "label": "Trace from the Jira feature to its source branch",
+    "x": 523,
+    "y": 373,
+    "w": 25,
+    "h": 18,
+    "anchor": "inputs"
+  },
+  {
+    "id": "pull-request",
+    "label": "A feature commit opens review",
+    "x": 632,
+    "y": 431,
+    "w": 30,
+    "h": 24,
+    "anchor": "inputs"
+  },
+  {
+    "id": "ci",
+    "label": "A pull request starts CI",
+    "x": 746,
+    "y": 494,
+    "w": 25,
+    "h": 20,
+    "anchor": "inputs"
+  },
+  {
+    "id": "merge",
+    "label": "Passing checks allow merge",
+    "x": 858,
+    "y": 435,
+    "w": 26,
+    "h": 136,
+    "anchor": "inputs"
+  },
+  {
+    "id": "build",
+    "label": "Merged source triggers the integrated build",
+    "x": 967,
+    "y": 494,
+    "w": 27,
+    "h": 20,
+    "anchor": "inputs"
+  },
+  {
+    "id": "qa-rollout",
+    "label": "Send the built candidate to QA",
+    "x": 1078,
+    "y": 551,
+    "w": 29,
+    "h": 27,
+    "anchor": "inputs"
+  },
+  {
+    "id": "registry",
+    "label": "Pull the selected image for QA",
+    "x": 1188,
+    "y": 617,
+    "w": 30,
+    "h": 19,
+    "anchor": "inputs"
+  },
+  {
+    "id": "qa-revision",
+    "label": "Run the image in QA",
+    "x": 1189,
+    "y": 738,
+    "w": 28,
+    "h": 20,
+    "anchor": "inputs"
+  },
+  {
+    "id": "qa-tests",
+    "label": "Use the verified QA revision for testing",
+    "x": 1191,
+    "y": 860,
+    "w": 25,
+    "h": 147,
+    "anchor": "inputs"
+  },
+  {
+    "id": "uat-promotion",
+    "label": "Hand off the passing QA evidence",
+    "x": 1304,
+    "y": 576,
+    "w": 23,
+    "h": 375,
+    "anchor": "inputs"
+  },
+  {
+    "id": "uat-runtime",
+    "label": "Deploy the accepted QA digest in UAT",
+    "x": 1413,
+    "y": 617,
+    "w": 24,
+    "h": 140,
+    "anchor": "inputs"
+  },
+  {
+    "id": "uat-decision",
+    "label": "Exercise the running UAT revision",
+    "x": 1413,
+    "y": 860,
+    "w": 24,
+    "h": 147,
+    "anchor": "inputs"
+  },
+  {
+    "id": "release",
+    "label": "Follow business acceptance to release publication",
+    "x": 1527,
+    "y": 451,
+    "w": 20,
+    "h": 496,
+    "anchor": "inputs"
+  },
+  {
+    "id": "release",
+    "label": "Link the target version to the release entry",
+    "x": 1637,
+    "y": 373,
+    "w": 24,
+    "h": 18,
+    "anchor": "inputs"
+  },
+  {
+    "id": "policy",
+    "label": "Start the production authorization check",
+    "x": 1636,
+    "y": 494,
+    "w": 25,
+    "h": 20,
+    "anchor": "inputs"
+  },
+  {
+    "id": "rollout",
+    "label": "Hand off the authorized candidate",
+    "x": 1745,
+    "y": 552,
+    "w": 28,
+    "h": 26,
+    "anchor": "inputs"
+  },
+  {
+    "id": "registry",
+    "label": "Retrieve the qualified image for production",
+    "x": 1857,
+    "y": 617,
+    "w": 26,
+    "h": 19,
+    "anchor": "inputs"
+  },
+  {
+    "id": "observe",
+    "label": "Observe the revision receiving production traffic",
+    "x": 1858,
+    "y": 738,
+    "w": 26,
+    "h": 20,
+    "anchor": "inputs"
+  },
+  {
+    "id": "deployment-record",
+    "label": "Link actual production state back to the issue",
+    "x": 1985,
+    "y": 325,
+    "w": 24,
+    "h": 466,
+    "anchor": "evidence"
+  },
+  {
+    "id": "smoke",
+    "label": "Verify the feature in production",
+    "x": 1968,
+    "y": 838,
+    "w": 23,
+    "h": 210,
+    "anchor": "inputs"
+  },
+  {
+    "id": "notes",
+    "label": "Link the smoke result to the release notes",
+    "x": 1857,
+    "y": 1110,
+    "w": 26,
+    "h": 36,
+    "anchor": "evidence"
+  },
+  {
+    "id": "validation-summary",
+    "label": "Link the recorded UAT result to the summary",
+    "x": 1414,
+    "y": 1110,
+    "w": 24,
+    "h": 36,
+    "anchor": "evidence"
+  },
+  {
+    "id": "hold",
+    "label": "QA failure or business rejection holds promotion",
+    "x": 977,
+    "y": 1128,
+    "w": 385,
+    "h": 9,
+    "anchor": "failure"
+  },
+  {
+    "id": "branch",
+    "label": "Repair the rejected change and qualify it again",
+    "x": 527,
+    "y": 620,
+    "w": 19,
+    "h": 425,
+    "anchor": "steps"
+  },
+  {
+    "id": "incident",
+    "label": "Route an actionable alert to incident response",
+    "x": 908,
+    "y": 1311,
+    "w": 47,
+    "h": 16,
+    "anchor": "inputs"
+  },
+  {
+    "id": "recover",
+    "label": "From incident response to recovery confirmation",
+    "x": 1435,
+    "y": 1311,
+    "w": 45,
+    "h": 16,
+    "anchor": "evidence"
+  },
+  {
+    "id": "measure",
+    "label": "Compare outcome evidence with the objective",
+    "x": 908,
+    "y": 1408,
+    "w": 47,
+    "h": 17,
+    "anchor": "measure"
+  },
+  {
+    "id": "feedback",
+    "label": "Use the comparison in a product decision",
+    "x": 1435,
+    "y": 1408,
+    "w": 46,
+    "h": 17,
+    "anchor": "inputs"
+  }
+]

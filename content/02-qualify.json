@@ -1,0 +1,301 @@
+[
+  {
+    "id": "qa-rollout",
+    "title": "Request a QA rollout",
+    "phase": "Prove",
+    "summary": "A QA rollout gives the team a running copy of a particular candidate. The deployment request says which image and settings to use. The running service supplies the evidence that those instructions took effect.",
+    "owner": "DevOps engineer or developer responsible for the QA deployment job",
+    "inputs": [
+      "Candidate record from the integrated build, including the registry path and full digest",
+      "Versioned QA settings, deployment target and test data requirements"
+    ],
+    "steps": [
+      "Select the image recorded by the integrated build. Keep its commit, build run and digest together so that QA can trace a candidate back to the change that produced it.",
+      "Pass QA configuration to the same deployment procedure that later environments use. In this example the QA routing table and test accounts differ from UAT, while the application package stays the same.",
+      "Start the job and capture its run identifier. Wait for the platform to report a ready deployment. A queued job supplies no evidence that a tester can use the new feature.",
+      "Hand the test lead the observed revision, reachable endpoint and relevant configuration version. Agree how long that target will remain stable, especially when several releases share a QA environment."
+    ],
+    "evidence": "A rollout request identifies the requested digest, configuration and job. The completion record adds the actual target, revision, readiness and time.",
+    "example": "Build 418 contains automatic approval routing. QA asks to deploy that build with the test routing rule for the purchasing team. A delayed deployment leaves the old revision serving for several minutes. The test lead begins the run after checking the new revision.",
+    "failure": "If the registry pull or configuration fails, record the deployment error and hold the test run. A deployment failure and a failed feature test have different owners and produce different evidence.",
+    "measure": "Track elapsed time from a candidate becoming available to a verified QA endpoint. Separate queue time from deployment time when investigating delays.",
+    "sources": [
+      {
+        "title": "DORA · Deployment automation",
+        "url": "https://dora.dev/capabilities/deployment-automation/"
+      },
+      {
+        "title": "Microsoft Learn · Azure Container Apps revisions",
+        "url": "https://learn.microsoft.com/en-us/azure/container-apps/revisions"
+      }
+    ]
+  },
+  {
+    "id": "registry",
+    "title": "Retrieve the candidate from the registry",
+    "phase": "Prove",
+    "summary": "A registry stores the published container image. A tag is a readable label, while a digest identifies particular content. Recording which reference the deployment actually pulled is essential when a tag is updated between QA and release.",
+    "owner": "Engineer responsible for publishing and retrieving release artifacts",
+    "inputs": [
+      "Registry and repository name from the build",
+      "Full content digest plus target platform when the published image supports multiple platforms"
+    ],
+    "steps": [
+      "Read the digest from the output of the job that pushed the image. Keep a readable release or build label alongside it for people searching the registry.",
+      "Retrieve the image by repository and digest. Check that the target platform is supported. A multi-platform index can point at different platform-specific manifests, so record the platform when it can affect qualification.",
+      "Keep the candidate available through the qualification and release window. Link tests and deployments to the recorded digest so they can be compared after labels change.",
+      "Supply environment settings during deployment. If someone rebuilds the application for UAT, capture the new digest and treat that build as a separate candidate."
+    ],
+    "evidence": "A registry reference, content digest, build run and, where relevant, platform identify the package available for deployment. Test and acceptance evidence is recorded separately.",
+    "example": "QA pulls the approval application published by build 418. Build 419 later moves the team's integration tag. UAT can still retrieve build 418 by the digest recorded in QA's deployment record.",
+    "failure": "If a pinned artifact is missing, pause promotion and investigate retention or retrieval. Substituting whichever image currently has the release tag breaks the link to the test results.",
+    "measure": "For a sample release, follow the digest from the build output to the QA, UAT and production deployment records. Count unresolved differences.",
+    "sources": [
+      {
+        "title": "Docker · Image digests",
+        "url": "https://docs.docker.com/dhi/explore/security-concepts/digests/"
+      },
+      {
+        "title": "Docker · Pull an image by digest",
+        "url": "https://docs.docker.com/reference/cli/docker/image/pull/"
+      },
+      {
+        "title": "DORA · Deployment automation",
+        "url": "https://dora.dev/capabilities/deployment-automation/"
+      }
+    ]
+  },
+  {
+    "id": "qa-revision",
+    "title": "Identify the running QA revision",
+    "phase": "Prove",
+    "summary": "The revision is the platform's record of a deployed application version. QA needs to know which revision handled its requests, particularly when a shared endpoint can route traffic to more than one version.",
+    "owner": "DevOps engineer provides the target and QA engineer verifies it",
+    "inputs": [
+      "Requested digest and deployment job",
+      "QA endpoint, active routing configuration and platform deployment record"
+    ],
+    "steps": [
+      "Inspect the platform's completed deployment. In Azure Container Apps a revision captures revision-scoped application settings. Other platforms may provide a deployment ID, workload revision or equivalent record.",
+      "Check which revision the test endpoint serves. If several revisions receive traffic, choose a revision-specific route or another controlled way to establish which version served each test.",
+      "Record any external configuration that determines the feature's behavior. For approval routing this can include the effective routing table and the roles assigned to the test identities.",
+      "Bind the test run to the observed revision. If another rollout occurs mid-run, separate the affected cases and repeat them against a known target."
+    ],
+    "evidence": "The QA run references its actual revision, candidate digest, endpoint and relevant configuration identity. Keep secret values outside the test evidence.",
+    "example": "The general QA URL points partly to the previous revision. The engineer gives the test lead a route to the candidate revision and records the routing table used for the purchasing rule. A repeat run can now isolate code changes from configuration changes.",
+    "failure": "A successful response from a health endpoint confirms reachability. If the team cannot identify the serving revision, an application-level result remains ambiguous and cannot qualify the candidate in this example.",
+    "measure": "Track test cases repeated because the target changed during execution. Repeated ambiguity can justify isolated test targets or more reliable deployment records.",
+    "sources": [
+      {
+        "title": "Microsoft Learn · Azure Container Apps revisions",
+        "url": "https://learn.microsoft.com/en-us/azure/container-apps/revisions"
+      },
+      {
+        "title": "DORA · Deployment automation",
+        "url": "https://dora.dev/capabilities/deployment-automation/"
+      }
+    ]
+  },
+  {
+    "id": "qa-tests",
+    "title": "Verify automatic routing and decision permissions",
+    "phase": "Prove",
+    "summary": "Test the two promises separately. AC-01 says submission automatically assigns the approver specified by the rule. AC-02 says only authorized approvers can record a decision. Seeing the expected name on screen is insufficient to distinguish automatic routing from a manual fix.",
+    "owner": "QA engineer designs and executes the checks with the business analyst",
+    "inputs": [
+      "AC-01 and AC-02, the effective routing rule and expected approver",
+      "Known QA revision and digest, an eligible request, authorized and unauthorized test identities"
+    ],
+    "steps": [
+      "Create a fresh eligible request. Write down the expected approver before submitting. Submit it once and leave the assignment controls untouched.",
+      "Inspect the first assignment, its source and its timing. Use a system event or audit record if the application provides one. If assignment is asynchronous, allow the specified processing window and capture the outcome when that window ends.",
+      "Using a separate eligible request or a reset fixture, attempt the decision as an unauthorized test user. Verify rejection and that the persisted decision state is unchanged. Then exercise the authorized path and verify the saved decision.",
+      "Record each criterion's result, expected and observed values, run, revision, configuration and digest. Send a failed required check to the release hold path."
+    ],
+    "evidence": "Example passing evidence includes the request identifier, recorded rule assignment, expected and actual recipient, rejected unauthorized action, successful authorized decision and the candidate identity.",
+    "example": "QA run qa-204 tested request R-17 on revision qa-r17 using qa-routing-3 and build 418. AC-01 passed: the recorded actor was the routing rule and the recipient matched the expected purchasing approver. AC-02 passed: the requester’s decision was denied without changing state, then the nominated approver recorded a decision. The downloadable qualification record includes the full candidate digest, the UAT rejection and later retest.",
+    "failure": "A tester manually reassigns R-17 after submission. The final recipient is correct, but AC-01 is unproven. Preserve the observed sequence, start a clean request and investigate the absent rule assignment.",
+    "measure": "Report required criteria passed, failed and untested separately. Retain the first failure when recording a successful retest.",
+    "sources": [
+      {
+        "title": "ISTQB · Acceptance testing and business rules",
+        "url": "https://istqb.org/certifications/certified-tester-acceptance-testing/"
+      },
+      {
+        "title": "Microsoft Learn · Track test status",
+        "url": "https://learn.microsoft.com/en-us/azure/devops/test/track-test-status?view=azure-devops"
+      }
+    ]
+  },
+  {
+    "id": "uat-promotion",
+    "title": "Promote the QA-qualified candidate to UAT",
+    "phase": "Prove",
+    "summary": "Promotion selects an already tested candidate for a new environment. The decision depends on whether the required QA results still describe the candidate about to be deployed, including configuration changes that affect user-visible behavior.",
+    "owner": "Deployment workflow applies the team's promotion policy",
+    "inputs": [
+      "QA run, criterion-level results and observed digest",
+      "Selected candidate digest, UAT deployment configuration and known differences from QA"
+    ],
+    "steps": [
+      "Resolve the candidate and look up the QA evidence for that exact image. Check that the required cases ran to completion and their outcomes meet the team's policy.",
+      "Compare behavior-sensitive settings. The QA and UAT identities may have different names, but both need roles representing the same business permissions. Identify changed routing rules, flags, integrations or data assumptions.",
+      "Pass the pinned image and UAT configuration into the deployment job. Capture the job ID and the resulting UAT revision so the acceptor can identify the target.",
+      "Record the reason for any additional testing. A changed business rule can warrant a targeted QA rerun or a new acceptance scenario even when the digest matches."
+    ],
+    "evidence": "The promotion record links the passing QA run, selected digest, reviewed configuration differences and UAT deployment. A team using GitHub environments can add protection rules appropriate to its release policy.",
+    "example": "QA qualified build 418. A newer build now exists. The workflow selects 418 for UAT because the QA run covers that digest. The UAT signatory then exercises the local routing table and business role assignments.",
+    "failure": "Hold a candidate with missing evidence, a changed digest or an unexplained configuration difference that could invalidate the tested behavior. Capture what would make it eligible again.",
+    "measure": "Count promotions paused because evidence refers to a different candidate. Investigate whether labels, manual copying or parallel releases caused the mismatch.",
+    "sources": [
+      {
+        "title": "DORA · Deployment automation",
+        "url": "https://dora.dev/capabilities/deployment-automation/"
+      },
+      {
+        "title": "GitHub Docs · Deployments and environments",
+        "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments"
+      },
+      {
+        "title": "Azure Well-Architected Framework · Safe deployment practices",
+        "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
+      }
+    ]
+  },
+  {
+    "id": "uat-runtime",
+    "title": "Prepare the UAT environment",
+    "phase": "Prove",
+    "summary": "User acceptance testing lets representative users exercise a proposed change in a realistic business setting. A dedicated environment is the choice in this worked example. Its usefulness depends on the identities, data and integrations available to the participants.",
+    "owner": "DevOps engineer prepares the environment and the business analyst prepares the scenario",
+    "inputs": [
+      "QA-qualified candidate, reviewed UAT configuration and deployment record",
+      "Representative test users, an agreed business scenario and known starting data"
+    ],
+    "steps": [
+      "Deploy the selected image and check which revision serves the UAT endpoint. Record the digest along with the effective configuration version and any deliberate substitutions for external systems.",
+      "Prepare representative roles and synthetic business data. Give the requester and approver distinct accounts so the exercise covers the actual handoff.",
+      "Agree what the users should observe and which parts of the workflow are simulated. If notifications go to a test inbox, document what that setup allows the signatory to conclude about notification delivery.",
+      "Check the environment immediately before the exercise. If a role mapping, feature flag or dependency changes afterwards, identify the affected scenarios and repeat them before relying on the decision."
+    ],
+    "evidence": "The UAT entry record identifies the revision, digest, scenario, participants' roles, test data and known environment limitations.",
+    "example": "A requester submits a purchase approval and a purchasing approver receives it. Both users see familiar workspace names in UAT. A test mailbox catches the notification, so the signatory records that mailbox handling separately from real email delivery.",
+    "failure": "When an expected role cannot sign in, classify the session as blocked and resolve the environment issue. A blocked exercise provides no acceptance evidence for the missing steps.",
+    "measure": "Review how much scheduled UAT time is lost to missing accounts, unavailable dependencies or stale data. Use the recurring causes to improve preparation.",
+    "sources": [
+      {
+        "title": "ISTQB · Acceptance testing and business rules",
+        "url": "https://istqb.org/certifications/certified-tester-acceptance-testing/"
+      },
+      {
+        "title": "Microsoft Learn · Azure Container Apps revisions",
+        "url": "https://learn.microsoft.com/en-us/azure/container-apps/revisions"
+      },
+      {
+        "title": "DORA · Deployment automation",
+        "url": "https://dora.dev/capabilities/deployment-automation/"
+      }
+    ]
+  },
+  {
+    "id": "uat-decision",
+    "title": "Record business acceptance",
+    "phase": "Prove",
+    "summary": "QA can show that a rule executed correctly. Business acceptance asks whether the resulting workflow supports the intended work. The designated signatory records a decision for a named candidate after representative users exercise the agreed scenarios.",
+    "owner": "UAT signatory decides after users and subject-matter experts exercise the workflow",
+    "inputs": [
+      "Agreed business scenarios, acceptance criteria and scope of the decision",
+      "Verified UAT target, configuration identity, candidate digest and QA results"
+    ],
+    "steps": [
+      "Walk through the request from submission to decision using representative business roles. Ask users to explain whether the recipient and available actions make sense for the situation.",
+      "Record what happened at the important boundaries. Capture whether the first assignment was automatic, whether the expected person could act, and what the requester saw after the decision.",
+      "Distinguish the application's approver from the release signatory. The first person decides a business request. The second person accepts or rejects the candidate for this scope.",
+      "Capture the signatory, date, scenarios, linked results, decision and limitations. In this example acceptance allows preparation of the release. Rejection holds the candidate for investigation."
+    ],
+    "evidence": "A dated acceptance record connects the signatory's decision to the tested digest, UAT revision and exercised business scenarios. It can be referenced during production authorization.",
+    "example": "An authorized approver can decide a request, but buyers explain that the routing table directs requests for their unit to another unit's approver. UAT rejects the candidate and links the scenario, even though an earlier QA fixture passed.",
+    "failure": "If a user skipped a required scenario or the target changed, record the decision as pending. Ask the signatory to decide after the missing evidence has been collected.",
+    "measure": "Track acceptance decisions reopened because the changed scenario, candidate or operating assumption was unclear. Use those cases to improve the decision record.",
+    "sources": [
+      {
+        "title": "ISTQB · Acceptance testing and business rules",
+        "url": "https://istqb.org/certifications/certified-tester-acceptance-testing/"
+      },
+      {
+        "title": "Azure Well-Architected Framework · Safe deployment practices",
+        "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
+      }
+    ]
+  },
+  {
+    "id": "hold",
+    "title": "Hold release and requalify",
+    "phase": "Prove",
+    "summary": "A hold keeps a candidate from advancing when a required QA check fails or the business rejects it. The failure record should help the next person reproduce the observation, understand its impact and choose the smallest meaningful retest.",
+    "owner": "QA lead records the hold and the team responsible for the defect investigates",
+    "inputs": [
+      "Failed criterion, rejected UAT scenario or unresolved difference",
+      "Observed target, configuration, digest, test data and expected result"
+    ],
+    "steps": [
+      "Record the first failing observation while the environment is identifiable. Link a work item to the candidate and the specific criterion. Capture expected and actual behavior and the actions that produced the difference.",
+      "Identify whether code, configuration, test data, the environment or the expectation caused the result. Agree with the business owner when a proposed fix changes an acceptance criterion.",
+      "For a code change, build a fresh candidate and repeat the required qualification for that digest. For a configuration change, record its new identity and rerun scenarios affected by that setting.",
+      "Repeat business acceptance when the correction changes the workflow previously exercised or when an earlier UAT decision rejected it. Preserve both the original result and the later decision."
+    ],
+    "evidence": "A requalification record links the original defect, candidate and failed test to the correction, retest and replacement decision. A fixed issue becomes useful evidence when a subsequent run demonstrates the fix.",
+    "example": "The UAT table maps purchasing to the wrong department. The engineer corrects the table while keeping the image. QA checks the affected rule and permission boundaries. Representative users repeat the rejected scenario using the corrected mapping.",
+    "failure": "A retry that happens to pass can hide intermittent behavior. Before clearing the hold, explain what changed or record the remaining uncertainty and follow the team's stated risk policy.",
+    "measure": "Measure time from a failed gate to an evidence-backed decision. Keep separate the time spent diagnosing, fixing and waiting for requalification.",
+    "sources": [
+      {
+        "title": "ISTQB · Acceptance testing and business rules",
+        "url": "https://istqb.org/certifications/certified-tester-acceptance-testing/"
+      },
+      {
+        "title": "Azure Well-Architected Framework · Safe deployment practices",
+        "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
+      },
+      {
+        "title": "Microsoft Learn · Track test status",
+        "url": "https://learn.microsoft.com/en-us/azure/devops/test/track-test-status?view=azure-devops"
+      }
+    ]
+  },
+  {
+    "id": "validation-summary",
+    "title": "Assemble a validation summary",
+    "phase": "Prove",
+    "summary": "A validation summary gives the person preparing a release a short, verifiable account of the candidate's qualification. It connects the feature's intent with technical results and the business decision while leaving detailed records in the tools that own them.",
+    "owner": "Business analyst, QA lead or release manager compiles the links and checks their consistency",
+    "inputs": [
+      "Feature and acceptance criteria, candidate digest and source commit",
+      "QA run, UAT decision, tested revisions, relevant configurations and open issues"
+    ],
+    "steps": [
+      "Start with the change and scope. Identify the candidate and conditions under which it was evaluated, including materially different QA and UAT settings.",
+      "Link each required criterion to its result, and each business scenario to its acceptance decision. Include failed, blocked or skipped cases alongside the disposition of any defect.",
+      "Make the limits of the evidence explicit. A passing UAT decision establishes acceptance in the recorded setting. Production rollout, health checks and observed user outcomes generate further evidence later.",
+      "Have a reader follow the links in both directions. They should be able to start from a release candidate and find its business decision, or start from a failed criterion and locate the corrected candidate."
+    ],
+    "evidence": "A short summary in Confluence or an equivalent document system contains links to the source evidence, candidate identity, acceptance scope and remaining conditions. The release job can check machine-readable records directly.",
+    "example": "The approval-routing summary links AC-01 to the first automatic assignment event and AC-02 to the allowed and rejected decisions. It includes the fixed UAT mapping, the repeat run and the signatory's acceptance for the same image.",
+    "failure": "A copied screenshot labelled passed loses its value if nobody can identify the candidate or the run. Repair the link or ask the owner to repeat the affected check before treating the summary as current.",
+    "measure": "Sample a released feature and time how long a new reader takes to find the underlying test run, business decision and exact image identifier.",
+    "sources": [
+      {
+        "title": "Microsoft Learn · Track test status",
+        "url": "https://learn.microsoft.com/en-us/azure/devops/test/track-test-status?view=azure-devops"
+      },
+      {
+        "title": "ISTQB · Acceptance testing and business rules",
+        "url": "https://istqb.org/certifications/certified-tester-acceptance-testing/"
+      },
+      {
+        "title": "DORA · Deployment automation",
+        "url": "https://dora.dev/capabilities/deployment-automation/"
+      }
+    ]
+  }
+]

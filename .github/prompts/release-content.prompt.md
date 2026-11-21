@@ -1,0 +1,1 @@
+Read project/APPROACH.md and README.md. Confirm section and changelog, check the signed-off edition with scripts/check_release.py, build, test and generate the tagged notes and PDF. Publish only the reviewed source revision and capture the returned deployment status.

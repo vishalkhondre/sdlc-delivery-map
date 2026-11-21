@@ -1,0 +1,1 @@
+Read CLAUDE.md and the section-pipeline skill. Update the relevant canonical lesson and any affected map routes. Verify primary sources, conduct the three reviews, update the edition review and run the local checks.

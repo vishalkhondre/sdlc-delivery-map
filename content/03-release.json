@@ -1,0 +1,444 @@
+[
+  {
+    "id": "release-plan",
+    "title": "Plan the release",
+    "phase": "Release",
+    "summary": "Which accepted changes belong together, and who needs to be ready for them? A release plan makes the intended scope, audience and timing visible before anyone sends traffic to new software.",
+    "owner": "Release coordinator, with the Product Owner and service owner",
+    "inputs": [
+      "Feature issue and parent objective",
+      "Candidate version and dependencies",
+      "QA and business acceptance records",
+      "Service ownership and change policy"
+    ],
+    "steps": [
+      "Collect the work items intended for this version. In Jira, a version can group related issues. Record what is ready, what is deferred and which dependencies could change who can use the feature.",
+      "Ask who will notice the change. An approver may need to know where new requests appear. A support colleague may need to know how to recognize a routing failure. Give each communication an owner.",
+      "Choose how exposure will start, what must be true to proceed and who will decide to pause. Record whether sensitive approval rules or data changes need separate coordination.",
+      "Reconcile scope with the accepted candidate before publishing. A feature added after acceptance changes what the team is about to ship. Obtain evidence for the new scope."
+    ],
+    "evidence": "A version entry links the intended issues, candidate, acceptance evidence, release owner and rollout conditions. Actual deployment is recorded later.",
+    "example": "The release includes automatic assignment for one request category. The team defers a second category because its approver mapping is still under review. The release notes and initial audience reflect that boundary.",
+    "failure": "If two teams assign different meanings to the same version, reconcile the included issues and candidate identity before issuing the release.",
+    "measure": "Pick an included issue and a deferred issue. A colleague should be able to explain the difference from the plan and identify the owner of each prerequisite.",
+    "sources": [
+      {
+        "title": "Atlassian · Manage versions",
+        "url": "https://support.atlassian.com/jira-cloud-administration/docs/manage-versions/"
+      },
+      {
+        "title": "Microsoft Azure Well-Architected Framework · Safe deployment practices",
+        "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
+      }
+    ]
+  },
+  {
+    "id": "release",
+    "title": "Publish the release",
+    "phase": "Release",
+    "summary": "A published release gives a known version a stable name and makes its contents discoverable. In this workflow it also gives the production job a candidate to evaluate.",
+    "owner": "Release coordinator or repository maintainer",
+    "inputs": [
+      "Accepted source commit",
+      "Matching image digest and QA run",
+      "Business acceptance decision",
+      "Release scope and version"
+    ],
+    "steps": [
+      "Resolve the accepted commit and compare it with the version being tagged. A Git tag identifies a point in source history. The image digest identifies the packaged content. Preserve both references.",
+      "Create the release entry with the intended audience, a short description of the change, and links to the candidate and acceptance decision. Label any early-access scope accurately.",
+      "Publish the entry under the agreed version. If publication triggers an automated job, that job still checks the candidate and applicable production policy before it can deploy.",
+      "Record later exposure separately. The release can be available while production still serves the earlier version, or while a feature flag limits use to a pilot."
+    ],
+    "evidence": "A release URL and tag resolve to the accepted commit. The release record identifies the tested image and where to verify its business acceptance.",
+    "example": "The release entry describes the new approval routing. The on-call engineer can identify the intended image from the release before the first production instance receives it.",
+    "failure": "If a tag resolves to a different commit from the accepted record, pause publication or promotion. Establish a corrected, traceable version and repeat the checks affected by the change.",
+    "measure": "Trace the version in both directions, from the feature to its published release and from the release back to the exact source and accepted candidate.",
+    "sources": [
+      {
+        "title": "GitHub Docs · About releases",
+        "url": "https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases"
+      },
+      {
+        "title": "Docker Docs · Image digests",
+        "url": "https://docs.docker.com/dhi/explore/security-concepts/digests/"
+      }
+    ]
+  },
+  {
+    "id": "policy",
+    "title": "Authorize production promotion",
+    "phase": "Release",
+    "summary": "Production authorization answers whether this exact candidate may enter this environment under the applicable policy. A QA result, a business decision and a deployment authorization answer three different questions.",
+    "owner": "Deployment workflow enforces the rules. A designated reviewer participates when the release policy calls for one.",
+    "inputs": [
+      "QA pass and UAT acceptance tied to the candidate",
+      "Full candidate digest",
+      "Production configuration change record",
+      "Applicable release policy"
+    ],
+    "steps": [
+      "Before UAT promotion, verify a passing QA run against the selected candidate digest. A failed or missing run holds the candidate.",
+      "Compare the candidate digest against both evidence records. Check that QA passed, UAT accepted the change and both records apply to the intended candidate and scope.",
+      "Review production-specific differences that could alter behavior. A matching image still reads the active role mapping, feature flags and external services. Identify which differences require another test or business review.",
+      "Apply the environment policy. GitHub supports protection rules that can require a reviewer or impose deployment restrictions. Which controls apply depends on the repository settings and the team’s policy.",
+      "Pass the authorized identifier to the rollout job and record the decision. A subsequent change to the candidate or a material configuration input requires the relevant checks again."
+    ],
+    "evidence": "A dated decision identifies the environment, candidate digest, evidence links, policy result and any required human approval. Keep exception decisions attributable to their owner.",
+    "example": "QA and UAT used the accepted routing image. Production uses a differently named approver group. Before authorizing rollout, the team checks that the group resolves to the intended business role.",
+    "failure": "If acceptance belongs to yesterday’s build or a required reviewer has withheld approval, hold the candidate and record the specific unmet condition.",
+    "measure": "Inspect a held decision as well as a successful one. Both records should explain which condition determined the result.",
+    "sources": [
+      {
+        "title": "GitHub Docs · Deployment protection rules",
+        "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments"
+      },
+      {
+        "title": "Docker Docs · Image digests",
+        "url": "https://docs.docker.com/dhi/explore/security-concepts/digests/"
+      },
+      {
+        "title": "Microsoft Azure Well-Architected Framework · Safe deployment practices",
+        "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
+      }
+    ]
+  },
+  {
+    "id": "rollout",
+    "title": "Start the production rollout",
+    "phase": "Release",
+    "summary": "A rollout turns an authorized version into running software. The operator chooses where it runs, which configuration it uses and how much traffic reaches it. Each choice affects what users experience.",
+    "owner": "Platform engineer or deployment automation, with the service owner responsible for rollout health",
+    "inputs": [
+      "Authorized image digest",
+      "Production configuration reference",
+      "Deployment strategy and baseline",
+      "Recovery option and accountable operator"
+    ],
+    "steps": [
+      "Resolve the approved digest from the registry and deploy the same candidate. Record the configuration or flag version alongside it. A rebuild could produce a different artifact.",
+      "Select an initial audience or traffic share appropriate to the service. For a small service this may be a single deployment with an observation window. A larger service may introduce traffic in successive groups.",
+      "Inspect the runtime after deployment. Capture the active revision, resolved image and actual traffic assignment. Separate deployment time from feature enablement time if a flag controls exposure.",
+      "Expand only when the agreed checks and observation window support the next step. Preserve each attempt, including pauses, so the team can reconstruct what users encountered."
+    ],
+    "evidence": "A deployment attempt records the intended version, observed runtime identity, configuration, traffic exposure and start time. The health decision follows separately.",
+    "example": "A new revision serves a pilot group for purchase approvals. Other request categories continue with the prior behavior. The feature first becomes visible when a request from the enabled group is submitted.",
+    "failure": "If the intended revision starts but receives no representative traffic, keep its rollout status pending. A healthy idle process supplies limited evidence about routing.",
+    "measure": "Compare intended and observed exposure at each step. Verify that a representative request can reach the new version before drawing conclusions from error rates.",
+    "sources": [
+      {
+        "title": "Microsoft Azure Well-Architected Framework · Safe deployment practices",
+        "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
+      },
+      {
+        "title": "Microsoft Learn · Revisions in Azure Container Apps",
+        "url": "https://learn.microsoft.com/en-us/azure/container-apps/revisions"
+      },
+      {
+        "title": "Google SRE Workbook · Canarying Releases",
+        "url": "https://sre.google/workbook/canarying-releases/"
+      }
+    ]
+  },
+  {
+    "id": "observe",
+    "title": "Observe the running revision",
+    "phase": "Release",
+    "summary": "A successful deployment command confirms an operation was accepted. Rollout observation asks whether people receiving the new behavior can complete their work reliably over a meaningful period.",
+    "owner": "Service owner, supported by the platform engineer and QA",
+    "inputs": [
+      "Active revision and traffic split",
+      "Known healthy reference period or comparison group",
+      "Service and routing indicators",
+      "Predefined observation window"
+    ],
+    "steps": [
+      "Confirm which revision is actually serving each exposed group. Collect the revision, configuration and feature enablement state so that observed symptoms can be connected to the change.",
+      "Observe both service-level and business-path signals. For routing, check request traffic, errors and latency alongside successful automatic assignments, incorrect assignments and age of eligible unassigned requests.",
+      "Read rates with their counts. An error rate of zero across zero eligible submissions offers little evidence. Choose a window that includes normal usage or exercise a controlled production smoke test.",
+      "Compare with the healthy reference and record a decision to proceed, hold or recover. Investigate unrelated shifts in traffic and dependency failures before assigning a cause."
+    ],
+    "evidence": "The observation record names the actual revision, the exposed population, the interval, the signal values and sample sizes, the smoke result and the rollout decision.",
+    "example": "In a small rollout, the API accepted 25 distinct eligible purchase requests. After the normal processing window, the owner matches each request ID to its first correct assignment. Seventeen are accounted for; eight need investigation. Expansion pauses while the owner reconciles those request IDs.",
+    "failure": "If telemetry stops arriving, treat health as unknown. Check collection and obtain independent evidence before expanding exposure.",
+    "measure": "Can the on-call engineer explain how much real use occurred, which user-visible behavior was observed and why that evidence justified the next traffic increment?",
+    "sources": [
+      {
+        "title": "Microsoft Azure Well-Architected Framework · Safe deployment practices",
+        "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
+      },
+      {
+        "title": "Google SRE Workbook · Canarying Releases",
+        "url": "https://sre.google/workbook/canarying-releases/"
+      },
+      {
+        "title": "Google SRE · Monitoring Distributed Systems",
+        "url": "https://sre.google/sre-book/monitoring-distributed-systems/"
+      }
+    ]
+  },
+  {
+    "id": "recover",
+    "title": "Halt and recover a rollout",
+    "phase": "Release",
+    "summary": "Recovery protects current users and restores correct work already in flight. The safest action depends on what changed, how far it spread and whether the previous version can safely read the current data.",
+    "owner": "Service owner directs recovery. Platform and application engineers execute and verify the chosen action.",
+    "inputs": [
+      "Failed smoke check or degraded health",
+      "Current and prior serving state",
+      "Compatibility of configuration, data and dependencies",
+      "Affected request population"
+    ],
+    "steps": [
+      "Pause additional exposure and preserve the failed observation. Capture which groups, revisions and time intervals could contain affected requests.",
+      "Choose a mitigation that addresses the fault. Disable the feature for affected traffic, restore a compatible revision or configuration, or roll forward with a qualified fix. Evaluate data compatibility before changing a serving version.",
+      "Verify that a fresh controlled request follows the correct rule. Reconcile requests submitted during the incident, including those assigned to the wrong person or given no assignment.",
+      "Record the revision and configuration now serving, the unresolved exceptions and their owners. Assign follow-up work for the cause after the service is stable."
+    ],
+    "evidence": "A recovery record links the failed attempt, decision, action, serving state, recovery checks and disposition of affected requests.",
+    "example": "A production role mapping is wrong. The team restores the last verified mapping, confirms a fresh request reaches its expected approver and checks the disposition of each request routed during the affected interval.",
+    "failure": "A functional rollback can leave an old backlog or duplicate notifications behind. Confirm each affected request has one valid assignment or an explicitly owned follow-up.",
+    "measure": "Track time to safe service restoration and the count of affected requests awaiting disposition. These measures distinguish restored traffic from completed recovery.",
+    "sources": [
+      {
+        "title": "Microsoft Azure Well-Architected Framework · Safe deployment practices",
+        "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
+      },
+      {
+        "title": "Google SRE Workbook · Incident Response",
+        "url": "https://sre.google/workbook/incident-response/"
+      }
+    ]
+  },
+  {
+    "id": "smoke",
+    "title": "Run a production smoke test",
+    "phase": "Release",
+    "summary": "A smoke test exercises a small, consequential path in the real environment immediately after deployment. It can detect a broken role mapping or integration even when the accepted image starts successfully.",
+    "owner": "QA or a designated service operator runs the controlled check. The service owner acts on a failure.",
+    "inputs": [
+      "Expected approver for a designated test case",
+      "Authorized test account and data",
+      "Target deployment revision and exposure state",
+      "Expected evidence and cleanup procedure"
+    ],
+    "steps": [
+      "Choose one representative request with a known expected recipient. Arrange test data and an account whose actions can be identified and excluded from business measures.",
+      "Submit through the production entry point used by the exposed group. Record the request identifier, time and revision or route if available. A successful response establishes only that submission worked.",
+      "Inspect the actual assignment source and recipient. Confirm the rule caused the assignment and that the expected approver can see the request. Compare observed behavior to the active production configuration.",
+      "Finish or clean up the test request using an agreed procedure. Record the outcome against the deployed revision. On a mismatch, hold further exposure and start recovery."
+    ],
+    "evidence": "The result identifies the deployed revision, expected and actual routing, the observed automatic assignment event, the test request and its disposition.",
+    "example": "A test purchase request should reach the regional approver. It lands in a general queue despite normal API health. The failed smoke result blocks expansion and points the team toward the production mapping.",
+    "failure": "If a test account always bypasses routing, redesign the test fixture. A passing bypassed path offers no evidence about the rule used by real requesters.",
+    "measure": "Ask whether the check would detect a healthy application pointing at the wrong approver group. If the answer is unclear, refine the expected business result.",
+    "sources": [
+      {
+        "title": "Microsoft Azure Well-Architected Framework · Safe deployment practices",
+        "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
+      },
+      {
+        "title": "Google SRE · Monitoring Distributed Systems",
+        "url": "https://sre.google/sre-book/monitoring-distributed-systems/"
+      }
+    ]
+  },
+  {
+    "id": "deployment-record",
+    "title": "Record the deployment",
+    "phase": "Release",
+    "summary": "The deployment record answers what actually ran, where, when and for whom. It lets a team start from a customer report and find the relevant source, qualification evidence and rollout decision.",
+    "owner": "Deployment automation captures runtime facts. The release coordinator links them to the feature record.",
+    "inputs": [
+      "Deployment attempt and release tag",
+      "Observed production revision and digest",
+      "Active configuration and exposure interval",
+      "Smoke and health outcomes"
+    ],
+    "steps": [
+      "Write a separate entry for each attempt. Include the triggering release, environment, start and end times, observed serving state and result. Retain failed or interrupted attempts.",
+      "Connect the deployed version to its artifact and qualification evidence. In GitHub, deployment history can help readers locate earlier attempts and workflow runs. Attach runtime or platform evidence where it is recorded.",
+      "Record the actual outcome precisely. Distinguish a deployed but disabled feature, a partial rollout, full exposure and a recovery to an earlier revision.",
+      "Link the work item to the deployment record and the release notes. Keep the authoritative details in one place and cross-link them so a later update stays consistent."
+    ],
+    "evidence": "Link the approved digest to the actual Azure revision and digest, active configuration, exposure population, health observation and a controlled smoke test that routed to the expected approver. The feature issue should lead to this record and the runtime record should lead back to the qualified candidate.",
+    "example": "An approver reports a missing request during a pilot. The deployment record shows when the pilot received traffic and which configuration it used. The team can check whether that request belonged to the exposed group.",
+    "failure": "If the record contains only a target version, retrieve the actual deployed identity and traffic state. Mark unknown facts explicitly until an operator can substantiate them.",
+    "measure": "Try a reverse trace using a timestamp and affected group. Estimate the time it takes to identify the candidate and its qualification evidence.",
+    "sources": [
+      {
+        "title": "GitHub Docs · Viewing deployment history",
+        "url": "https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/view-deployment-history"
+      },
+      {
+        "title": "Microsoft Learn · Revisions in Azure Container Apps",
+        "url": "https://learn.microsoft.com/en-us/azure/container-apps/revisions"
+      }
+    ]
+  },
+  {
+    "id": "notes",
+    "title": "Publish release notes",
+    "phase": "Release",
+    "summary": "Release notes translate a change in the software into a change in somebody’s work. They help requesters, approvers and support staff understand availability, expected behavior, limitations and how to get help.",
+    "owner": "Release coordinator, with the Product Owner and support or documentation representative",
+    "inputs": [
+      "Verified release scope",
+      "Actual availability and rollout state",
+      "User-visible differences and limitations",
+      "Support route and engineering evidence"
+    ],
+    "steps": [
+      "State the audience and the practical change. Explain what happens to a new request and whether an existing request will be migrated or handled under the prior procedure.",
+      "Use the release and merged pull requests as a starting point. GitHub can generate a list of merged changes. Review that list for omissions, internal-only detail and language that a requester could understand.",
+      "Describe availability accurately. Distinguish a published version, a limited pilot and broad enablement. Give support staff a way to identify users included in the initial rollout.",
+      "Publish reader-facing notes and link the technical evidence for colleagues who need it. Update the availability statement if the change is paused, recovered or expanded."
+    ],
+    "evidence": "A stable note names the version, audience, visible change, rollout status and support route, and links to the issue, release entry and production check.",
+    "example": "New requests in the pilot category are assigned automatically. Existing open requests retain their current owner. The note tells a requester where to report a missing assignment and identifies who handles other categories.",
+    "failure": "If a pull request title says only “routing cleanup,” inspect the accepted scope and observed behavior before writing the announcement.",
+    "measure": "Give the note to a support colleague. Can they tell which request qualifies, what the user should see and what evidence to collect if the change appears absent?",
+    "sources": [
+      {
+        "title": "GitHub Docs · Automatically generated release notes",
+        "url": "https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes"
+      },
+      {
+        "title": "GitHub Docs · About releases",
+        "url": "https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases"
+      }
+    ]
+  },
+  {
+    "id": "alert",
+    "title": "Alert on routing failures",
+    "phase": "Learn",
+    "summary": "Monitoring continues after rollout. A routing rule can fail on the following business day when traffic changes or an external role mapping is edited. An alert gives a person a specific reason and enough context to act.",
+    "owner": "Service owner defines the signal and response. The scheduled responder receives actionable alerts.",
+    "inputs": [
+      "Eligible submission and assignment events",
+      "Expected event delay, traffic and business hours",
+      "Service objective and alert destination",
+      "Incident procedure and diagnostic view"
+    ],
+    "steps": [
+      "Define the symptom from the requester’s perspective. Track how many eligible requests lack a correct assignment and how long the oldest such request has waited. A functioning web server can still lose this business outcome.",
+      "Set a threshold and observation interval using the expected service behavior and normal event delay. Distinguish urgent user impact from trends that can wait for planned work.",
+      "Include scope, start time, sample count, oldest affected age and an investigation link in the notification. Route it to someone able to acknowledge and mitigate the incident.",
+      "Exercise the alert and the recovery notification. Check what happens during a quiet period, when event collection stops or when only one category begins to fail."
+    ],
+    "evidence": "The owner can show the signal definition, its destination, the acknowledgment record and an incident or follow-up linked to the affected feature or deployment.",
+    "example": "Five eligible purchase requests first breach the unassigned-age threshold and trigger an alert. Investigation across the full affected interval finds eight requests to reconcile. The alert count and incident count have different observation windows.",
+    "failure": "A total assignment counter may rise while one group is stranded. Break down the signal by the smallest operationally meaningful group and inspect affected volume before paging.",
+    "measure": "Review actionable alerts, delayed detection and recurring false positives with responders. Adjust thresholds when evidence shows a real mismatch with user impact.",
+    "sources": [
+      {
+        "title": "Google SRE · Monitoring Distributed Systems",
+        "url": "https://sre.google/sre-book/monitoring-distributed-systems/"
+      },
+      {
+        "title": "Google SRE Workbook · Incident Response",
+        "url": "https://sre.google/workbook/incident-response/"
+      }
+    ]
+  },
+  {
+    "id": "incident",
+    "title": "Respond and confirm recovery",
+    "phase": "Learn",
+    "summary": "An incident begins when the service needs coordinated action to protect its users. Restoring normal handling for new traffic is one part of the job. The people whose requests were delayed or misrouted also need a known outcome.",
+    "owner": "Service owner or incident lead, with a responder for mitigation and an owner for communication",
+    "inputs": [
+      "Alert or credible user report",
+      "Scope of exposed traffic and impacted requests",
+      "Timeline of releases and configuration changes",
+      "Recovery record and communication channel"
+    ],
+    "steps": [
+      "Acknowledge the report, identify an owner and establish the affected interval and categories. Record known facts separately from working explanations. A recent deployment is a lead to investigate.",
+      "Limit ongoing impact and coordinate one recovery action at a time. Communicate what users should do in the meantime and when the team expects to update them.",
+      "After mitigation, test fresh requests and reconcile the affected population. Check that each request has the correct assignment, an existing legitimate decision or an explicitly owned exception. Avoid replaying actions that were already completed.",
+      "Document impact, restoration time, remaining work and follow-up changes. Link the incident to relevant releases or configuration changes and to the feature issue for product review."
+    ],
+    "evidence": "A recoverable timeline explains who acted, which users were affected, how normal routing was verified and how each affected request was resolved or assigned for follow-up.",
+    "example": "New submissions route correctly after a mapping is restored. Of eight earlier requests, seven need reassignment and one was already decided by the authorized approver. The responder handles those cases differently.",
+    "failure": "Clearing a queue mechanically can repeat decisions or notifications. Reconcile business state before retrying side effects.",
+    "measure": "Compare restored routing time with the time the last affected request received a disposition. A gap between them identifies unfinished recovery work.",
+    "sources": [
+      {
+        "title": "Google SRE Workbook · Incident Response",
+        "url": "https://sre.google/workbook/incident-response/"
+      },
+      {
+        "title": "Google SRE · Monitoring Distributed Systems",
+        "url": "https://sre.google/sre-book/monitoring-distributed-systems/"
+      }
+    ]
+  },
+  {
+    "id": "measure",
+    "title": "Measure the feature outcome",
+    "phase": "Learn",
+    "summary": "Did automatic routing shorten the wait for the approver and the time until a decision? Those are different milestones. Define both using the same submission population so slow or unfinished requests stay visible.",
+    "owner": "Product Owner and analyst, with the service team responsible for trustworthy event collection",
+    "inputs": [
+      "Pre-release baseline and target",
+      "Submission, correct assignment and final decision events",
+      "Eligible and exposed request population",
+      "Common observation window and user feedback"
+    ],
+    "steps": [
+      "Define comparable requests before calculating results. Specify categories, entry times, exposure rules, test exclusions, time zone and the amount of follow-up each request receives. Check that the baseline uses matching definitions.",
+      "For each request, measure from submission to first correct assignment and separately to final decision. Record whether assignment was automatic or manual. Preserve open requests and distinguish missing telemetry from a confirmed pending state.",
+      "For this example, use the earliest elapsed time by which at least half the cohort reached a milestone. With equal complete follow-up, report “not yet reached” when fewer than half reach it. If follow-up varies, use a common horizon or an appropriate time-to-event analysis.",
+      "Compare the share still open one day after submission using only requests observed for a full day. Read the counts and guardrails, including wrong assignments, alongside the time measures."
+    ],
+    "evidence": "The review documents the cohort, event definitions, counts, observation horizon, both time measures, one-day open share, baseline, target and known data limitations.",
+    "example": "All 100 requests had a full day of follow-up. Forty received decisions within that day. Sixty percent were still open at day one. The one-day median target was missed, even if many of the forty decided within minutes.",
+    "failure": "If the reporting query selects only requests with a final decision, it systematically omits the longest waits. Reconstruct the cohort from submissions, then attach later events.",
+    "measure": "Check that decided plus open plus explicitly documented alternative outcomes reconcile to the cohort size. Handle withdrawals using a predeclared rule and report their count.",
+    "sources": [
+      {
+        "title": "GOV.UK Service Manual · How to set performance metrics for your service",
+        "url": "https://www.gov.uk/service-manual/measuring-success/how-to-set-performance-metrics-for-your-service"
+      },
+      {
+        "title": "NIST Engineering Statistics Handbook · Estimating event times with incomplete follow-up",
+        "url": "https://www.itl.nist.gov/div898/handbook/apr/section2/apr215.htm"
+      }
+    ]
+  },
+  {
+    "id": "feedback",
+    "title": "Feed the result back to the feature",
+    "phase": "Learn",
+    "summary": "The loop closes when the evidence changes or confirms a product decision. A dashboard can show a trend. A decision record explains what the team believes, what it will do and when it will check again.",
+    "owner": "Product Owner, with input from requesters, approvers, analysts and the service owner",
+    "inputs": [
+      "Original feature objective and target",
+      "Comparable outcome measures with counts",
+      "Requester and approver feedback",
+      "Operational incidents and guardrails"
+    ],
+    "steps": [
+      "Restate the intended change in user experience. Review time to correct assignment alongside time to final decision and the share open at one day. Inspect differences in workload, eligibility and release exposure.",
+      "Ask requesters and approvers about the remaining wait. Sample both completed and overdue requests. Check whether automatic routing sent work to the intended person and whether approvers could act when it arrived.",
+      "Choose an action proportionate to the evidence. Keep the feature, improve a specific part or revisit the original assumption. When the window is too short, record the uncertainty, owner and next review date.",
+      "Write the decision on the parent objective and link evidence and any follow-up work. Give a new improvement its own testable criterion and outcome measure so the next cycle can start on a clear question."
+    ],
+    "evidence": "A decision record names the observed outcome, its limitations, the selected action and the owner. Readers can navigate from follow-up work to the original objective and the release that supplied the evidence.",
+    "example": "Automatic assignment now happens promptly, yet many requests remain open after one day. Approvers report unclear supporting information. The Product Owner keeps routing and opens a separate improvement to test whether clearer request details reduce decision delay.",
+    "failure": "A faster median after launch can reflect an easier mix of requests. Report the competing explanation and investigate before crediting the feature with the whole change.",
+    "measure": "At the next review, verify that the agreed action occurred and that its evidence addresses the question recorded in the previous decision.",
+    "sources": [
+      {
+        "title": "GOV.UK Service Standard · Define what success looks like and publish performance data",
+        "url": "https://www.gov.uk/service-manual/service-standard/point-10-define-success-publish-performance-data"
+      },
+      {
+        "title": "GOV.UK Service Manual · How to set performance metrics for your service",
+        "url": "https://www.gov.uk/service-manual/measuring-success/how-to-set-performance-metrics-for-your-service"
+      }
+    ]
+  }
+]

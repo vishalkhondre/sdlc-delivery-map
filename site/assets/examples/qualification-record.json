@@ -1,0 +1,102 @@
+{
+  "type": "Fictional teaching example. All identifiers and measurements are illustrative.",
+  "issue": "CC-123",
+  "parent": "CC-100",
+  "criterion": {
+    "AC-01": "The routing rule automatically assigns an eligible request to the designated approver at submission.",
+    "AC-02": "Only an authorized approver can record a decision."
+  },
+  "source": {
+    "pull_request": "PR-42",
+    "commit": "3ab862bc3190549bff7df2e0c1a02c9cc11459e4",
+    "build": "build-418",
+    "published_digest": "sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c",
+    "platform": "linux/amd64"
+  },
+  "qualification": {
+    "qa": {
+      "revision": "qa-r17",
+      "config": "qa-routing-3",
+      "test_run": "qa-204",
+      "candidate_digest": "sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c",
+      "expected": "Purchasing approver",
+      "observed": "Purchasing approver",
+      "assignment_actor": "routing-rule",
+      "requester_attempt": "denied; request still pending",
+      "authorized_approval": "recorded",
+      "outcome": "passed",
+      "request_id": "R-17",
+      "criteria": [
+        "AC-01",
+        "AC-02"
+      ],
+      "tested_at": "2026-03-10T10:00:00Z",
+      "retest": "qa-209: purchasing mapping and permissions rechecked following the UAT hold."
+    },
+    "uat": {
+      "revision": "uat-r9",
+      "config": "uat-routing-6",
+      "candidate_digest": "sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c",
+      "scenario": "Submit eligible request, verify recipient, record final decision.",
+      "signatory_role": "Designated business representative",
+      "outcome": "accepted",
+      "record": "uat-82",
+      "decided_at": "2026-03-12T11:00:00Z",
+      "prior_decision": {
+        "record": "uat-80",
+        "decided_at": "2026-03-11T10:00:00Z",
+        "revision": "uat-r8",
+        "config": "uat-routing-5",
+        "signatory_role": "Designated business representative",
+        "outcome": "rejected",
+        "reason": "Purchasing unit B reached unit A’s approver.",
+        "candidate_digest": "sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c"
+      },
+      "requalification": "Corrected the UAT mapping, reran qa-209 for the affected rule and authorization, then repeated the scenario in uat-r9."
+    }
+  },
+  "release": {
+    "version": "1.3.0",
+    "approval_policy": "Standard change; allowed after recorded QA and business acceptance and configuration review.",
+    "authorized_digest": "sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c",
+    "tag": "v1.3.0",
+    "tagged_commit": "3ab862bc3190549bff7df2e0c1a02c9cc11459e4",
+    "authorized_at": "2026-03-12T12:00:00Z"
+  },
+  "production": {
+    "rollout": "prod-rollout-87",
+    "runtime_revision": "prod-r42",
+    "actual_digest": "sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c",
+    "config": "prod-routing-11",
+    "mapping_review": "Mapped the QA purchasing role to the production purchasing group and verified membership.",
+    "smoke": "Test request automatically reached the designated test approver.",
+    "observation": "Illustrative corrected rollout: between 11:00 and 13:00 UTC on 13 March, 24 of 24 distinct eligible pilot requests received a correct assignment inside the agreed two-minute routing window. Two additional controlled smoke submissions also passed and were excluded from that denominator. No increase in serving errors was observed during that window; the service owner then expanded exposure.",
+    "attempts": [
+      {
+        "time": "2026-03-13T09:00:00Z",
+        "revision": "prod-r41",
+        "config": "prod-routing-10",
+        "digest": "sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c",
+        "exposure": "limited pilot",
+        "result": "halted after a controlled purchase request reached the wrong approver",
+        "incident": "INC-7; eight eligible requests required reconciliation; seven reassigned and one authorized decision retained."
+      },
+      {
+        "time": "2026-03-13T11:00:00Z",
+        "revision": "prod-r42",
+        "config": "prod-routing-11",
+        "digest": "sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c",
+        "result": "rechecked the corrected mapping, passed smoke, observed routing before expanding exposure"
+      }
+    ]
+  },
+  "product_review": {
+    "cohort": "100 eligible submissions, each observed for a full 24 hours",
+    "decisions_by_24h": 40,
+    "open_at_24h": 60,
+    "conclusion": "Median time to decision not reached by one day.",
+    "follow_up": "Learn why approvers still wait after assignment and link the next change to CC-100.",
+    "population": "Separate post-recovery cohort exposed to prod-r42 after the pilot; excludes the pilot incident and synthetic tests. The CSV uses elapsed minutes from each submission.",
+    "limits": "No baseline assignment durations are supplied. The observed one-day decision data establish a missed target, not the exact median or change from the two-day baseline."
+  }
+}

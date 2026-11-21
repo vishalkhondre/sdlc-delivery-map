@@ -1,0 +1,161 @@
+[
+  {
+    "id": "phase-define",
+    "title": "Decide & Define",
+    "phase": "Define",
+    "summary": "Before the journey reaches a commit, someone has to decide which problem deserves attention. This phase connects an observed user need to a bounded change the team can build and evaluate.",
+    "owner": "The Product Owner makes the priority decision. The business analyst brings together user evidence, a map of the current work and the people who can explain exceptions.",
+    "inputs": [
+      "A recurring difficulty and the people affected by it",
+      "Product objectives, competing opportunities and constraints"
+    ],
+    "steps": [
+      "Observe the whole journey. Find how a requester submits work, who finds the approver, how the approver learns about it and when the requester receives a decision. Sample ordinary and difficult cases.",
+      "Compare alternatives against the part of the journey that takes time. Changing staffing, publishing clearer instructions or reassigning a responsibility may solve the problem with less software.",
+      "If software looks promising, select a narrow first release. Discuss whether rules live in code or configuration, who can change them and how their effect will be observable. Record expensive design questions for early investigation.",
+      "Give the selected feature a measurable objective and testable boundaries. Agree who can accept the result and when the Product Owner will review production evidence."
+    ],
+    "evidence": "A feature brief links the problem, alternatives considered, chosen scope, success signal and criteria. The first Jira card in the diagram represents this upstream reasoning.",
+    "example": "Requesters say a decision takes two days. Sampling shows that many requests spend their first morning unassigned. The team prioritizes automatic routing for one eligible request type and leaves approver reminders for another decision.",
+    "failure": "If a sample reveals that work waits mainly after assignment, revisit the proposed change. Capture what changed the team's understanding so the same assumption is not repeated.",
+    "measure": "A new team member can explain why this feature was selected, identify a plausible alternative and describe what observation would cause the Product Owner to reconsider.",
+    "sources": [
+      {
+        "title": "GOV.UK Service Manual · How the discovery phase works",
+        "url": "https://www.gov.uk/service-manual/agile-delivery/how-the-discovery-phase-works"
+      },
+      {
+        "title": "GOV.UK Service Manual · How to set performance metrics for your service",
+        "url": "https://www.gov.uk/service-manual/measuring-success/how-to-set-performance-metrics-for-your-service"
+      }
+    ]
+  },
+  {
+    "id": "phase-build",
+    "title": "Build & Prove",
+    "phase": "Build",
+    "summary": "This phase turns the chosen behavior into a version of the application that the team can identify and test. It brings design, implementation and evidence of business acceptance together.",
+    "owner": "Developers integrate the change. QA engineers design and run verification scenarios. Representative business users exercise the workflow and a designated signatory records the decision.",
+    "inputs": [
+      "The selected change, acceptance criteria and a business example",
+      "The application source, development tools and candidate environments"
+    ],
+    "steps": [
+      "Choose a design with the failure cases in view. Looking up the approver during submission gives a prompt answer but couples submission to directory availability. Queuing the lookup introduces a period where the request can legitimately remain unassigned. Whichever approach is chosen, define recovery and record the tradeoff.",
+      "Divide work so people can collaborate in parallel. A tester can prepare isolated role fixtures while a developer implements the assignment, and a business user can prepare a UAT example. Agree the shared data contract and integrate small changes frequently.",
+      "Check the pull request, merge the reviewed change and build a candidate from the integrated source. QA must know the exact packaged version it exercised when recording the outcome.",
+      "Ask business users to complete the journey on the qualified candidate. A rejection identifies the criterion and leads to a fix and requalification. A recorded acceptance lets release preparation begin."
+    ],
+    "evidence": "The integrated commit, build record, image digest, QA result and UAT decision form the evidence for this candidate. They answer different questions about source, packaged content, behavior and suitability.",
+    "example": "During the first UAT run, the active mapping sends an eligible request to the wrong purchasing unit. The signatory rejects the candidate in that configuration. The team corrects the mapping, keeps the same image digest and reruns the affected QA and UAT scenarios. The new results identify both the digest and the corrected configuration.",
+    "failure": "Separate success on two feature branches does not demonstrate that the changes work together. Include a test of the integrated workflow before admitting the candidate to release preparation.",
+    "measure": "Trace the most consequential design choice to a test and to the tested candidate. Inspect wait time for reviews or acceptance when evidence arrives too late to guide development.",
+    "sources": [
+      {
+        "title": "DORA · Trunk-based development",
+        "url": "https://dora.dev/capabilities/trunk-based-development/"
+      },
+      {
+        "title": "DORA · Deployment automation",
+        "url": "https://dora.dev/capabilities/deployment-automation/"
+      }
+    ]
+  },
+  {
+    "id": "phase-release",
+    "title": "Release & Learn",
+    "phase": "Release",
+    "summary": "The delivery job changes the running service. Learning begins when the team can observe who received the change, how it behaved under actual configuration, and whether the original user problem improved.",
+    "owner": "The release owner coordinates authorization, the service owner operates the service and the Product Owner evaluates the business outcome. Local policy determines any required reviewer.",
+    "inputs": [
+      "A candidate tied to its QA and UAT records",
+      "Environment configuration, rollout plan, recovery action and measurement plan"
+    ],
+    "steps": [
+      "Publish release information that identifies the chosen commit and artifact. Enforce the configured evidence requirements when the production job starts. Record the version and settings that actually became active.",
+      "Run a controlled production smoke test using a designated test request. Verify that the active production rule reaches the expected approver and use service health during the planned observation period to guide rollout.",
+      "Keep monitoring after rollout. Establish who receives actionable alerts, who can restore the service and how to reconcile requests already affected. Separate the incident record from the later decision about product value.",
+      "At the agreed outcome review, compare comparable submissions against the baseline. Look at time to assignment, time to decision and requests still open. Ask users what happened behind those numbers."
+    ],
+    "evidence": "The deployment record reports the actual revision and health result. The incident record captures recovery where needed. The objective carries the later measurement and the Product Owner's decision.",
+    "example": "At one day, 40 of 100 comparable submissions have decisions and 60 remain open. Every request has had a full day of follow-up. The one-day target was missed, and the median decision time was not reached within that window. The exact median and its change from the two-day baseline remain unknown. The Product Owner records the result and follows the cohort longer.",
+    "failure": "If only early completers appear in the dashboard, restore the full submission cohort before judging success. If the rollout itself is unhealthy, address the incident immediately instead of waiting for the outcome review.",
+    "measure": "Ask both whether the known version is healthy and whether users achieved the intended result. Each question has its own owner, review time and evidence.",
+    "sources": [
+      {
+        "title": "Microsoft Azure Well-Architected Framework · Safe deployments",
+        "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
+      },
+      {
+        "title": "GOV.UK Service Manual · How the live phase works",
+        "url": "https://www.gov.uk/service-manual/agile-delivery/how-the-live-phase-works"
+      },
+      {
+        "title": "GOV.UK Service Manual · How to set performance metrics for your service",
+        "url": "https://www.gov.uk/service-manual/measuring-success/how-to-set-performance-metrics-for-your-service"
+      }
+    ]
+  },
+  {
+    "id": "handoffs",
+    "title": "Read the arrows and follow the evidence",
+    "phase": "Build",
+    "summary": "Each arrow explains a relationship between map items. Reading only the left-to-right sequence misses two important questions: what another team receives and where work goes when a check fails.",
+    "owner": "The person or job producing a result records it. The person or job consuming it checks that the result applies to the selected work item, candidate and environment.",
+    "inputs": [
+      "Two connected map boxes",
+      "The arrow style, nearby label and output named on the originating box"
+    ],
+    "steps": [
+      "Follow a solid navy arrow for the next action in the same lane. A feature branch leads to a pull request in the GitHub repository lane. The proposed commit and target branch are concrete inputs for that step.",
+      "Follow a solid teal arrow for a handoff across lanes. A pull request event starts a workflow in GitHub Actions. Check the named input or output to understand what changes hands.",
+      "Follow a dashed red arrow for rejection, failure or recovery. A failed QA result reaches Hold release. A fix returns through qualification and a later passing result must identify the corrected candidate.",
+      "Follow a dashed gray arrow to a linked record or evidence. A deployment can be linked back to Jira, or a UAT result summarized in Confluence. The output chip names what was recorded, such as a digest or UAT decision."
+    ],
+    "evidence": "A useful handoff record identifies the source, recipient, item transferred, relevant version and decision. Stable links let a reader start at either end.",
+    "example": "Trace forward from CC-123 through its pull request and build run to the digest and QA result. Trace backward from a production revision to its artifact, integrated commit, pull request and acceptance criteria. The same feature key alone cannot prove which binary ran.",
+    "failure": "If two reports cite different digests, stop the handoff and identify the correct candidate. A link to a team's current dashboard can point at a different release tomorrow.",
+    "measure": "Select one successful branch and one failed branch. At every step, ask which record you would open and what fact it would establish.",
+    "sources": [
+      {
+        "title": "DORA · Deployment automation",
+        "url": "https://dora.dev/capabilities/deployment-automation/"
+      },
+      {
+        "title": "GitHub Docs · Pull requests",
+        "url": "https://docs.github.com/en/pull-requests/reference/pull-requests"
+      }
+    ]
+  },
+  {
+    "id": "service-retirement",
+    "title": "Maintain and eventually retire a service",
+    "phase": "Release",
+    "summary": "The diagram follows one feature through its first outcome review. A service can remain in use for years after that review. Teams continue to maintain it and eventually decide how its users will be served when it closes.",
+    "owner": "The service owner coordinates the transition. The Product Owner works with users and dependent teams to establish whether the need has ended or a replacement must meet it.",
+    "inputs": [
+      "Service usage, operating costs, support requests and dependencies",
+      "A record of open cases, data obligations and any replacement service"
+    ],
+    "steps": [
+      "While the service is live, use operational evidence and user research to plan changes. Maintain dependencies, revisit outdated rules and test essential workflows after changes in adjacent services.",
+      "Before proposing retirement, identify direct users, automated callers and supported channels. Learn what happens to an open request or a historical decision if the service stops accepting work.",
+      "Plan the transition with affected groups. Give them dates, a destination for new requests and a way to retrieve previous decisions where policy requires. Agree how long each integration needs to migrate.",
+      "Move an identifiable set of requests first. Reconcile completed, transferred and still-open cases. Retire the old path when the transition conditions hold and the responsible owner has recorded the result."
+    ],
+    "evidence": "A retirement record identifies affected users and integrations, communication, case reconciliation, the replacement route and owners for any remaining records. Capture the final service state after cutover.",
+    "example": "A new purchasing platform replaces the approval app. The team directs new submissions to the new platform while older requests remain available to their existing approvers. It checks for requests stranded between the two queues before closing the old path.",
+    "failure": "An unnoticed integration can continue submitting to a retired endpoint. Investigate residual traffic and establish a supported route before the final shutdown. Keep a contact for transition problems.",
+    "measure": "Track remaining users and callers, outstanding requests, misdirected submissions and unresolved support cases. A quiet dashboard alone can hide a client that stopped sending work after the change.",
+    "sources": [
+      {
+        "title": "GOV.UK Service Manual · How the live phase works",
+        "url": "https://www.gov.uk/service-manual/agile-delivery/how-the-live-phase-works"
+      },
+      {
+        "title": "GOV.UK Service Manual · Retiring your service",
+        "url": "https://www.gov.uk/service-manual/agile-delivery/retiring-your-service"
+      }
+    ]
+  }
+]

@@ -1,0 +1,54 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    uses: ./.github/workflows/validate.yml
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  edition:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install reportlab pypdf PyYAML
+      - name: Attach the field guide to a newly reviewed edition
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          tag="v$(cat content/VERSION)"
+          if gh release view "$tag" >/dev/null 2>&1; then exit 0; fi
+          python scripts/release_snapshot.py notes "$tag" > "$RUNNER_TEMP/notes.md"
+          pdf="$RUNNER_TEMP/sdlc-delivery-map-$tag.pdf"
+          python scripts/field_guide_pdf.py "$tag" "$pdf"
+          gh release create "$tag" "$pdf" --target "$GITHUB_SHA" \
+            --title "The SDLC Delivery Map $tag" --notes-file "$RUNNER_TEMP/notes.md"

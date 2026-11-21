@@ -1,0 +1,490 @@
+[
+  {
+    "id": "tool-jira",
+    "title": "Jira: the work record",
+    "phase": "Reference",
+    "summary": "An issue tracker connects a problem worth solving to the change and the decision made after release. Jira plays that part in this example.",
+    "owner": "The Product Owner owns the objective. The team member who makes a delivery decision records it or links its evidence.",
+    "inputs": [
+      "A user problem, a business owner and a measurable objective.",
+      "Acceptance criteria, a stable issue key and the parent objective."
+    ],
+    "steps": [
+      "Write the issue so a reader can understand the current delay, the proposed change and the population affected. Give each acceptance criterion an identifier that remains usable in bug reports and test results.",
+      "Connect the issue to the source change. When Jira has a supported development integration, including the issue key in the expected branch, commit or PR field can surface the link. Open the link and confirm it resolves to the intended repository and change.",
+      "Attach the target release, actual rollout evidence and the later outcome decision as they become available. Any issue tracker can play this role if its identifiers and links survive the release."
+    ],
+    "evidence": "A feature record points to the parent objective, criteria, source change, release, test evidence and a dated outcome decision. The corresponding systems retain the detailed records.",
+    "example": "On CC-123, AC-01 specifies automatic routing. A reviewer can follow the QA run to the test request that was assigned by the rule, then follow CC-100 to the decision about continuing the feature.",
+    "failure": "An issue marked Done with a target version still leaves deployment in doubt. Find the actual runtime and deployment record before communicating to users that the change is available.",
+    "measure": "Sample released features and try tracing each in both directions. Count unresolved handoffs, then repair the links that repeatedly stop readers.",
+    "sources": [
+      {
+        "title": "Atlassian · What development data can I view in Jira?",
+        "url": "https://support.atlassian.com/jira-cloud-administration/docs/what-development-data-can-i-view-in-jira-software/"
+      },
+      {
+        "title": "Atlassian · Use Confluence and Jira together",
+        "url": "https://www.atlassian.com/software/confluence/resources/guides/extend-functionality/confluence-jira"
+      }
+    ]
+  },
+  {
+    "id": "tool-github",
+    "title": "GitHub repository: source and review",
+    "phase": "Reference",
+    "summary": "A Git repository holds a versioned change. GitHub adds a review conversation, checks and release records that make the change easier to inspect.",
+    "owner": "Developers maintain the change. A reviewer assesses the proposed behavior and the repository owner configures the merge rules.",
+    "inputs": [
+      "An issue and the intended behavior change.",
+      "A short-lived branch, its target branch and a testable implementation."
+    ],
+    "steps": [
+      "Open the pull request while its purpose and scope are easy to examine. Explain the existing behavior, the changed code path and the evidence a reviewer should inspect.",
+      "Review the changed files and tests together. Resolve conversations by recording what changed or why the team chose another approach. Configure required checks and reviews according to the project’s merge policy.",
+      "Capture the integrated commit after merge. Record which commit the release tag identifies. Another Git hosting service can support the same workflow when it preserves revision identity and review history."
+    ],
+    "evidence": "The PR connects the issue and review discussion to a specific revision. The integrated commit and release record provide the bridge to the candidate build.",
+    "example": "The reviewer notices that the new test only asserts the final approver. The developer adds a case that submits an unassigned request and records which rule made the first assignment.",
+    "failure": "A passing branch build can precede a different integrated revision after merge. Reconnect the release build to its actual source commit.",
+    "measure": "For a chosen release, see whether a second developer can find the source change, its rationale and the exact integrated commit.",
+    "sources": [
+      {
+        "title": "GitHub Docs · Resolving reviews",
+        "url": "https://docs.github.com/en/pull-requests/concepts/resolving-reviews"
+      },
+      {
+        "title": "GitHub Docs · Deploying code",
+        "url": "https://docs.github.com/en/pull-requests/concepts/deploying-code"
+      }
+    ]
+  },
+  {
+    "id": "tool-actions",
+    "title": "GitHub Actions: execute the workflow",
+    "phase": "Reference",
+    "summary": "A workflow engine turns repository events into repeatable jobs. The job run is where a reader can inspect the inputs, checks and outcome of an attempted change.",
+    "owner": "Developers and platform engineers maintain the workflow. The applicable release policy identifies any human approver.",
+    "inputs": [
+      "A versioned workflow, its trigger and its intended target.",
+      "An integrated commit or candidate digest, plus the required test and acceptance records."
+    ],
+    "steps": [
+      "Separate checking a proposed change from publishing an integrated build. Give each job an explicit purpose and trigger so that each run has an interpretable result.",
+      "Carry the immutable candidate identifier between deployment jobs. Match earlier test and acceptance records to that candidate before advancing it. Hold jobs when the required evidence is missing.",
+      "Record the job attempt and reconcile its result with the target platform. A workflow that starts a deployment may finish before that application revision serves traffic. Other CI and delivery engines can implement the same handoffs."
+    ],
+    "evidence": "Keep the run identifier, event, source revision, output digest, target environment, result and links to the qualification records.",
+    "example": "A PR event runs checks. A later main-branch build produces the image tested in QA. The Prod job receives that digest and the accepted UAT decision, then records which revision Azure actually served.",
+    "failure": "A retried job can accidentally select the newest available image. Retain the original candidate identity and apply the same qualification gate on every attempt.",
+    "measure": "Trace a deployment retry and check whether the tested, authorized and deployed candidate identities still match.",
+    "sources": [
+      {
+        "title": "GitHub Docs · Workflows",
+        "url": "https://docs.github.com/en/actions/concepts/workflows-and-actions/workflows"
+      },
+      {
+        "title": "GitHub Docs · Deployment environments",
+        "url": "https://docs.github.com/en/actions/concepts/workflows-and-actions/deployment-environments"
+      },
+      {
+        "title": "DORA · Deployment automation",
+        "url": "https://dora.dev/capabilities/deployment-automation/"
+      }
+    ]
+  },
+  {
+    "id": "tool-registry",
+    "title": "Docker Hub: store and retrieve a candidate",
+    "phase": "Reference",
+    "summary": "A container registry holds packaged application images. Docker Hub is the registry in the map. A digest gives downstream jobs a content-addressed reference they can request again.",
+    "owner": "The build workflow publishes the candidate. Platform engineers manage the repository, its access and retention.",
+    "inputs": [
+      "The image produced by the integrated build.",
+      "Registry repository, platform information and the source commit that produced the candidate."
+    ],
+    "steps": [
+      "Publish the successful build once and capture the digest returned for the published reference. Retain the relationship between that digest, the build run and its source commit.",
+      "Pass the qualified reference to QA, UAT and Prod. Human-friendly tags can accompany the digest in notes. Teams using multi-platform images should record whether the reference identifies an index or a platform image and check the target architecture.",
+      "Set retention to cover the team’s rollback and investigation needs. Another OCI-compatible registry can fill the same role when jobs can retrieve the approved content by identity."
+    ],
+    "evidence": "Record the repository and digest as a pair. For a release investigation, also capture the effective platform and the runtime revision.",
+    "example": "QA qualifies a Linux image for the routing app. When a newer build gets the same moving tag, the Prod workflow still requests the qualified digest.",
+    "failure": "An identical image may use different role mappings in different environments. Test a controlled routing case against the active production configuration.",
+    "measure": "Sample promoted candidates and compare the qualified identity with the image reference retrieved by the runtime.",
+    "sources": [
+      {
+        "title": "Docker Docs · Image digests",
+        "url": "https://docs.docker.com/dhi/explore/security-concepts/digests/"
+      },
+      {
+        "title": "Docker Docs · Pull an image",
+        "url": "https://docs.docker.com/reference/cli/docker/image/pull/"
+      }
+    ]
+  },
+  {
+    "id": "tool-azure",
+    "title": "Azure Cloud: where the application runs",
+    "phase": "Reference",
+    "summary": "The hosting platform supplies the runtime where the user encounters the feature. Azure is the example provider. The evidence a team needs depends on the specific compute service it chooses.",
+    "owner": "Platform engineers operate the hosting configuration. The Service Owner is accountable for the behavior users experience.",
+    "inputs": [
+      "The authorized image digest and environment configuration.",
+      "The release job, intended traffic destination and recovery plan."
+    ],
+    "steps": [
+      "Choose a runtime record the team can query after deployment. For example, Azure Container Apps exposes revisions. A different platform may expose a deployment, workload version or task definition.",
+      "Compare the intended image and settings to what actually receives traffic. During progressive rollout, more than one revision may be serving, so record exposure as well as deployment time.",
+      "Exercise a small, controlled user journey and observe health signals over the agreed window. Connect runtime evidence to the release record so on-call staff can identify the active change."
+    ],
+    "evidence": "Capture the environment, active revision or equivalent identifier, image digest, traffic allocation, smoke-test result and observed health.",
+    "example": "The accepted image starts normally, but the new revision sends a test request to the wrong team. Runtime health and application behavior give the release owner different, useful observations.",
+    "failure": "A successful provisioning message can hide a routing defect or traffic still flowing to an older revision. Verify both the serving target and the application’s result.",
+    "measure": "During a release, measure user-visible errors and routing delays alongside the share of traffic using the new revision.",
+    "sources": [
+      {
+        "title": "Microsoft Azure Well-Architected Framework · Safe deployment practices",
+        "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
+      },
+      {
+        "title": "Microsoft Learn · Update and deploy changes in Azure Container Apps",
+        "url": "https://learn.microsoft.com/en-us/azure/container-apps/revisions"
+      }
+    ]
+  },
+  {
+    "id": "tool-test",
+    "title": "Test management: cases, runs and decisions",
+    "phase": "Reference",
+    "summary": "A test management system connects a reusable test case to a particular execution. It can hold manual results, automated results and business acceptance records, depending on the tool and integrations.",
+    "owner": "QA maintains coverage and run evidence. A designated business signatory makes the UAT decision in this example.",
+    "inputs": [
+      "Identified acceptance criteria and a candidate under test.",
+      "Test cases, expected outcomes, named test environment and representative users."
+    ],
+    "steps": [
+      "Write a case with preconditions, data, steps and an observable expected result. Use a separate case for a prohibited action where the permission rule matters.",
+      "Start a new execution against each candidate that needs qualification. Record actual observations, the candidate identity and any failure. Preserve the earlier run when a defect is fixed.",
+      "Link the business sign-off to the candidate and the scenarios the participants exercised. Azure Test Plans is one example with requirement-based suites. A lightweight register can work when it maintains comparable history and traceability."
+    ],
+    "evidence": "A test result states the case, criterion, candidate, environment, actual result and outcome. A UAT decision additionally identifies the business signatory and date.",
+    "example": "For AC-02, a named test account lacking approval rights attempts a decision. The run records the denied action and checks that the request remained undecided.",
+    "failure": "A checked box saying passed gives little help when a later build fails. Open the run and recover the precise candidate, inputs and observed result.",
+    "measure": "Review failed runs and unresolved criteria by candidate. Counting all cases across all past releases can conceal coverage missing from this release.",
+    "sources": [
+      {
+        "title": "Microsoft Learn · Create and manage test suites",
+        "url": "https://learn.microsoft.com/en-us/azure/devops/test/create-test-suites?view=azure-devops"
+      },
+      {
+        "title": "ISTQB · Acceptance testing",
+        "url": "https://istqb.org/certifications/certified-tester-acceptance-testing/"
+      }
+    ]
+  },
+  {
+    "id": "tool-confluence",
+    "title": "Confluence: explain the release",
+    "phase": "Reference",
+    "summary": "A documentation space gives readers the narrative behind the operational records. Confluence holds the validation summary and release notes in this example.",
+    "owner": "The Business Analyst and QA Lead prepare the summary. The release coordinator makes the notes discoverable to their intended readers.",
+    "inputs": [
+      "Accepted scope, changed user behavior and known limitations.",
+      "Links to the issue, tested candidate, UAT decision and production rollout record."
+    ],
+    "steps": [
+      "Write for the person arriving after release. Explain what changed, which users are affected, when it becomes available and where to report unexpected behavior.",
+      "Link to authoritative records for exact results and decisions. If a point-in-time result is summarized in prose, identify its candidate and date so later readers can interpret it.",
+      "Make the notes reachable from the version and from the feature. A versioned Markdown site or another knowledge base can serve the same purpose."
+    ],
+    "evidence": "A durable release note explains user impact and carries working links to the records behind the conclusion.",
+    "example": "The note explains that eligible requests are now assigned at submission. It links the criteria, the UAT decision, the Prod smoke test and the contact for a request that remains unassigned.",
+    "failure": "A summary copied before a late requalification can describe a candidate that never shipped. Verify links and scope against the serving release before publishing.",
+    "measure": "Ask a support colleague to find the changed behavior, its release and the path to evidence without contacting the author.",
+    "sources": [
+      {
+        "title": "Atlassian · Use Confluence and Jira together",
+        "url": "https://www.atlassian.com/software/confluence/resources/guides/extend-functionality/confluence-jira"
+      },
+      {
+        "title": "Atlassian · What development data can I view in Jira?",
+        "url": "https://support.atlassian.com/jira-cloud-administration/docs/what-development-data-can-i-view-in-jira-software/"
+      }
+    ]
+  },
+  {
+    "id": "role-product",
+    "title": "Product Owner",
+    "phase": "Reference",
+    "summary": "The Product Owner explains why a feature merits investment and decides what to prioritize after seeing the result. In Scrum the role carries accountability for product value and the backlog. Other teams distribute these decisions differently.",
+    "owner": "The Product Owner owns the product decision and brings users, analysts and the delivery team into the discussion.",
+    "inputs": [
+      "A user need, competing uses of capacity and evidence of the current problem.",
+      "A proposed baseline, target, review window and eligible population."
+    ],
+    "steps": [
+      "Describe whose situation should improve and how the team would recognize improvement. Compare the proposed feature with alternatives, including a small process change.",
+      "Agree how the team will measure the outcome before implementation. Identify a direct signal for the changed behavior and a broader business outcome that the change might influence.",
+      "After release, inspect comparable cohorts and listen to requesters and approvers. Record a decision to keep, improve or revisit the feature with a reason and an owner for any next action."
+    ],
+    "evidence": "The parent objective preserves the baseline, target, observation window, evidence and resulting backlog decision.",
+    "example": "Forty of 100 eligible submissions reached a decision within one day. The one-day target was missed. The exact change from the two-day baseline is unknown at this horizon. The Product Owner asks approvers about the remaining wait and prioritizes an investigation into the information they need.",
+    "failure": "A faster median among early completions can coexist with many requests still waiting. Inspect the entire eligible cohort and the share open after one day before declaring success.",
+    "measure": "Track elapsed time to assignment, elapsed time to decision and unfinished requests together. Revisit the target when the definition or user population changes.",
+    "sources": [
+      {
+        "title": "Scrum Guides · The Scrum Guide",
+        "url": "https://scrumguides.org/scrum-guide.html"
+      },
+      {
+        "title": "GOV.UK Service Manual · Set performance metrics for your service",
+        "url": "https://www.gov.uk/service-manual/measuring-success/how-to-set-performance-metrics-for-your-service"
+      }
+    ]
+  },
+  {
+    "id": "role-ba",
+    "title": "Business Analyst",
+    "phase": "Reference",
+    "summary": "The Business Analyst turns a business need into rules and scenarios that implementers and users can evaluate. The role is especially useful when a familiar word such as approver has different meanings across a workflow.",
+    "owner": "The Business Analyst facilitates clarification. Business policy owners resolve policy choices and the Product Owner prioritizes the resulting work.",
+    "inputs": [
+      "Examples of current requests and the people who handle them.",
+      "The business objective, eligibility rules and known exceptions."
+    ],
+    "steps": [
+      "Walk through an ordinary request with people who submit and approve it. Identify the start and end events, data needed to choose an approver and places where a person intervenes today.",
+      "Write examples for ordinary, denied and exceptional cases. Agree who may change a mapping and what happens when no valid approver exists. Record unresolved policy questions for the person authorized to answer them.",
+      "Give each criterion a stable reference and connect it to a candidate test. Clarify the difference between a person who decides a request in the app and the person who accepts the feature in UAT."
+    ],
+    "evidence": "A small set of agreed rules, examples, open decisions and traceable criteria is more useful to QA than a long list of screen descriptions.",
+    "example": "The analyst discovers that the correct approver depends on request type. Two sample requests differ only in type and should resolve to different queues without an operator touching either record.",
+    "failure": "“The request reaches the approver” can pass after a manual reassignment. Specify the triggering event, automatic selection, expected recipient and how the result can be observed.",
+    "measure": "During refinement, ask QA and a business representative to predict the outcome of the same example independently. Resolve differences before development.",
+    "sources": [
+      {
+        "title": "GOV.UK Service Manual · What each role does in a service team",
+        "url": "https://www.gov.uk/service-manual/the-team/what-each-role-does-in-service-team"
+      },
+      {
+        "title": "ISTQB · Acceptance testing",
+        "url": "https://istqb.org/certifications/certified-tester-acceptance-testing/"
+      }
+    ]
+  },
+  {
+    "id": "role-dev",
+    "title": "Developer and peer reviewer",
+    "phase": "Reference",
+    "summary": "A developer translates an agreed behavior into code and tests. A peer reviewer helps judge whether the change and its evidence justify integrating it. Both roles contribute to quality throughout the feature.",
+    "owner": "The author owns the proposed change. An assigned reviewer evaluates it under the repository’s review rules.",
+    "inputs": [
+      "The feature criteria, current implementation and domain examples.",
+      "A reviewable change, test data and a way to run the relevant checks."
+    ],
+    "steps": [
+      "Find the smallest coherent implementation that covers the agreed behavior and its failure modes. Plan how to observe the outcome in QA and production while limiting collection to data needed for the decision.",
+      "Write tests at useful boundaries. A rule-level test checks selection logic. An integration test can establish that submission actually invokes the rule and persists the assignment.",
+      "Explain the change and show a failing or distinguishing case in the PR. After integration, associate the resulting source commit with its build. Work with QA and operations when an observed result diverges from the intended result."
+    ],
+    "evidence": "A reviewed diff, test cases, review discussion, passing required checks and the integrated source revision give the next person enough information to reconstruct the change.",
+    "example": "The interface displays the assigned approver correctly. The reviewer asks what would happen during a retry, which leads the author to check that a second delivery of the event preserves an already valid assignment.",
+    "failure": "Counting green tests can miss the user workflow that connects the tested units. Revisit the criterion and identify the observable transition that the tests must establish.",
+    "measure": "Review whether a defect can be reproduced by a targeted regression case and whether review comments lead to clearer behavior or stronger evidence.",
+    "sources": [
+      {
+        "title": "Scrum Guides · The Scrum Guide",
+        "url": "https://scrumguides.org/scrum-guide.html"
+      },
+      {
+        "title": "GitHub Docs · Resolving reviews",
+        "url": "https://docs.github.com/en/pull-requests/concepts/resolving-reviews"
+      }
+    ]
+  },
+  {
+    "id": "role-qa",
+    "title": "QA Engineer and QA Lead",
+    "phase": "Reference",
+    "summary": "QA helps the team discover discrepancies between expected and observed behavior. An engineer designs and executes checks. A lead may coordinate coverage and unresolved risks across the candidate.",
+    "owner": "QA owns the quality of its test evidence. The whole delivery team contributes to product quality.",
+    "inputs": [
+      "Candidate, environment, criteria, configuration and representative test data.",
+      "A risk assessment and the release decision that the evidence will inform."
+    ],
+    "steps": [
+      "Choose tests from the rules, boundaries and plausible failure modes. Decide which behavior can be checked automatically and which benefits from exploration or a representative user.",
+      "Observe the action that caused the result. For automatic routing, confirm that an eligible request acquired the expected approver through the configured rule following submission.",
+      "Run the allowed and denied decision scenarios, record what happened and tie the result to the exact candidate. On failure, link a reproducible defect and identify the affected criterion. Send a qualified candidate to business acceptance."
+    ],
+    "evidence": "A candidate-specific QA run shows expected and observed results, open defects and the basis for proceeding or holding.",
+    "example": "A user without the approval role can see the request. QA verifies whether attempting a decision changes its state, since simply hiding a button gives incomplete evidence about authorization.",
+    "failure": "A later change to mappings or data can make yesterday’s pass irrelevant. Identify which scenarios are affected and repeat those checks against the new setup.",
+    "measure": "Report which high-impact scenarios have current evidence, which remain untested and which failures still block the candidate.",
+    "sources": [
+      {
+        "title": "ISTQB · Acceptance testing",
+        "url": "https://istqb.org/certifications/certified-tester-acceptance-testing/"
+      },
+      {
+        "title": "Microsoft Learn · Create and manage test suites",
+        "url": "https://learn.microsoft.com/en-us/azure/devops/test/create-test-suites?view=azure-devops"
+      }
+    ]
+  },
+  {
+    "id": "role-business",
+    "title": "Business user and UAT signatory",
+    "phase": "Reference",
+    "summary": "A representative business user exercises a realistic workflow. The designated UAT signatory decides whether the demonstrated candidate is acceptable for its intended business use under the agreed conditions.",
+    "owner": "Representative requesters and approvers supply observations. The designated business signatory owns the acceptance decision in this example.",
+    "inputs": [
+      "Business scenarios, acceptance criteria and a QA-qualified candidate.",
+      "Representative roles, realistic data and a clear path to raise a defect or question."
+    ],
+    "steps": [
+      "Choose a scenario with a meaningful outcome. A requester submits an eligible request, a designated approver sees the correct work, and a decision is reflected back to the requester.",
+      "Ask users to perform the scenario with the candidate configuration. Record workarounds and confusion alongside functional results. If manual intervention made the scenario succeed, capture that intervention explicitly.",
+      "Accept or reject the candidate against the agreed scope and record the reason. A rejection returns the unmet criterion to the team. The authorization to deploy follows the release policy in a later step."
+    ],
+    "evidence": "Preserve the candidate identity, scenario results, participating role, signatory, date, decision and any scope conditions.",
+    "example": "The approver can record a decision, but a purchase request for one unit is routed to another unit’s approver. The UAT signatory rejects the candidate. After a configuration correction and affected QA checks, users repeat the purchasing scenario against the same image.",
+    "failure": "An invitation to a demo or a participant’s attendance cannot establish acceptance. Ask who has decision authority and where their decision for this candidate is recorded.",
+    "measure": "Trace a sample signed decision to what the users exercised. Check whether rejected scenarios returned to the acceptance session after correction.",
+    "sources": [
+      {
+        "title": "ISTQB · Acceptance testing",
+        "url": "https://istqb.org/certifications/certified-tester-acceptance-testing/"
+      }
+    ]
+  },
+  {
+    "id": "role-release",
+    "title": "Release Manager",
+    "phase": "Reference",
+    "summary": "Release coordination brings tested scope, candidate identity and the applicable authorization rules together. Teams can assign this responsibility to an individual or rotate it through a delivery team.",
+    "owner": "The release coordinator assembles the evidence. A named reviewer authorizes deployment when the release policy requires one.",
+    "inputs": [
+      "Intended scope and target version, candidate commit and digest.",
+      "QA results, business acceptance, configuration review and recovery plan."
+    ],
+    "steps": [
+      "Confirm what is intended to ship and how readers can identify it. Cross-check the source tag, package digest and qualification records. Investigate any mismatch before publishing the release record.",
+      "Review dependencies that can alter the user experience, including role mappings, enabled features and data changes. Identify who may decide an exception and capture their decision when the policy allows one.",
+      "Coordinate the rollout and communicate actual availability after runtime checks. For phased exposure, distinguish the time deployment began from the time a particular user group gained access."
+    ],
+    "evidence": "The release record preserves scope, qualifying evidence, authorization if required, actual deployment status and links to the user-facing notes.",
+    "example": "A second build appears after UAT. The coordinator catches that the release tag and the suggested digest now refer to different candidates and selects the accepted candidate before rollout.",
+    "failure": "The existence of a published release entry can be mistaken for a live deployment. Confirm the serving runtime record before announcing availability.",
+    "measure": "Pick a past release and determine how quickly a second person can establish what was approved, what ran and what the team would restore.",
+    "sources": [
+      {
+        "title": "Google SRE · Release engineering",
+        "url": "https://sre.google/sre-book/release-engineering/"
+      },
+      {
+        "title": "GitHub Docs · Deployment environments",
+        "url": "https://docs.github.com/en/actions/concepts/workflows-and-actions/deployment-environments"
+      }
+    ]
+  },
+  {
+    "id": "role-ops",
+    "title": "DevOps and platform engineer",
+    "phase": "Reference",
+    "summary": "A platform or DevOps engineer helps make delivery repeatable and observable. In this guide the role supports automation, environment configuration and deployment evidence. Teams may share this work between developers and operations specialists.",
+    "owner": "The platform engineer maintains delivery mechanisms. Product and business owners supply the policy and business decisions those mechanisms consume.",
+    "inputs": [
+      "Versioned deployment definitions, registry access and environment configuration.",
+      "A candidate identity, required qualification evidence and the service’s recovery objectives."
+    ],
+    "steps": [
+      "Design the deployment jobs so the same qualified package can be promoted. Keep environment-specific behavior visible through configuration and clear records of effective settings.",
+      "Build a useful failure response into the workflow. Show which gate failed, retain diagnostics and keep a failed candidate from becoming the default target of a later retry.",
+      "Capture the actual serving target and the observations needed to recover service. Rehearse restoration with the service team, including any configuration or data compatibility required for recovery."
+    ],
+    "evidence": "A rerunnable deployment job, a record of the active configuration and candidate, and a tested recovery procedure make the runtime handoff inspectable.",
+    "example": "QA and Prod use the same image. The role mapping is different in Prod, so the engineer records where the live mapping is managed and helps QA exercise a controlled test request.",
+    "failure": "A single rebuild for each environment introduces several distinct candidates. Compare the resolved image identities before assuming the QA result carries forward.",
+    "measure": "Sample deployments and ask whether the candidate and configuration can be reconstructed from recorded inputs. Track workarounds that bypass the normal repeatable path.",
+    "sources": [
+      {
+        "title": "DORA · Deployment automation",
+        "url": "https://dora.dev/capabilities/deployment-automation/"
+      },
+      {
+        "title": "Microsoft Azure Well-Architected Framework · Safe deployment practices",
+        "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
+      }
+    ]
+  },
+  {
+    "id": "role-service",
+    "title": "Service Owner and on-call response",
+    "phase": "Reference",
+    "summary": "Service ownership continues after rollout. The accountable owner makes sure somebody can detect user harm, respond and verify recovery. On-call responders perform the immediate diagnosis and restoration according to the team’s arrangement.",
+    "owner": "The Service Owner is accountable for service operation. The on-call responder coordinates individual incidents or engages an incident lead as needed.",
+    "inputs": [
+      "User-facing service expectations and actionable symptoms.",
+      "An alert destination, a response procedure and access to runtime evidence."
+    ],
+    "steps": [
+      "Choose signals users would recognize. For routing, a growing set of old, unassigned requests can reveal harm even when the application is responding normally.",
+      "When an alert fires, establish impact and scope, identify the current runtime and recent changes, and choose a safe response. Keep an incident timeline and communicate the effect on users.",
+      "Verify that new requests reach the expected approver and reconcile requests affected during the incident. Link recovery evidence and follow-up work to the deployment or feature where appropriate."
+    ],
+    "evidence": "An incident record identifies affected users or requests, response actions, active revision and configuration, evidence of restored behavior, and ownership of follow-up actions.",
+    "example": "After a mapping correction, newly submitted requests route immediately. The responder then identifies the earlier unassigned requests, verifies their destinations and records their disposition before closing the incident.",
+    "failure": "A green health endpoint after recovery can hide requests that were stranded earlier. Verify both the current user journey and the fate of previously affected work.",
+    "measure": "Measure time from user impact to detection and recovery. Separately track unresolved affected requests and whether the alert led to an actionable response.",
+    "sources": [
+      {
+        "title": "GOV.UK Service Manual · What each role does in a service team",
+        "url": "https://www.gov.uk/service-manual/the-team/what-each-role-does-in-service-team"
+      },
+      {
+        "title": "Google SRE · Monitoring distributed systems",
+        "url": "https://sre.google/sre-book/monitoring-distributed-systems/"
+      },
+      {
+        "title": "Google SRE Workbook · Incident response",
+        "url": "https://sre.google/workbook/incident-response/"
+      }
+    ]
+  },
+  {
+    "id": "environments",
+    "title": "Dev, QA, UAT and Prod",
+    "phase": "Reference",
+    "summary": "An environment is a target with its own runtime context, data, identity and settings. A delivery activity is work done to advance a candidate. The map labels both because release preparation sits between deployment targets.",
+    "owner": "The delivery team defines the topology. Platform, QA, business and service owners contribute the configuration or decision needed in each context.",
+    "inputs": [
+      "One integrated candidate, qualification criteria and the reasons each environment exists.",
+      "Data and permissions appropriate to each environment, plus a documented route to production."
+    ],
+    "steps": [
+      "Use Dev for implementation and fast feedback. In this example it includes local work and CI. A team with a dedicated shared Dev runtime should identify that target and its deployment evidence explicitly.",
+      "Exercise technical criteria on the QA deployment, then use UAT for a representative business decision. Track the same candidate in both places and record behavior-affecting configuration differences.",
+      "Prepare the release record and enforce promotion rules. In Prod verify the actual serving revision, configuration and user behavior. Some teams combine environments or use short-lived ones. Keep the purpose, evidence and decision clear when adapting the diagram."
+    ],
+    "evidence": "For each deployment target capture the candidate, environment-specific configuration, actual runtime identity and the observation that closes the step.",
+    "example": "An image that routed a test request correctly in UAT encounters a different production identity mapping. A controlled Prod smoke test exposes the difference before wider exposure.",
+    "failure": "Matching environment names provides weak assurance when data, identities or feature flags differ silently. Identify which differences could change the tested business rule and briefly explain how they are checked.",
+    "measure": "Compare expected and observed candidate and configuration on a sample promotion. Ask whether the results still apply after any intervening change.",
+    "sources": [
+      {
+        "title": "GitHub Docs · Deployment environments",
+        "url": "https://docs.github.com/en/actions/concepts/workflows-and-actions/deployment-environments"
+      },
+      {
+        "title": "DORA · Deployment automation",
+        "url": "https://dora.dev/capabilities/deployment-automation/"
+      },
+      {
+        "title": "Microsoft Azure Well-Architected Framework · Safe deployment practices",
+        "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
+      }
+    ]
+  }
+]
