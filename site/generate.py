@@ -214,7 +214,7 @@ def topic_index(topics, hotspots):
             aliases[h["id"]].append(h["label"])
     total=len(topics)
     out = ['<main class="frame index-page" id="content" tabindex="-1"><div class="page-intro"><h1>Topic index</h1><p>Open a lesson by activity, tool, role or output. The sections provide a text view of the map.</p></div>']
-    out.append('<div class="filterbar js-only"><label for="topic-search">Search topics<input type="search" id="topic-search" placeholder="Try UAT, acceptance criteria or image digest" autocomplete="off"></label><label for="phase-select">Section<select id="phase-select"><option value="">All sections</option>' + ''.join(f'<option value="{p}">{p}</option>' for p in PHASES) + '</select></label><button id="clear-search" type="button">Reset</button></div>')
+    out.append('<div class="filterbar js-only"><label for="topic-search">Search topics<input type="search" id="topic-search" placeholder="Try UAT, acceptance criteria or image digest" autocomplete="off"></label><label for="phase-select"><span id="section-label">Section</span><select id="phase-select" aria-labelledby="section-label"><option value="">All sections</option>' + ''.join(f'<option value="{p}">{p}</option>' for p in PHASES) + '</select></label><button id="clear-search" type="button">Reset</button></div>')
     out.append(f'<p id="result-count" aria-live="polite">{total} topics</p>')
     for phase in PHASES:
         rows = []
