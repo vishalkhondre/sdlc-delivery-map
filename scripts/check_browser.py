@@ -75,6 +75,28 @@ def check_detail_routes(page, base, lessons):
         page.wait_for_url(base + f"topics/{parent}.html")
 
 
+def check_flow_routes(page, base, lessons):
+    flows = [item for item in lessons if item.get("kind") == "flow"]
+    assert len(flows) == 6
+    page.goto(base + "tour.html#flows")
+    links = page.locator("#flows a")
+    assert links.evaluate_all("(links) => links.map(a => a.getAttribute('href'))") == [
+        f"topics/{flow['id']}.html" for flow in flows
+    ]
+    links.first.focus()
+    page.keyboard.press("Enter")
+    for index, item in enumerate(flows):
+        page.wait_for_url(base + f'topics/{item["id"]}.html')
+        assert page.locator("h1").inner_text() == item["title"]
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
+        assert page.locator("#next-decision .handoffs a").count() == len(item["touches"])
+        overview = item["touches"][0]
+        page.locator(f'#next-decision a[href="../topics/{overview}.html"]').click()
+        page.locator(f'#related-flows a[href="../topics/{item["id"]}.html"]').click()
+        if index + 1 < len(flows):
+            page.get_by_role("navigation", name="Reading order").get_by_role("link", name="Next topic").click()
+
+
 def check_build_reading_order(page, base):
     order = ("local-dev-loop", "branch-commit-conventions", "code-review-practice",
              "ci-integration-tests", "merge-rules", "image-build")
@@ -211,6 +233,7 @@ def main(integration=False):
                 page.set_viewport_size({"width": 390, "height": 844})
                 check_detail_routes(page, base, lessons)
                 check_build_reading_order(page, base)
+                check_flow_routes(page, base, lessons)
                 plain = browser.new_context(java_script_enabled=False)
                 text_page = plain.new_page()
                 text_page.goto(base)

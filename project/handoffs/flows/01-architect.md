@@ -1,0 +1,3 @@
+# Flow brief
+
+The six independent entry points follow a record across several actors: CC-123, a proposed revision's failed check, CC-131, uat-80, INC-7 and the accepted image digest. Use the exact touches and research targets in project/DEPTH-INVENTORY.md. Guide readers from the tour to all six, from each touched overview into its flows, and from each flow back to its overview steps. The Jira case uses the seven numbered map headers. The CI, QA, UAT, Prod and evidence cases each need a figure with a text equivalent. Preserve the distinction between observed and proposed work in both directions.

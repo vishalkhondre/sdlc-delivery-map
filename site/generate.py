@@ -275,7 +275,12 @@ def tour_page(topics):
             children = [topic_link(topics, child) for key in keys for child in child_ids(topics, key)]
         deeper = f'<div class="tour-deeper"><strong>Go deeper</strong><div class="topic-links">{"".join(children)}</div></div>' if children else ""
         parts.append(f'<li id="{slug}" class="phase-{PHASE_BANDS[topics[keys[0]]["phase"]][0]}"><div class="phase-name">{e(phase)}</div><h2>{e(name)}</h2><p>{e(intro)}</p><div class="topic-links">{"".join(items)}</div>{deeper}<details><summary>{e(prompt)}</summary><p>{e(answer)}</p></details></li>')
-    parts.append('</ol><a href="index.html#map" class="primary">Return to the map</a></main>')
+    parts.append('</ol>')
+    flows = [topic_link(topics, key) for key, item in topics.items() if item.get("kind") == "flow"]
+    if flows:
+        links = "".join(f"<li>{link}</li>" for link in flows)
+        parts.append(f'<section id="flows"><h2>Follow a record across the map</h2><ul>{links}</ul></section>')
+    parts.append('<a href="index.html#map" class="primary">Return to the map</a></main>')
     return shell("Guided tour","Follow a fictional feature through seven decisions.",''.join(parts),active="Guided tour")
 
 def topic_index(topics, hotspots):
@@ -372,6 +377,11 @@ def topic_page(key, topics, area_by_id):
     if children:
         links = ''.join(f'<li>{topic_link(topics, child, prefix)}</li>' for child in children)
         result.append(section("go-deeper", "Go deeper", f'<ul>{links}</ul>'))
+    related_flows = [topic_link(topics, flow_id, prefix) for flow_id, flow in topics.items()
+                     if key in flow.get("touches", [])]
+    if related_flows:
+        links = "".join(f"<li>{link}</li>" for link in related_flows)
+        result.append(section("related-flows", "Follow this step across the map", f"<ul>{links}</ul>"))
     branches = BRANCHES.get(key, [])
     if parent:
         branches = [(parent, "Return to the overview"), *branches]
@@ -390,6 +400,8 @@ def topic_page(key, topics, area_by_id):
         tour_id = "intent"
     elif kind == "deep-dive" and phase == "Prove":
         tour_id = "qualification"
+    if kind == "flow":
+        tour_id = "flows"
     result.append(section("next-decision","Follow the workflow",
                           (f'<ul class="handoffs">{choices}</ul>' if choices else '')+
                           (f'<a href="../tour.html#{tour_id}">Open this stop in the guided tour</a> · ' if tour_id else '')+
@@ -420,7 +432,7 @@ def generate():
     if OUT.exists():
         shutil.rmtree(OUT)
     OUT.mkdir()
-    shutil.copytree(SITE/"assets",OUT/"assets")
+    shutil.copytree(SITE/"assets", OUT/"assets", ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     shutil.copy2(SITE/"favicon.svg",OUT/"favicon.svg")
     shutil.copy2(ROOT/"LICENSE",OUT/"LICENSE.txt")
     write("index.html",home(topics,spots))
