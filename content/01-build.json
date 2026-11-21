@@ -63,7 +63,8 @@
   },
   {
     "id": "branch",
-    "title": "Design the change and commit it on a feature branch",
+    "title": "Feature branch",
+    "activity": "Dev",
     "phase": "Build",
     "summary": "A short-lived branch gives a developer a place to implement one reviewable change. Its commits capture the design the team actually chose, along with the tests that explain the expected behavior.",
     "owner": "The developer owns the change and consults the business analyst, QA engineer and relevant maintainers when a design choice affects the workflow.",
@@ -94,7 +95,8 @@
   },
   {
     "id": "pull-request",
-    "title": "Open a pull request and review the proposed behavior",
+    "title": "Open pull request",
+    "activity": "Dev",
     "phase": "Build",
     "summary": "A pull request puts a proposed change in front of another person before it joins the shared codebase. The author supplies context and evidence. The reviewer evaluates both the implementation and what the evidence leaves uncertain.",
     "owner": "The developer prepares the proposal. A peer with knowledge of the affected code reviews it under the team's repository policy.",
@@ -129,7 +131,8 @@
   },
   {
     "id": "ci",
-    "title": "Run continuous integration checks on the proposed change",
+    "title": "Run CI checks",
+    "activity": "Dev",
     "phase": "Build",
     "summary": "Continuous integration gives the team repeatable feedback on a proposed revision. In this workflow, a pull request starts automated checks, and the configured merge rules use their results when deciding whether the change may enter main.",
     "owner": "Developers own failed application checks. The team maintaining the build system owns runner, dependency and workflow reliability.",
@@ -164,7 +167,8 @@
   },
   {
     "id": "merge",
-    "title": "Merge the reviewed change into main",
+    "title": "Merge feature PR",
+    "activity": "Dev",
     "phase": "Build",
     "summary": "Merging integrates an approved change into the shared development line. It produces an identifiable state that the release build can consume. Other changes may have entered main since the author first opened the pull request.",
     "owner": "A maintainer or authorized merge automation enforces the repository rules. The developer resolves integration conflicts with the relevant code owners.",
@@ -199,7 +203,8 @@
   },
   {
     "id": "build",
-    "title": "Build and publish the release candidate once",
+    "title": "Build candidate once",
+    "activity": "Dev",
     "phase": "Build",
     "summary": "The release build packages one integrated source revision into a deployable candidate. The team records exactly what it produced so QA, UAT and production can request the same published object.",
     "owner": "The developer owns application build correctness. The platform or DevOps engineer maintains the workflow, registry access and artifact retention.",

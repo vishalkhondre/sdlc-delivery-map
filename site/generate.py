@@ -17,6 +17,15 @@ CONTENT = ROOT / "content"
 SITE = ROOT / "site"
 OUT = ROOT / "dist"
 PHASES = ("Define", "Build", "Prove", "Release", "Learn", "Reference")
+PHASE_BANDS = {
+    "Define": ("define", "Decide & Define"),
+    "Build": ("build", "Build & Prove"),
+    "Prove": ("build", "Build & Prove"),
+    "Release": ("release", "Release & Learn"),
+    "Learn": ("release", "Release & Learn"),
+    "Reference": ("reference", "Reference"),
+}
+TECHNICAL_VALUE = re.compile(r"\b(?:CC-\d+|AC-\d+|sha256:[a-fA-F0-9]{8,64})\b")
 NAV = (("Map", "index.html"), ("Guided tour", "tour.html"), ("Topics", "topics.html"), ("Sources", "references.html"))
 SECTIONS = (("inputs", "Before you begin"), ("steps", "How it works"), ("example", "Worked example"),
             ("evidence", "What to record"), ("failure", "When it goes wrong"), ("measure", "How to measure it"),
@@ -82,6 +91,9 @@ def icon(name):
 
 def e(text):
     return html.escape(str(text), quote=True)
+
+def lesson_text(value):
+    return TECHNICAL_VALUE.sub(lambda m: f"<code>{m.group()}</code>", e(value))
 
 def load():
     result = {}
@@ -151,7 +163,7 @@ def interactive_map(hotspots, topics):
 
 def home(topics, hotspots):
     body = f'''<main class="home frame" id="content" tabindex="-1">
-<section class="intro"><div><h1>Follow a feature from idea to production.</h1>
+<section class="intro"><div><h1>From Feature Commit to Production</h1>
 <p>Explore how a team defines, builds, tests and releases a change, then uses production evidence to decide what to do next.</p></div>
 <div class="start-card"><strong>New to software delivery?</strong><p>Follow one approval-routing feature through seven decisions.</p><a class="primary" href="tour.html">Start the guided tour</a></div></section>
 {interactive_map(hotspots, topics)}
@@ -168,7 +180,7 @@ def home(topics, hotspots):
     if lookup:
         body += '<nav class="lookup-links" aria-label="Learning resources">'+ " · ".join(lookup) + '</nav>'
     body += '</main>' 
-    return shell("From feature intent to production learning","Explore the SDLC with a clickable software delivery diagram and guided walkthrough.",body,active="Map")
+    return shell("From Feature Commit to Production","Explore the SDLC with a clickable software delivery diagram and guided walkthrough.",body,active="Map")
 
 def tour_page(topics):
     parts=['<main id="content" class="reading frame" tabindex="-1"><div class="page-intro"><h1>Follow one feature</h1><p>Work through seven decisions in the approval-routing example. At each stop, trace the evidence and test what happens when a check fails.</p></div><ol class="tour-list" id="tour-stops">']
@@ -176,7 +188,7 @@ def tour_page(topics):
         items = [topic_link(topics,key) for key in keys if key in topics]
         if slug == "qualification" and "hold" in topics:
             items.append(topic_link(topics,"hold",label="Failure path: hold and requalify"))
-        parts.append(f'<li id="{slug}"><div class="phase-name">{e(phase)}</div><h2>{e(name)}</h2><p>{e(intro)}</p><div class="topic-links">{"".join(items)}</div><details><summary>{e(prompt)}</summary><p>{e(answer)}</p></details></li>')
+        parts.append(f'<li id="{slug}" class="phase-{PHASE_BANDS[topics[keys[0]]["phase"]][0]}"><div class="phase-name">{e(phase)}</div><h2>{e(name)}</h2><p>{e(intro)}</p><div class="topic-links">{"".join(items)}</div><details><summary>{e(prompt)}</summary><p>{e(answer)}</p></details></li>')
     parts.append('</ol><a href="index.html#map" class="primary">Return to the map</a></main>')
     return shell("Guided tour","Follow a fictional feature through seven decisions.",''.join(parts),active="Guided tour")
 
@@ -199,7 +211,7 @@ def topic_index(topics, hotspots):
             note = f'<p class="aliases">On the map · {e(" · ".join(alt_names))}</p>' if alt_names else ""
             rows.append(f'<article class="topic-row" data-phase="{phase}" data-text="{e(keywords)}"><h3>{topic_link(topics,key)}</h3><p>{e(t["summary"])}</p>{note}</article>')
         if rows:
-            out.append(f'<section class="index-section" id="phase-{phase.lower()}" data-index-phase="{phase}"><h2>{phase}</h2><div class="topic-grid">{"".join(rows)}</div></section>')
+            out.append(f'<section class="index-section phase-{PHASE_BANDS[phase][0]}" id="phase-{phase.lower()}" data-index-phase="{phase}"><h2>{phase}</h2><div class="topic-grid">{"".join(rows)}</div></section>')
     out.append('<p id="no-results" hidden>There are no matching topics. Try a different word or choose another phase.</p></main>')
     return shell("Topic index","Browse or search every topic in the SDLC Delivery Map.",''.join(out),active="Topics")
 
@@ -221,23 +233,27 @@ def topic_page(key, topics, area_by_id):
     t=topics[key]
     prefix="../"
     phase=t["phase"]
+    band, band_name = PHASE_BANDS[phase]
+    activity = t.get("activity", "")
+    tag = (f'<span class="activity-tag activity-{e(activity.lower().replace(" ", "-"))}">{e(activity)}</span>'
+           if activity else "")
     same_phase = [item for item in topics.values() if item["phase"]==phase]
     keys=list(topics)
     ordinal=keys.index(key)
     nav_items=''.join(f'<li><a href="{e(item["id"])}.html"'+(' aria-current="page"' if item["id"]==key else '')+f'>{e(item["title"])}</a></li>' for item in same_phase)
     back_id = f"area-{area_by_id[key]}" if key in area_by_id else "map"
     top = f'''<div class="docs has-onpage"><nav class="sidenav" aria-label="Topics in {e(phase)}"><p class="sidenav-title">{e(phase)}</p><ul>{nav_items}</ul><a href="../topics.html">All topics</a></nav>
-<main id="content" tabindex="-1" class="lesson"><article id="article"><nav aria-label="Breadcrumb" class="crumb"><a href="../index.html#map">Map</a><span>/</span><a href="../topics.html#phase-{phase.lower()}">{phase}</a></nav>
-<h1>{e(t["title"])}</h1><p class="summary">{e(t["summary"])}</p><div class="owner"><b>Responsible role</b> {e(t["owner"])}</div>'''
+<main id="content" tabindex="-1" class="lesson"><article id="article"><nav aria-label="Breadcrumb" class="crumb phase-{band}"><a href="../index.html#map">Map</a><span>/</span><a class="phase-name" href="../topics.html#phase-{phase.lower()}">{e(band_name)}</a>{tag}</nav>
+<h1>{e(t["title"])}</h1><p class="summary">{lesson_text(t["summary"])}</p><div class="owner"><b>Responsible role</b> {e(t["owner"])}</div>'''
     result=[top]
     def section(sec, label, content, cls=""):
         return f'<section class="lesson-block {cls}" id="{sec}"><h2>{label}</h2>{content}</section>'
     def listing(tag, items):
-        return f'<{tag}>'+''.join(f'<li>{e(x)}</li>' for x in items)+f'</{tag}>'
+        return f'<{tag}>'+''.join(f'<li>{lesson_text(x)}</li>' for x in items)+f'</{tag}>'
     result.append(section("inputs","Before you begin",listing("ul",t["inputs"])))
     result.append(section("steps","How it works",listing("ol",t["steps"])))
     for sec,heading in SECTIONS[2:6]:
-        result.append(section(sec,heading,f'<p>{e(t[sec])}</p>', "example-panel" if sec=="example" else ""))
+        result.append(section(sec,heading,f'<p>{lesson_text(t[sec])}</p>', "example-panel" if sec=="example" else ""))
     branches=BRANCHES.get(key,[])
     if not branches:
         sequence=[x["id"] for x in same_phase]

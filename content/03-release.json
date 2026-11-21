@@ -2,6 +2,7 @@
   {
     "id": "release-plan",
     "title": "Plan the release",
+    "activity": "Release preparation",
     "phase": "Release",
     "summary": "Which accepted changes belong together, and who needs to be ready for them? A release plan makes the intended scope, audience and timing visible before anyone sends traffic to new software.",
     "owner": "Release coordinator, with the Product Owner and service owner",
@@ -34,7 +35,8 @@
   },
   {
     "id": "release",
-    "title": "Publish the release",
+    "title": "Publish GitHub release",
+    "activity": "Release preparation",
     "phase": "Release",
     "summary": "A published release gives a known version a stable name and makes its contents discoverable. In this workflow it also gives the production job a candidate to evaluate.",
     "owner": "Release coordinator or repository maintainer",
@@ -67,7 +69,8 @@
   },
   {
     "id": "policy",
-    "title": "Authorize production promotion",
+    "title": "Enforce Prod policy",
+    "activity": "Release preparation",
     "phase": "Release",
     "summary": "Production authorization answers whether this exact candidate may enter this environment under the applicable policy. A QA result, a business decision and a deployment authorization answer three different questions.",
     "owner": "Deployment workflow enforces the rules. A designated reviewer participates when the release policy calls for one.",
@@ -105,7 +108,8 @@
   },
   {
     "id": "rollout",
-    "title": "Start the production rollout",
+    "title": "Start Prod rollout",
+    "activity": "Prod",
     "phase": "Release",
     "summary": "A rollout turns an authorized version into running software. The operator chooses where it runs, which configuration it uses and how much traffic reaches it. Each choice affects what users experience.",
     "owner": "Platform engineer or deployment automation, with the service owner responsible for rollout health",
@@ -142,7 +146,8 @@
   },
   {
     "id": "observe",
-    "title": "Observe the running revision",
+    "title": "Roll out and observe",
+    "activity": "Prod",
     "phase": "Release",
     "summary": "A successful deployment command confirms an operation was accepted. Rollout observation asks whether people receiving the new behavior can complete their work reliably over a meaningful period.",
     "owner": "Service owner, supported by the platform engineer and QA",
@@ -179,7 +184,8 @@
   },
   {
     "id": "recover",
-    "title": "Halt and recover a rollout",
+    "title": "Recover service",
+    "activity": "Prod",
     "phase": "Release",
     "summary": "Recovery protects current users and restores correct work already in flight. The safest action depends on what changed, how far it spread and whether the previous version can safely read the current data.",
     "owner": "Service owner directs recovery. Platform and application engineers execute and verify the chosen action.",
@@ -212,7 +218,8 @@
   },
   {
     "id": "smoke",
-    "title": "Run a production smoke test",
+    "title": "Record smoke test",
+    "activity": "Prod",
     "phase": "Release",
     "summary": "A smoke test exercises a small, consequential path in the real environment immediately after deployment. It can detect a broken role mapping or integration even when the accepted image starts successfully.",
     "owner": "QA or a designated service operator runs the controlled check. The service owner acts on a failure.",
@@ -245,7 +252,8 @@
   },
   {
     "id": "deployment-record",
-    "title": "Record the deployment",
+    "title": "Record deployment",
+    "activity": "Prod",
     "phase": "Release",
     "summary": "The deployment record answers what actually ran, where, when and for whom. It lets a team start from a customer report and find the relevant source, qualification evidence and rollout decision.",
     "owner": "Deployment automation captures runtime facts. The release coordinator links them to the feature record.",
@@ -279,6 +287,7 @@
   {
     "id": "notes",
     "title": "Publish release notes",
+    "activity": "Prod",
     "phase": "Release",
     "summary": "Release notes translate a change in the software into a change in somebody’s work. They help requesters, approvers and support staff understand availability, expected behavior, limitations and how to get help.",
     "owner": "Release coordinator, with the Product Owner and support or documentation representative",
@@ -311,7 +320,8 @@
   },
   {
     "id": "alert",
-    "title": "Alert on routing failures",
+    "title": "Alert on unassigned requests",
+    "activity": "Prod",
     "phase": "Learn",
     "summary": "Monitoring continues after rollout. A routing rule can fail on the following business day when traffic changes or an external role mapping is edited. An alert gives a person a specific reason and enough context to act.",
     "owner": "Service owner defines the signal and response. The scheduled responder receives actionable alerts.",
@@ -345,6 +355,7 @@
   {
     "id": "incident",
     "title": "Respond and confirm recovery",
+    "activity": "Prod",
     "phase": "Learn",
     "summary": "An incident begins when the service needs coordinated action to protect its users. Restoring normal handling for new traffic is one part of the job. The people whose requests were delayed or misrouted also need a known outcome.",
     "owner": "Service owner or incident lead, with a responder for mitigation and an owner for communication",
@@ -377,7 +388,7 @@
   },
   {
     "id": "measure",
-    "title": "Measure the feature outcome",
+    "title": "Measure the outcome",
     "phase": "Learn",
     "summary": "Did automatic routing shorten the wait for the approver and the time until a decision? Those are different milestones. Define both using the same submission population so slow or unfinished requests stay visible.",
     "owner": "Product Owner and analyst, with the service team responsible for trustworthy event collection",
@@ -410,7 +421,7 @@
   },
   {
     "id": "feedback",
-    "title": "Feed the result back to the feature",
+    "title": "Feed the result back to Jira",
     "phase": "Learn",
     "summary": "The loop closes when the evidence changes or confirms a product decision. A dashboard can show a trend. A decision record explains what the team believes, what it will do and when it will check again.",
     "owner": "Product Owner, with input from requesters, approvers, analysts and the service owner",

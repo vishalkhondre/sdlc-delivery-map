@@ -61,6 +61,16 @@ def main():
                 page.wait_for_url(base + target)
                 assert page.locator("h1").inner_text().strip()
                 page.go_back()
+                page.get_by_role("link", name="Record UAT decision", exact=True).click()
+                assert page.locator("h1").inner_text() == "Record UAT decision"
+                assert page.locator(".crumb .phase-name").inner_text() == "Build & Prove"
+                assert page.locator(".crumb .activity-tag").inner_text() == "UAT"
+                page.emulate_media(color_scheme="light")
+                badge = page.locator(".activity-tag")
+                light_ink = badge.evaluate("el => getComputedStyle(el).color")
+                page.locator("#theme-toggle").click()
+                assert page.locator("html").get_attribute("data-theme") == "dark"
+                assert badge.evaluate("el => getComputedStyle(el).color") != light_ink
                 page.goto(base + "topics.html")
                 search = page.locator("#topic-search")
                 search.fill("unfindable-test-phrase")
@@ -76,7 +86,7 @@ def main():
                 page.goto(base + "tour.html")
                 assert page.locator("#tour-stops a").count() > 1
                 page.set_viewport_size({"width": 375, "height": 812})
-                for route in ("index.html", "topics.html", "tour.html", target):
+                for route in ("index.html", "topics.html", "tour.html", target, "topics/uat-decision.html"):
                     page.goto(base + route)
                     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1"), f"Viewport overflow: {route}"
                 plain = browser.new_context(java_script_enabled=False)

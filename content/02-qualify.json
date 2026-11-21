@@ -1,7 +1,8 @@
 [
   {
     "id": "qa-rollout",
-    "title": "Request a QA rollout",
+    "title": "Request QA rollout",
+    "activity": "QA",
     "phase": "Prove",
     "summary": "A QA rollout gives the team a running copy of a particular candidate. The deployment request says which image and settings to use. The running service supplies the evidence that those instructions took effect.",
     "owner": "DevOps engineer or developer responsible for the QA deployment job",
@@ -67,7 +68,8 @@
   },
   {
     "id": "qa-revision",
-    "title": "Identify the running QA revision",
+    "title": "Deploy to QA",
+    "activity": "QA",
     "phase": "Prove",
     "summary": "The revision is the platform's record of a deployed application version. QA needs to know which revision handled its requests, particularly when a shared endpoint can route traffic to more than one version.",
     "owner": "DevOps engineer provides the target and QA engineer verifies it",
@@ -98,7 +100,8 @@
   },
   {
     "id": "qa-tests",
-    "title": "Verify automatic routing and decision permissions",
+    "title": "Verify AC-01 and AC-02",
+    "activity": "QA",
     "phase": "Prove",
     "summary": "Test the two promises separately. AC-01 says submission automatically assigns the approver specified by the rule. AC-02 says only authorized approvers can record a decision. Seeing the expected name on screen is insufficient to distinguish automatic routing from a manual fix.",
     "owner": "QA engineer designs and executes the checks with the business analyst",
@@ -129,7 +132,8 @@
   },
   {
     "id": "uat-promotion",
-    "title": "Promote the QA-qualified candidate to UAT",
+    "title": "Promote to UAT",
+    "activity": "UAT",
     "phase": "Prove",
     "summary": "Promotion selects an already tested candidate for a new environment. The decision depends on whether the required QA results still describe the candidate about to be deployed, including configuration changes that affect user-visible behavior.",
     "owner": "Deployment workflow applies the team's promotion policy",
@@ -164,7 +168,8 @@
   },
   {
     "id": "uat-runtime",
-    "title": "Prepare the UAT environment",
+    "title": "Deploy to UAT",
+    "activity": "UAT",
     "phase": "Prove",
     "summary": "User acceptance testing lets representative users exercise a proposed change in a realistic business setting. A dedicated environment is the choice in this worked example. Its usefulness depends on the identities, data and integrations available to the participants.",
     "owner": "DevOps engineer prepares the environment and the business analyst prepares the scenario",
@@ -199,7 +204,8 @@
   },
   {
     "id": "uat-decision",
-    "title": "Record business acceptance",
+    "title": "Record UAT decision",
+    "activity": "UAT",
     "phase": "Prove",
     "summary": "QA can show that a rule executed correctly. Business acceptance asks whether the resulting workflow supports the intended work. The designated signatory records a decision for a named candidate after representative users exercise the agreed scenarios.",
     "owner": "UAT signatory decides after users and subject-matter experts exercise the workflow",
@@ -230,7 +236,7 @@
   },
   {
     "id": "hold",
-    "title": "Hold release and requalify",
+    "title": "Hold release",
     "phase": "Prove",
     "summary": "A hold keeps a candidate from advancing when a required QA check fails or the business rejects it. The failure record should help the next person reproduce the observation, understand its impact and choose the smallest meaningful retest.",
     "owner": "QA lead records the hold and the team responsible for the defect investigates",
@@ -265,7 +271,7 @@
   },
   {
     "id": "validation-summary",
-    "title": "Assemble a validation summary",
+    "title": "Validation summary",
     "phase": "Prove",
     "summary": "A validation summary gives the person preparing a release a short, verifiable account of the candidate's qualification. It connects the feature's intent with technical results and the business decision while leaving detailed records in the tools that own them.",
     "owner": "Business analyst, QA lead or release manager compiles the links and checks their consistency",

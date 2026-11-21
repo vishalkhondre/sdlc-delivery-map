@@ -1,5 +1,5 @@
 {
-  "edition": "1.0.0",
-  "review": "content/reviews/1.0.0.md",
-  "source_sha256": "fdcf3e8cf2f85c0d77950a9980825df8a7f8130e9936d81bab7f30f45dc085d8"
+  "edition": "1.0.1",
+  "review": "content/reviews/1.0.1.md",
+  "source_sha256": "b3c32579868bf5f90ad9d61934bfaee457db3c0370f8d76ae711f49685eb36a4"
 }
