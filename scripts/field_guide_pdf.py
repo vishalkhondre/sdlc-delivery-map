@@ -10,7 +10,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import mm
 from reportlab.platypus import (BaseDocTemplate, Frame, Image, KeepTogether, PageBreak,
-                                PageTemplate, Paragraph, Spacer)
+                                PageTemplate, Paragraph, Preformatted, Spacer, Table, TableStyle)
 
 from release_snapshot import version_for
 
@@ -35,6 +35,9 @@ style("label", 8.5, 12, TEAL, bold=True, after=3)
 style("body", 10.3, 14, after=5)
 style("small", 9, 12, MUTED, after=4)
 style("lead", 12.2, 16.5, BODY, after=9)
+style("detail", 14, 18, NAVY, bold=True, after=6)
+STYLES["detail"].keepWithNext = True
+STYLES["code"] = ParagraphStyle("code", fontName="Courier", fontSize=8, leading=11, spaceAfter=6)
 
 
 class Book(BaseDocTemplate):
@@ -53,9 +56,43 @@ def block(label, text):
     return KeepTogether([paragraph(label, "label"), paragraph(text)])
 
 
+def detail_content(section):
+    yield paragraph(section["title"], "detail")
+    for entry in section["blocks"]:
+        kind = entry["type"]
+        if kind == "text":
+            yield paragraph(entry["value"])
+        elif kind == "callout":
+            yield block(entry["label"], entry["value"])
+        elif kind == "list":
+            for i, item in enumerate(entry["items"], 1):
+                yield paragraph((f"{i}. " if entry["ordered"] else "• ") + item)
+        elif kind == "code":
+            yield paragraph(entry["caption"], "label")
+            yield Preformatted(entry["value"], STYLES["code"], maxLineLength=96)
+        elif kind == "figure":
+            yield paragraph(entry["caption"], "label")
+            equivalent = entry["text_equivalent"]
+            if isinstance(equivalent, list):
+                for item in equivalent:
+                    yield paragraph("• " + item)
+            else:
+                yield paragraph(equivalent)
+        elif kind == "table":
+            yield paragraph(entry["caption"], "label")
+            grid = [[paragraph(cell, "label") for cell in entry["columns"]]]
+            grid.extend([paragraph(cell, "small") for cell in row] for row in entry["rows"])
+            table = Table(grid, colWidths=[WIDTH/len(grid[0])] * len(grid[0]),
+                          repeatRows=1, splitInRow=1, spaceAfter=7)
+            table.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"),
+                                       ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#e6f2f0")),
+                                       ("LINEBELOW", (0, 0), (-1, -1), .35, colors.HexColor("#c6d5d6"))]))
+            yield table
+
+
 def make_pdf(tag, out):
     version = version_for(tag)
-    topics = [t for path in sorted((ROOT / "content").glob("0*.json"))
+    topics = [t for path in sorted((ROOT / "content").glob("[0-9][0-9]-*.json"))
               for t in json.loads(path.read_text())]
     image_file = ROOT / "site/assets/delivery-map.png"
     doc = Book(str(out), pagesize=A4, leftMargin=19*mm, rightMargin=19*mm,
@@ -95,6 +132,8 @@ def make_pdf(tag, out):
                     for i, txt in enumerate(topic[field], 1)]
             story.append(KeepTogether([paragraph(label, "label"), rows[0]]))
             story.extend(rows[1:])
+        for section in topic.get("detail", []):
+            story.extend(detail_content(section))
         for key, name in [("evidence", "HANDOFF EVIDENCE"), ("example", "WORKED EXAMPLE"),
                           ("failure", "WHEN IT FAILS"), ("measure", "WHAT TO MEASURE")]:
             story.append(block(name, topic[key]))

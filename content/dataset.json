@@ -188,6 +188,8 @@
       },
       "test_management_evidence": {
         "tool": "Kiwi TCMS",
+        "version": "17.2",
+        "evidence_basis": "Documentation and published source. This example has not been demonstrated on a live Kiwi TCMS and Jira setup.",
         "map_label": "Test Management Tool",
         "failed_execution": "TC-04 in qa-196 against build-422",
         "defect_reference": "The Kiwi execution stores the URL of CC-131 in Jira.",

@@ -13,3 +13,5 @@ description: "Plan the section and map its learning targets."
 ## Return
 
 A scoped section brief with topic IDs, expected handoffs and observable completion checks.
+
+Provide a depth inventory with parent or touched overviews, subtopics, sample artifacts, reader tasks, worked failures and research targets for each lesson.

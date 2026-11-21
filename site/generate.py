@@ -19,6 +19,7 @@ CONTENT = ROOT / "content"
 SITE = ROOT / "site"
 OUT = ROOT / "dist"
 PHASES = ("Define", "Build", "Prove", "Release", "Learn", "Reference")
+KIND_GROUPS = {"deep-dive": "Deep dive", "flow": "Flow"}
 PHASE_BANDS = {
     "Define": ("define", "Decide & Define"),
     "Build": ("build", "Build & Prove"),
@@ -99,7 +100,7 @@ def lesson_text(value):
 
 def load():
     result = {}
-    for path in sorted(CONTENT.glob("0*.json")):
+    for path in sorted(CONTENT.glob("[0-9][0-9]-*.json")):
         for t in json.loads(path.read_text()):
             if t["id"] in result or not re.fullmatch(r"[a-z0-9-]+", t["id"]):
                 raise ValueError(f'Duplicate or malformed topic ID: {t["id"]}')
@@ -107,7 +108,7 @@ def load():
                 raise ValueError(f'Unknown phase: {t["phase"]}')
             result[t["id"]] = t
     if not result:
-        raise ValueError("No lessons in content/0*.json")
+        raise ValueError("No numbered lesson files in content/")
     return result
 
 def source_url(url):
@@ -117,6 +118,58 @@ def source_url(url):
 
 def topic_link(topics, key, prefix="", label=None):
     return f'<a href="{prefix}topics/{e(key)}.html">{e(label or topics[key]["title"])}</a>'
+
+def index_group(topic):
+    return KIND_GROUPS.get(topic.get("kind"), topic["phase"])
+
+def child_ids(topics, parent):
+    return [key for key, topic in topics.items() if topic.get("parent") == parent]
+
+def text_list(tag, items):
+    return f'<{tag}>' + ''.join(f'<li>{lesson_text(item)}</li>' for item in items) + f'</{tag}>'
+
+def render_block(block):
+    kind = block["type"]
+    if kind == "text":
+        return f'<p>{lesson_text(block["value"])}</p>'
+    if kind == "list":
+        return text_list("ol" if block.get("ordered") else "ul", block["items"])
+    if kind == "table":
+        headers = ''.join(f'<th scope="col">{e(col)}</th>' for col in block["columns"])
+        rows = ''.join('<tr>' + ''.join(f'<td>{lesson_text(cell)}</td>' for cell in row) + '</tr>'
+                       for row in block["rows"])
+        caption = e(block["caption"])
+        return (f'<div class="table-scroll" role="region" aria-label="{caption}" tabindex="0">'
+                f'<table><caption>{caption}</caption><thead><tr>{headers}</tr></thead>'
+                f'<tbody>{rows}</tbody></table></div>')
+    if kind == "code":
+        language, caption = e(block["language"]), e(block["caption"])
+        return (f'<figure class="code-sample"><figcaption><strong>{language}</strong> {caption}</figcaption>'
+                f'<pre tabindex="0" aria-label="{language} sample"><code class="language-{language}">'
+                f'{e(block["value"])}</code></pre></figure>')
+    if kind == "figure":
+        equivalent = block["text_equivalent"]
+        text = text_list("ul", equivalent) if isinstance(equivalent, list) else f'<p>{lesson_text(equivalent)}</p>'
+        return (f'<figure class="detail-figure"><img src="../{e(block["src"])}" alt="{e(block["alt"])}">'
+                f'<figcaption>{e(block["caption"])}</figcaption></figure>'
+                f'<details class="figure-description"><summary>Text description of the figure</summary>{text}</details>')
+    if kind == "callout":
+        return (f'<aside class="detail-callout"><strong>{e(block["label"])}</strong>'
+                f'<p>{lesson_text(block["value"])}</p></aside>')
+    raise ValueError(f'Unknown detail block type: {kind}')
+
+def detail_keywords(topic):
+    for section in topic.get("detail", []):
+        yield section["title"]
+        for block in section["blocks"]:
+            for field in ("value", "caption", "label", "language", "alt", "text_equivalent", "items", "columns"):
+                value = block.get(field, [])
+                if isinstance(value, str):
+                    yield value
+                else:
+                    yield from value
+            for row in block.get("rows", []):
+                yield from row
 
 @lru_cache(maxsize=1)
 def edition_stamp():
@@ -203,7 +256,10 @@ def tour_page(topics):
         items = [topic_link(topics,key) for key in keys if key in topics]
         if slug == "qualification" and "hold" in topics:
             items.append(topic_link(topics,"hold",label="Failure path: hold and requalify"))
-        parts.append(f'<li id="{slug}" class="phase-{PHASE_BANDS[topics[keys[0]]["phase"]][0]}"><div class="phase-name">{e(phase)}</div><h2>{e(name)}</h2><p>{e(intro)}</p><div class="topic-links">{"".join(items)}</div><details><summary>{e(prompt)}</summary><p>{e(answer)}</p></details></li>')
+            keys = (*keys, "hold")
+        children = [topic_link(topics, child) for key in keys for child in child_ids(topics, key)]
+        deeper = f'<div class="tour-deeper"><strong>Go deeper</strong><div class="topic-links">{"".join(children)}</div></div>' if children else ""
+        parts.append(f'<li id="{slug}" class="phase-{PHASE_BANDS[topics[keys[0]]["phase"]][0]}"><div class="phase-name">{e(phase)}</div><h2>{e(name)}</h2><p>{e(intro)}</p><div class="topic-links">{"".join(items)}</div>{deeper}<details><summary>{e(prompt)}</summary><p>{e(answer)}</p></details></li>')
     parts.append('</ol><a href="index.html#map" class="primary">Return to the map</a></main>')
     return shell("Guided tour","Follow a fictional feature through seven decisions.",''.join(parts),active="Guided tour")
 
@@ -213,21 +269,25 @@ def topic_index(topics, hotspots):
         if h["label"] not in aliases[h["id"]]:
             aliases[h["id"]].append(h["label"])
     total=len(topics)
-    out = ['<main class="frame index-page" id="content" tabindex="-1"><div class="page-intro"><h1>Topic index</h1><p>Open a lesson by activity, tool, role or output. The sections provide a text view of the map.</p></div>']
-    out.append('<div class="filterbar js-only"><label for="topic-search">Search topics<input type="search" id="topic-search" placeholder="Try UAT, acceptance criteria or image digest" autocomplete="off"></label><label for="phase-select"><span id="section-label">Section</span><select id="phase-select" aria-labelledby="section-label"><option value="">All sections</option>' + ''.join(f'<option value="{p}">{p}</option>' for p in PHASES) + '</select></label><button id="clear-search" type="button">Reset</button></div>')
+    groups = (*PHASES, *KIND_GROUPS.values())
+    out = ['<main class="frame index-page" id="content" tabindex="-1"><div class="page-intro"><h1>Topic index</h1><p>Browse the map by section, or open a deep dive to see what runs inside a step.</p></div>']
+    out.append('<div class="filterbar js-only"><label for="topic-search">Search topics<input type="search" id="topic-search" placeholder="Try UAT, acceptance criteria or image digest" autocomplete="off"></label><label for="phase-select"><span id="section-label">Section</span><select id="phase-select" aria-labelledby="section-label"><option value="">All sections</option>' + ''.join(f'<option value="{p}">{p}</option>' for p in groups) + '</select></label><button id="clear-search" type="button">Reset</button></div>')
     out.append(f'<p id="result-count" aria-live="polite">{total} topics</p>')
-    for phase in PHASES:
+    for group in groups:
         rows = []
         for key, t in topics.items():
-            if t["phase"] != phase:
+            if index_group(t) != group:
                 continue
             keywords = " ".join([*aliases[key], t["owner"], t["title"], t["summary"], *t["inputs"],
-                                 *t["steps"], t["example"], t["evidence"], t["failure"], t["measure"]])
+                                 *t["steps"], t["example"], t["evidence"], t["failure"], t["measure"],
+                                 group, t["phase"], *t.get("audience", []), *detail_keywords(t)])
             alt_names = [name for name in aliases[key] if name.lower() != t["title"].lower()]
             note = f'<p class="aliases">On the map · {e(" · ".join(alt_names))}</p>' if alt_names else ""
-            rows.append(f'<article class="topic-row" data-phase="{phase}" data-text="{e(keywords)}"><h3>{topic_link(topics,key)}</h3><p>{e(t["summary"])}</p>{note}</article>')
+            rows.append(f'<article class="topic-row" data-phase="{group}" data-text="{e(keywords)}"><h3>{topic_link(topics,key)}</h3><p>{e(t["summary"])}</p>{note}</article>')
         if rows:
-            out.append(f'<section class="index-section phase-{PHASE_BANDS[phase][0]}" id="phase-{phase.lower()}" data-index-phase="{phase}"><h2>{phase}</h2><div class="topic-grid">{"".join(rows)}</div></section>')
+            slug = group.lower().replace(" ", "-")
+            band = PHASE_BANDS[group][0] if group in PHASE_BANDS else slug
+            out.append(f'<section class="index-section phase-{band}" id="phase-{slug}" data-index-phase="{group}"><h2>{group}</h2><div class="topic-grid">{"".join(rows)}</div></section>')
     out.append('<p id="no-results" hidden>There are no matching topics. Try a different word or choose another section.</p></main>')
     return shell("Topic index","Browse or search every topic in the SDLC Delivery Map.",''.join(out),active="Topics")
 
@@ -250,27 +310,52 @@ def topic_page(key, topics, area_by_id):
     prefix="../"
     phase=t["phase"]
     band, band_name = PHASE_BANDS[phase]
-    activity = t.get("activity", "")
+    kind = t.get("kind", "overview")
+    parent = t.get("parent")
+    activity = KIND_GROUPS.get(kind, t.get("activity", ""))
     tag = (f'<span class="activity-tag activity-{e(activity.lower().replace(" ", "-"))}">{e(activity)}</span>'
            if activity else "")
-    same_phase = [item for item in topics.values() if item["phase"]==phase]
-    keys=list(topics)
+    keys = [k for k, item in topics.items() if item.get("kind", "overview") == kind]
+    same_phase = [topics[k] for k in keys if topics[k]["phase"] == phase]
+    nav_name = phase
+    parent_crumb = ""
+    if parent:
+        keys = child_ids(topics, parent)
+        nav_name = topics[parent]["title"]
+        same_phase = [topics[k] for k in keys]
+        parent_crumb = f'<span aria-hidden="true">/</span>{topic_link(topics, parent, prefix)}'
+    elif kind == "flow":
+        nav_name = "Flows"
+        same_phase = [topics[k] for k in keys]
     ordinal=keys.index(key)
     nav_items=''.join(f'<li><a href="{e(item["id"])}.html"'+(' aria-current="page"' if item["id"]==key else '')+f'>{e(item["title"])}</a></li>' for item in same_phase)
-    back_id = f"area-{area_by_id[key]}" if key in area_by_id else "map"
-    top = f'''<div class="docs has-onpage"><nav class="sidenav" aria-label="Topics in {e(phase)}"><p class="sidenav-title">{e(phase)}</p><ul>{nav_items}</ul><a href="../topics.html">All topics</a></nav>
-<main id="content" tabindex="-1" class="lesson"><article id="article"><nav aria-label="Breadcrumb" class="crumb phase-{band}"><a href="../index.html#map">Map</a><span>/</span><a class="phase-name" href="../topics.html#phase-{phase.lower()}">{e(band_name)}</a>{tag}</nav>
-<h1>{e(t["title"])}</h1><p class="summary">{lesson_text(t["summary"])}</p><div class="owner"><b>Responsible role</b> {e(t["owner"])}</div>'''
-    result=[top]
+    map_key = parent or key
+    back_id = f"area-{area_by_id[map_key]}" if map_key in area_by_id else "map"
+    audience = f'<span><b>Audience</b> {e(", ".join(t["audience"]))}</span>' if t.get("audience") else ""
+    top = f'''<div class="docs has-onpage"><nav class="sidenav" aria-label="Topics in {e(nav_name)}"><p class="sidenav-title">{e(nav_name)}</p><ul>{nav_items}</ul><a href="../topics.html">All topics</a></nav>
+<main id="content" tabindex="-1" class="lesson"><article id="article"><nav aria-label="Breadcrumb" class="crumb phase-{band}"><a href="../index.html#map">Map</a><span aria-hidden="true">/</span><a class="phase-name" href="../topics.html#phase-{phase.lower()}">{e(band_name)}</a>{parent_crumb}{tag}</nav>
+<h1>{e(t["title"])}</h1><p class="summary">{lesson_text(t["summary"])}</p><div class="owner"><span><b>Responsible role</b> {e(t["owner"])}</span>{audience}</div>'''
+    result = []
+    toc = []
     def section(sec, label, content, cls=""):
-        return f'<section class="lesson-block {cls}" id="{sec}"><h2>{label}</h2>{content}</section>'
-    def listing(tag, items):
-        return f'<{tag}>'+''.join(f'<li>{lesson_text(x)}</li>' for x in items)+f'</{tag}>'
-    result.append(section("inputs","Before you begin",listing("ul",t["inputs"])))
-    result.append(section("steps","How it works",listing("ol",t["steps"])))
+        toc.append(f'<li><a href="#{e(sec)}">{e(label)}</a></li>')
+        return f'<section class="lesson-block {cls}" id="{e(sec)}" tabindex="-1"><h2>{e(label)}</h2>{content}</section>'
+    result.append(section("inputs","Before you begin",text_list("ul",t["inputs"])))
+    result.append(section("steps","How it works",text_list("ol",t["steps"])))
+    for detail in t.get("detail", []):
+        blocks = ''.join(render_block(block) for block in detail["blocks"])
+        result.append(section(detail["id"], detail["title"], blocks, "detail-section"))
     for sec,heading in SECTIONS[2:6]:
         result.append(section(sec,heading,f'<p>{lesson_text(t[sec])}</p>', "example-panel" if sec=="example" else ""))
-    branches=BRANCHES.get(key,[])
+    children = child_ids(topics, key)
+    if children:
+        links = ''.join(f'<li>{topic_link(topics, child, prefix)}</li>' for child in children)
+        result.append(section("go-deeper", "Go deeper", f'<ul>{links}</ul>'))
+    branches = BRANCHES.get(key, [])
+    if parent:
+        branches = [(parent, "Return to the overview")]
+    elif kind == "flow":
+        branches = [(other, "Workflow step") for other in t["touches"]]
     if not branches:
         sequence=[x["id"] for x in same_phase]
         idx=sequence.index(key)
@@ -279,7 +364,7 @@ def topic_page(key, topics, area_by_id):
         elif ordinal+1<len(keys):
             branches=[(keys[ordinal+1],"Continue reading")]
     choices=''.join(f'<li><span>{e(label)}</span>{topic_link(topics,other,prefix)}</li>' for other,label in branches if other in topics)
-    tour_id=next((s[0] for s in TOUR if key in s[4]),None)
+    tour_id = next((s[0] for s in TOUR if map_key in s[4]), None)
     result.append(section("next-decision","Follow the workflow",
                           (f'<ul class="handoffs">{choices}</ul>' if choices else '')+
                           (f'<a href="../tour.html#{tour_id}">Open this stop in the guided tour</a> · ' if tour_id else '')+
@@ -290,12 +375,16 @@ def topic_page(key, topics, area_by_id):
             links = [f'<li><a href="../assets/examples/{e(f.name)}" download>{e(f.stem.replace("-", " ").replace("_"," ").capitalize())} ({e(f.suffix.lstrip(".").upper())})</a></li>' for f in files if f.is_file()]
             result.append(section("downloads","Download the example records",'<ul>'+''.join(links)+'</ul>'))
     result.append(section("sources","Sources",'<ul class="source-links">'+''.join(f'<li><a href="{source_url(s["url"])}">{e(s["title"])}</a></li>' for s in t["sources"])+'</ul>'))
+    toc_links = '<ul>' + ''.join(toc) + '</ul>'
+    mobile_toc = (f'<details class="mobile-contents"><summary>On this page</summary>'
+                  f'<nav aria-label="On this page">{toc_links}</nav></details>')
+    result[:0] = [top, mobile_toc]
     result.append('</article><nav class="lesson-pager" aria-label="Reading order">')
     for index,label in ((ordinal-1,"Previous topic"),(ordinal+1,"Next topic")):
         if 0<=index<len(keys):
             other=keys[index]
             result.append(f'<a href="{e(other)}.html"><small>{label}</small><strong>{e(topics[other]["title"])}</strong></a>')
-    result.append('</nav></main><nav class="onpage" aria-label="On this page"><p class="onpage-title">On this page</p><ul>'+''.join(f'<li><a href="#{sec}">{label}</a></li>' for sec,label in SECTIONS)+'</ul></nav></div>')
+    result.append(f'</nav></main><nav class="onpage" aria-label="On this page"><p class="onpage-title">On this page</p>{toc_links}</nav></div>')
     return shell(t["title"],t["summary"],''.join(result),active="Topics",prefix=prefix)
 
 def generate():

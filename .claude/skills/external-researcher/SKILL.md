@@ -13,3 +13,5 @@ description: "Verify primary public references for each lesson."
 ## Return
 
 A checked source list and unresolved evidence gaps.
+
+Check a primary source in this session for each tool-behavior claim. Record the page title, URL, date opened, product edition and version if material, and which claim the source establishes.

@@ -473,3 +473,11 @@ Owner decisions of 21 November 2026 take precedence over the earlier instruction
 - Section 4.2. Update the four numbered lesson readers together: site/generate.py, scripts/validate.py, scripts/check_browser.py and scripts/field_guide_pdf.py. Exclude dataset.json and hotspots.json from lesson discovery.
 - Sections 4.4 and 10. At the six-lesson CI pilot, require unit test, lint, coverage, SonarQube and quality gate. At integration require all fourteen probes, adding bug, severity, regression, test case, Jira status, hotfix, rollback, feature flag and median. Preserve the established correction search checks throughout.
 - The inventory contains 40 deep dives and six cross-cutting flows, in addition to the existing 53 overviews. Decision 2 is settled: use Kiwi TCMS with the generic map label “Test Management Tool”. This supersedes the earlier proposed example and requirement-based suite terminology. Use Kiwi plans, cases, runs and execution-level defect references. Three decisions remain open at Gate 1.
+
+### Gate 1 decision
+
+The owner approved the inventory and the recommended Python, pytest, Ruff and coverage.py examples, versioned SonarQube Server, and the existing map image. Edition 1.0.2 corrections are in the integration baseline. Every reader-facing lesson describing Kiwi TCMS behavior must name the version and state that the behavior comes from its documentation and published source and has not been demonstrated on a live Kiwi TCMS and Jira setup. Gate 2 covers only the model and six CI lessons.
+
+### Gate 2 decision
+
+The owner accepted the pilot depth. Apply the plain-language opening, first-use definitions and documented alternative for custom scripts in the template to every deep dive. The maintainer may merge syncs from main into edition/1.1.0. Leave all content PRs open for the owner.
