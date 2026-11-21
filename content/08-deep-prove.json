@@ -1,0 +1,1717 @@
+[
+  {
+    "id": "test-management-structure",
+    "parent": "tool-test",
+    "activity": "QA",
+    "audience": [
+      "Business Analyst",
+      "QA Engineer"
+    ],
+    "title": "Find the test result for the build under review",
+    "summary": "A list of checks tells you what the team intends to try. To decide whether a change is ready, find what someone actually tried on the version you plan to use. The same check may have failed on an earlier version and passed after a repair.",
+    "owner": "The quality assurance (QA) lead maintains the plan, gives testers the chosen cases and reviews the results before handing the candidate to business acceptance.",
+    "inputs": [
+      "Feature CC-123 and its acceptance criteria, the business conditions the change must satisfy. AC-01 covers automatic assignment and AC-02 controls who can decide.",
+      "The build receipt identifies the candidate, the packaged software under review. Obtain its image digest (a content identifier), the QA environment revision and the routing configuration.",
+      "The tester needs read access to the receipt, permission in the test management system to create or update the run and its results, and access to the QA application using representative test roles."
+    ],
+    "steps": [
+      "Find the reusable plan for CC-123. Select the cases required for this particular build and check their expected outcomes with the business analyst.",
+      "Create a run for the identified build. Record the deployed image and rule configuration with the run so another tester can reconstruct the setting.",
+      "Record the actual recipient, assignment actor, permission response and resulting request state for the cases exercised. Keep a link to the result that supports each conclusion.",
+      "Open the matching run from Jira and follow a failed execution to the defect. Tell the next decision maker which criteria the available executions cover."
+    ],
+    "evidence": "The reviewer can traverse feature → plan → selected run → individual execution, and then inspect the actual observation, build identity and any linked defect. Human and automated results carry their origins.",
+    "example": "In the fictional qa-204 record, request R-17 reached the Purchasing approver through the routing-rule actor. A requester was denied and the request stayed pending. The authorized approval was recorded. These observations support AC-01 and AC-02 for build-418.",
+    "failure": "If there is a passing case on an earlier build but no run for this candidate, the QA lead marks the candidate evidence missing and assigns a fresh execution. Promotion remains on hold.",
+    "measure": "Sample handoffs and count those for which a second reviewer can recover the exact candidate and actual observations for each claimed criterion.",
+    "sources": [
+      {
+        "title": "Kiwi TCMS 17.2 · Test Plans",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/guide/testplan.html"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Test Cases",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/guide/testcase.html"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Test Runs",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/guide/testrun.html"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Published source for TestRun.add_case",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/_modules/tcms/rpc/api/testrun.html#add_case"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Published source for TestExecution.add_link",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/_modules/tcms/rpc/api/testexecution.html#add_link"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Published Jira tracker implementation",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/_modules/tcms/issuetracker/types.html#JIRA"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Automation Frameworks plugins",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/plugins/automation-frameworks.html"
+      },
+      {
+        "title": "Atlassian · Link work items",
+        "url": "https://support.atlassian.com/jira-software-cloud/docs/link-issues/"
+      }
+    ],
+    "detail": [
+      {
+        "id": "read-the-objects",
+        "title": "Follow the plan into the execution",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Kiwi TCMS is the Test Management Tool in this example. A Test Plan collects the cases chosen for a piece of work. A Test Case gives reusable instructions and an expected outcome. A Test Run selects cases to exercise against a particular product build. Inside that run a TestExecution records one case being exercised. Open the execution to see the outcome and its evidence. A case title appears in many runs, so the title by itself leaves the candidate ambiguous."
+          },
+          {
+            "type": "text",
+            "value": "Kiwi TCMS 17.2 behavior is drawn from its documentation and published source code. This example has not been demonstrated on a live Kiwi TCMS and Jira setup."
+          },
+          {
+            "type": "table",
+            "caption": "Illustrative CC-123 plan and its reusable cases",
+            "columns": [
+              "Plan grouping chosen by the team",
+              "Case identifiers and purpose"
+            ],
+            "rows": [
+              [
+                "AC-01 · automatic assignment",
+                "TC-01 observes first assignment. TC-02 varies the purchasing unit and checks its mapped recipient."
+              ],
+              [
+                "AC-02 · permission to decide",
+                "TC-03 observes a designated approver’s decision. TC-04 observes an unrelated employee’s denied attempt and the saved pending state."
+              ],
+              [
+                "Proposed AC-03 · first correct automatic assignment within two minutes",
+                "TC-05 exercises exactly 120 seconds. TC-06 exercises a first correct assignment at 121 seconds. Both remain design examples outside the qa-204 pass."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "A Kiwi plan can contain cases at any status. Only confirmed cases, meaning ready for execution, can be added to a new run. Grouping by criterion and labels such as TC-04 are teaching conventions. Use the installation’s record links to open the underlying records."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "Preserve the instructions separately from the evidence. Changing a case or delivering a new build creates a reason to check again rather than a reason to rewrite an earlier observation."
+          }
+        ]
+      },
+      {
+        "id": "select-the-candidate",
+        "title": "Set up the run and distinguish the evidence",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "At QA entry the lead compares the candidate receipt with the software running in QA. Allow about ten minutes in this example to match the records and select the cases, before execution time. In the run’s build field select the matching build. In its notes record the digest, environment revision and named rule configuration. Recheck them if an environment changes during testing. A build label that resembles another build is an invitation to open the underlying receipt."
+          },
+          {
+            "type": "text",
+            "value": "If a required case is missing from the new-run selection, inspect its status in the plan. For an unconfirmed case, have a peer review its starting conditions, actions and expected result. Resolve any gaps, then have a permitted reviewer set the case to CONFIRMED and select it for the candidate run. Keep earlier executions with their original runs. Confirming the instructions establishes readiness to test. The tester must still execute the case and record the actual outcome."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative transcription of the recorded qa-204 context",
+            "value": "Plan: CC-123 approval routing\nRun: qa-204   Build: build-418   Source proposal: PR-42\nQA revision: qa-r17   Configuration: qa-routing-3\nImage digest: sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c\nRecorded criteria: AC-01 and AC-02"
+          },
+          {
+            "type": "text",
+            "value": "For a manual check, the tester performs the action as the specified actor and records what the application saved. For an automated check, a configured Kiwi plugin can import test names and results from a framework. The lead should still verify the originating run, its candidate and how the automated test observed the outcome. A green result imported from a developer’s machine cannot establish what was installed in QA. The fictional record does not identify an import mechanism for qa-204."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The QA lead accepts the candidate for the next handoff only when the identified build and configuration have observations supporting all required criteria and no unresolved blocking failure. Record a web link to the selected run on CC-123. The feature is In QA during execution. The business analyst moves it to In UAT on the business-testing handoff."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Worked failure · the plan contains a test, but which build passed?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The fictional first increment was PR-40. In qa-196 on build-412, TC-04 found that an unrelated employee could record a decision. Open that failed execution, preserve the actual behavior and follow its defect URL to Jira bug CC-131. In Jira, triage records that CC-131 blocks CC-123. From the feature, the same link reads “is blocked by CC-131”. The execution-to-defect link and the bug-to-feature relation have different endpoints. Verify each one from its starting record."
+          },
+          {
+            "type": "text",
+            "value": "For a Jira issue created through the Kiwi tracker interface’s programmatic creation path, inspect the Jira description for the originating execution URL. For an existing Jira issue, attaching its URL to a Kiwi execution and asking for a comment in Jira are distinct actions. Verify any requested comment in Jira separately. Someone relying on a reciprocal link should open it and confirm the execution and build before triage decides."
+          },
+          {
+            "type": "text",
+            "value": "The repair arrived in PR-41. The tester kept qa-196 and recorded new observations on build-415 in qa-198 for TC-04 and the authorized path. After the retest the triage owner closed CC-131 as Fixed. Later, PR-42 produced build-418. If the reviewer can find only qa-198, the lead first locates or requests build-418’s run. In the shared record qa-204 independently qualifies build-418 for AC-01 and AC-02."
+          },
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "Editing the earlier failure to say passed removes the original evidence against build-412. Keep the failed execution and put the new observation in the repair build’s run."
+          },
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "Counting six selected cases as six passes credits unexecuted work and may include the proposed timing criterion. Read each execution and report only the criteria supported on this candidate."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Any test register can separate instructions that survive a release from observations tied to one build. Keep a stable case reference, a candidate-specific execution and a verified route to the defect so the next reviewer can reconstruct the decision."
+          }
+        ]
+      }
+    ],
+    "kind": "deep-dive",
+    "phase": "Prove"
+  },
+  {
+    "id": "test-case-design",
+    "parent": "qa-tests",
+    "activity": "QA",
+    "audience": [
+      "QA Engineer",
+      "Business Analyst"
+    ],
+    "title": "Write six cases that can distinguish success from coincidence",
+    "summary": "The right approver’s name can appear on a request even if someone put it there by hand. A good test describes how the request starts, who acts and which evidence would show the rule worked. The same discipline reveals when a denied action still changed the request.",
+    "owner": "The quality assurance (QA) lead owns coverage. The business analyst confirms the expected recipient, authority and timing rule. The tester turns each promise into instructions another person can execute.",
+    "inputs": [
+      "The CC-123 acceptance criteria (the agreed business conditions), the plan’s selected cases and the mapping from purchasing unit to designated approver.",
+      "A candidate build, its QA environment and routing configuration, separate role accounts, and permission to read the saved request and its events.",
+      "For the proposed timing cases only, a controlled test clock or event schedule that can place the first correct assignment at an exact boundary and preserve the original submission time."
+    ],
+    "steps": [
+      "Choose an input that could reveal a wrong implementation. Explain what the request looks like before submission and which identity performs each action.",
+      "Write the short steps and the observable expected result before running the case. Give the tester a way to check stored state independently of the confirmation message.",
+      "For each selected case record the candidate, request, actor, actual result and evidence link. If the starting condition was false, correct it and start a fresh attempt."
+    ],
+    "evidence": "A reusable case states its starting state, roles, inputs, steps and expected observations. Its execution records what actually happened on the selected build and configuration.",
+    "example": "TC-04 exercises an unrelated employee who tries to decide another person’s purchasing request. The tester checks both the denial response and a fresh read of the pending request with no decision.",
+    "failure": "Hold a candidate that records an unauthorized decision. If someone preassigned the approver before a routing test, mark that attempt unusable as evidence and rerun from a clean purchase.",
+    "measure": "Give the cases to a second tester. Check whether they can choose the right identities, reconstruct each starting condition and reach the same verdict from the same event history.",
+    "sources": [
+      {
+        "title": "ISTQB · Certified Tester Foundation Level Syllabus v4.0.1, §§4.2.1–4.2.2",
+        "url": "https://istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Test Cases",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/guide/testcase.html"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Published source for the TestCase API",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/_modules/tcms/rpc/api/testcase.html"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Test Runs",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/guide/testrun.html"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Published source for TestExecution.add_link",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/_modules/tcms/rpc/api/testexecution.html#add_link"
+      }
+    ],
+    "detail": [
+      {
+        "id": "choose-the-partitions",
+        "title": "Choose inputs that exercise different rules",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "An equivalence partition groups inputs expected to follow the same behavior. For routing, a unit with one designated recipient and a different unit with another recipient exercise different mapping entries. An unmapped unit is another useful partition when the team has agreed its expected behavior. For decisions, distinguish the designated approver, the requester and an unrelated employee. Neither unauthorized role may decide, but a program might accidentally grant one of them an exception. Give each named scenario the identity it actually requires."
+          },
+          {
+            "type": "text",
+            "value": "A boundary is the point where the expected verdict changes. The proposed AC-03 starts its clock at submission and allows the first correct automatic assignment up to and including 120 seconds. At 121 seconds the window has already been missed. If an incorrect recipient appears at 30 seconds and the first correct automatic assignment at 100 seconds, the proposed timing rule passes while the wrong initial route remains a separate error. Keep the full event sequence."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "Decide which wrong behaviors your check must detect. If a manual assignment, wrong group or unauthorized state change could produce the same apparent success, add a direct observation."
+          }
+        ]
+      },
+      {
+        "id": "six-cases",
+        "title": "Use the cases at the test bench",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Use a fresh synthetic purchase for each case. Here a synthetic purchase is invented data reserved for the exercise. The criterion groups, stable case labels and timings below are illustrative case settings. Budget roughly twenty to thirty minutes for the tester and business analyst to review the design before QA execution. Budget additional setup for controlled timing and role separation."
+          },
+          {
+            "type": "table",
+            "caption": "Six proposed case designs for the CC-123 plan. Expected results do not assert that the cases ran.",
+            "columns": [
+              "Case and criterion",
+              "Precondition, role and data",
+              "Actions",
+              "Expected observation"
+            ],
+            "rows": [
+              [
+                "TC-01 · AC-01",
+                "Active purchasing mapping names the Purchasing approver. Requester starts with an eligible, unassigned purchase.",
+                "Submit as requester. Read the first saved assignment event and the resulting recipient.",
+                "Actor is routing-rule and recipient is Purchasing approver. No person supplied that assignment."
+              ],
+              [
+                "TC-02 · AC-01",
+                "Unit A and unit B map to distinct approver groups. Requester has a fresh eligible unit B purchase.",
+                "Submit the unit B purchase. Read the first saved assignment and compare with the unit B mapping captured before the test.",
+                "The rule assigns unit B’s group. Assignment to unit A’s group fails even if both groups can approve purchases."
+              ],
+              [
+                "TC-03 · AC-02",
+                "A fresh pending purchase is assigned to the designated approver. The approver session has verified membership and no elevated rights.",
+                "Sign in as that approver and approve once. Reopen the request and inspect its decisions.",
+                "One authorized approval is recorded on that request under the designated approver’s identity."
+              ],
+              [
+                "TC-04 · AC-02",
+                "Another fresh purchase is pending. An unrelated employee is neither its requester nor a member of its designated approver group.",
+                "Attempt approval as the unrelated employee. Read the response, then reload the saved request using a reader permitted to inspect it.",
+                "Denied. The request is still pending, with no recorded decision."
+              ],
+              [
+                "TC-05 · proposed AC-03",
+                "Fresh eligible purchase, correct mapping, requester and controlled QA clock. First correct automatic assignment is scheduled for exactly 120 seconds.",
+                "Submit at the starting time. Read the timestamp, actor and recipient of the first correct event and subtract submission time.",
+                "120 seconds meets the inclusive limit. Keep both timestamps and the matching recipient."
+              ],
+              [
+                "TC-06 · proposed AC-03",
+                "Fresh eligible purchase, same mapping and requester. Schedule the first correct automatic event at 121 seconds.",
+                "Submit. Inspect the history at the 120-second deadline and again after the scheduled event.",
+                "No correct assignment by the deadline misses the window. Record the 121-second correct assignment as late."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The QA lead requires evidence of AC-01 and AC-02 on the identified candidate before the business-testing handoff. The proposed AC-03 scenarios illustrate a boundary. They did not form part of the recorded qa-204 passing decision."
+          },
+          {
+            "type": "callout",
+            "value": "Kiwi TCMS is the example Test Management Tool. The tester can put setup instructions, actions, expected results and reset instructions in the reusable case text. The candidate-specific result belongs to its execution in a run. Carry the case identity through both records so the next tester can find the instructions behind a verdict.",
+            "label": "Tool behavior"
+          },
+          {
+            "type": "text",
+            "value": "Kiwi TCMS 17.2 behavior is drawn from its documentation and published source code. This example has not been demonstrated on a live Kiwi TCMS and Jira setup."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Worked failure · an employee’s decision is stored",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In the fictional qa-196 run for PR-40’s build-412, the unrelated employee in TC-04 could record a decision. QA preserves the failing execution and attaches the URL of Jira defect CC-131 to it. Triage records in Jira that CC-131 blocks CC-123. The feature stays In QA while qualification is held. The developer first reproduces the action from a pending request and inspects who could write the decision. A denial message accompanied by changed state would fail the same case."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Fictional recorded failure, condensed for the case designer",
+            "value": "Case: TC-04     Criterion: AC-02\nBuild: build-412     Run: qa-196\nActor: unrelated employee\nExpected: denial and unchanged pending request\nActual: the employee’s decision was recorded\nDisposition: failed; defect CC-131"
+          },
+          {
+            "type": "text",
+            "value": "PR-41 produced build-415. QA verified TC-04 and the authorized path in qa-198, then the triage owner closed CC-131 as Fixed. PR-42’s build-418 was checked separately in qa-204. That record explicitly includes a denied requester attempt with the request still pending and an authorized approval. Keep the requester observation under its own identity. It cannot supply an unrecorded unrelated-employee result for build-418."
+          },
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "Starting TC-01 with a preassigned approver makes a broken routing rule appear successful. Discard that setup as evidence and create another unassigned purchase."
+          },
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "Checking only the warning message after a denied decision can conceal a stored approval. Open the request again and compare its status and decision history with the starting state."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The business rule supplies the input groups, boundaries and expected observations for any test management system. Keep those instructions distinct from each run’s actual evidence so they can survive a change of tooling or a fresh build."
+          }
+        ]
+      }
+    ],
+    "kind": "deep-dive",
+    "phase": "Prove"
+  },
+  {
+    "id": "test-data-identities",
+    "parent": "qa-tests",
+    "activity": "QA",
+    "audience": [
+      "QA Engineer",
+      "Business Analyst"
+    ],
+    "title": "Choose test identities that exercise the real permission rule",
+    "summary": "A test can produce the expected approval even when the tester is using an account with too much authority. Give each participant a separate role and start every attempt with a fresh request. Then the result shows whose action the application allowed.",
+    "owner": "The quality assurance (QA) fixture owner prepares the accounts and starting data. A fixture is a controlled set of records and settings used by a test. The tester runs the scenario and the QA lead decides whether the resulting evidence is usable.",
+    "inputs": [
+      "The CC-123 routing and permission criteria, the selected test cases and the candidate build receipt. Confirm the installed QA revision and rule configuration.",
+      "Separate synthetic identities for the requester, the designated approver, an unrelated employee and the fixture administrator. Record role membership and the purchasing unit’s expected destination without including credentials.",
+      "Access to read the assignment and decision history, a way to create or reset test requests, and permission to attach observations to the correct test execution."
+    ],
+    "steps": [
+      "Match the expected recipient to the mapping for this environment. Prepare a fresh eligible purchase, initially unassigned for routing tests or already routed and pending for permission tests.",
+      "Check effective role membership and active identity before each action. Keep setup and observation separate from the person who submits or decides.",
+      "Capture the first assignment actor and recipient, the attempted decision actor and the resulting saved state. Preserve evidence before resetting or retiring the fixture."
+    ],
+    "evidence": "An execution identifies the build, configuration, request, starting state, role used, action and resulting state. The reviewer can distinguish a rule-generated assignment from an administrator’s manual correction.",
+    "example": "The fictional accepted QA record identifies request R-17, QA revision qa-r17 and configuration qa-routing-3. Its first assignment evidence names the routing-rule actor and Purchasing approver. It also records a denied requester attempt and an authorized approval.",
+    "failure": "If the wrong identity supplied the assignment or approved the request, the QA fixture owner first verifies the role membership and saved events, preserves the invalid attempt and prepares a clean replacement.",
+    "measure": "Sample permission results and check whether a reviewer can recover each actor’s actual relationship to the request. Track repeats caused by reused requests or excess rights separately from application failures.",
+    "sources": [
+      {
+        "title": "NIST · Role Based Access Control",
+        "url": "https://csrc.nist.gov/projects/role-based-access-control"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Test Cases",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/guide/testcase.html"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Published source for the TestCase API",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/_modules/tcms/rpc/api/testcase.html"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Test Runs",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/guide/testrun.html"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Published source for TestExecution.add_link",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/_modules/tcms/rpc/api/testexecution.html#add_link"
+      }
+    ],
+    "detail": [
+      {
+        "id": "prepare-the-identities",
+        "title": "Set up the roles before anyone acts",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Begin when the candidate and mapping arrive in the isolated QA environment. In this illustration, allow about ten minutes to prepare the data and verify memberships, plus two to five minutes to reset between attempts. The fixture owner can create test records and manage the test identities. The tester needs the permissions of the ordinary role for the action being exercised. An independent reader may inspect the saved state after the attempt. Nobody needs a real customer’s account to run these cases."
+          },
+          {
+            "type": "text",
+            "value": "Role-based access control means granting operations through roles. Inspect which roles are effective for this particular account and whether its purchasing group is designated for the request. Ensure the unrelated employee has neither approver membership nor a relationship to this purchase. The requester has a specific relationship, having submitted it, and tests a different denial path."
+          },
+          {
+            "type": "table",
+            "caption": "Illustrative role and fixture settings for an eligible purchasing request",
+            "columns": [
+              "Identity",
+              "Setup rights",
+              "Action to exercise",
+              "Forbidden action or excluded evidence",
+              "Reset before reuse"
+            ],
+            "rows": [
+              [
+                "Requester",
+                "Create an eligible test purchase. No group or mapping administration.",
+                "Submit the unassigned purchase. In the requester-denial scenario, try to approve it.",
+                "Cannot decide the submitted request or hand-pick its approver.",
+                "Use a new draft and a requester-only session. Verify no preexisting assignment."
+              ],
+              [
+                "Designated approver",
+                "Read the assigned pending purchase. No changes to role grants or mappings.",
+                "Approve once as a current member of the designated group.",
+                "Cannot grant self membership or prepare their own test outcome.",
+                "Use another pending purchase. Verify membership and an empty decision history."
+              ],
+              [
+                "Unrelated employee",
+                "Ordinary employee account with no elevated role or connection to the purchase.",
+                "Attempt to decide another requester’s pending purchase using the channel under test.",
+                "Cannot record a decision or change its pending state.",
+                "Use a new pending purchase and separate session. Recheck absence of group membership."
+              ],
+              [
+                "Fixture administrator",
+                "Provision QA accounts, mappings and clean starting data within the agreed test scope.",
+                "Prepare and verify the baseline, then leave the user action to the representative account.",
+                "Administrative assignment or approval is forbidden as test evidence for either criterion.",
+                "Preserve observations, clear temporary grants and retire used records. Verify baseline before the next run."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "A passing role test needs a known identity, a known relationship to this request and an observable outcome. Labeling an account “unauthorized” cannot establish which privileges it actually used."
+          }
+        ]
+      },
+      {
+        "id": "read-the-state",
+        "title": "Read the assignment and decision as separate events",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "For AC-01, the automatic assignment criterion, begin with no recipient. Submit the purchase through the ordinary requester path. Read the first assignment event for that request and compare both the actor and recipient with the expected routing rule and group. The person who prepared the fixture, the person who submitted it and the rule that assigned it fill three different roles. An administrator correcting the recipient afterward leaves a different event history."
+          },
+          {
+            "type": "text",
+            "value": "For AC-02, the permission criterion, use a pending purchase whose assigned group is known. Keep separate sessions for the requester, designated approver and unrelated employee. Check each session identity immediately before acting. For denial, inspect the application response and use a permitted reader to fetch the persisted request again. It should remain pending with no decision recorded. For authorized approval, start from a fresh pending request and check the decision record and its actor."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Fictional qa-204 evidence excerpt, rendered in ordinary language",
+            "value": "Request: R-17   Build: build-418\nQA revision: qa-r17   Rule configuration: qa-routing-3\nExpected and observed recipient: Purchasing approver\nAssignment actor: routing-rule\nRequester attempt: denied; request still pending\nAuthorized approval: recorded"
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The QA lead accepts a result only when the actor and starting state match the case, the expected response and saved state agree, and the run belongs to this candidate. Keep CC-123 In QA and link the run from the Jira feature. An invalid fixture holds this handoff until a clean rerun. It is not by itself proof of a product defect."
+          }
+        ]
+      },
+      {
+        "id": "save-before-reset",
+        "title": "Preserve evidence while restoring clean data",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Record the observed request identity and evidence before retiring a used request. Create another synthetic record for the next attempt. If data must be restored in place, preserve the earlier evidence outside the reset and use a separate execution to distinguish the attempts. Check the unit-to-group mapping and effective memberships after the reset. Deleting a rejected request or clearing history while it is still the only evidence can make the rejection impossible to audit."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "Kiwi TCMS, the example Test Management Tool, supports writing setup, actions, expected results and breakdown instructions in a test case. Record observations from each exercise in the run-specific execution. The application’s access controls and fixture reset are the responsibility of the test environment."
+          },
+          {
+            "type": "text",
+            "value": "Kiwi TCMS 17.2 behavior is drawn from its documentation and published source code. This example has not been demonstrated on a live Kiwi TCMS and Jira setup."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Worked failure · distinguish a broken rule from a bypass account",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In qa-196, the unrelated employee in TC-04 could record a decision on PR-40’s build-412. When reading that failure, the QA fixture owner first checks that the actor was unrelated, the request was pending and the saved decision belongs to this attempt. If investigation instead found an administrator session or temporary approver grant, the test would be invalid. Preserve the attempt, remove the unintended rights and retry as a genuine unrelated employee. Do not silently relabel it a product failure or a pass."
+          },
+          {
+            "type": "text",
+            "value": "The shared fictional history records a genuine defect, CC-131. The failed execution points to the Jira defect URL. Triage records that CC-131 blocks CC-123. PR-41 supplied the repair in build-415. QA verified TC-04 and the authorized path in qa-198 before the triage owner closed CC-131 as Fixed. PR-42’s build-418 was independently qualified in qa-204. Its recorded negative actor is the requester. Only claim observations about the identities the run actually records."
+          },
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "Using one privileged account in four browser tabs can approve every request. Separate sessions and verify the current identity before the action."
+          },
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "Reusing a request already approved by the designated approver makes it impossible to establish whether a later denial preserved a pending state. Start that denial attempt with a fresh pending request."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "For any approval system, choose identities by their permissions and relationship to the record under test. Keep the administrator’s setup actions separate from the business action, then preserve before-and-after evidence before resetting the data."
+          }
+        ]
+      }
+    ],
+    "kind": "deep-dive",
+    "phase": "Prove"
+  },
+  {
+    "id": "qa-test-types",
+    "kind": "deep-dive",
+    "parent": "qa-tests",
+    "audience": [
+      "Business Analyst",
+      "QA Engineer",
+      "Developer"
+    ],
+    "title": "Choose the test that answers the question",
+    "phase": "Prove",
+    "activity": "QA",
+    "summary": "A purchase request can open, submit and reach an approver, yet still reach the wrong person. The tester needs to know which group should receive it and who may record the decision. Different checks answer different parts of that question.",
+    "owner": "The quality assurance (QA) lead selects tests for the candidate, the version proposed for delivery. Testers capture observations and the lead determines whether the evidence supports handoff to the business representative.",
+    "inputs": [
+      "The packaged application’s digest, a content identifier, and the environment revision and routing configuration that will run it",
+      "An agreed mapping of units to approvers, synthetic role-specific accounts, fresh pending requests, and access to see assignment events and stored decisions",
+      "CC-123 and acceptance criteria AC-01 for automatic assignment and AC-02 for permission to decide"
+    ],
+    "steps": [
+      "Check the running digest and configuration against the run record. Prepare separate accounts for the requester, designated approver and unrelated employee.",
+      "Choose the tests by the decision due. For each case, write down what would fail it and gather the actual actor, recipient or state that lets another reader check the result.",
+      "Preserve each result against the candidate. The QA lead reviews failures and missing observations before passing the record to the business representative."
+    ],
+    "detail": [
+      {
+        "id": "plan-the-run",
+        "title": "Match the activity to the decision",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "When a build reaches QA, start with a fresh request in an environment set aside for testing. A smoke test is a short check that the deployed service can perform a basic task. A functional test checks a specified behavior. Confirmation testing repeats a previously failing scenario after a repair. Regression testing looks for adverse effects on behavior that used to work. These purposes can overlap: the same case might serve a different purpose on a later run."
+          },
+          {
+            "type": "table",
+            "caption": "Illustrative test schedule for the routing service · estimates for planning",
+            "columns": [
+              "Activity",
+              "When and where",
+              "Scope and budget",
+              "What a pass or finding establishes"
+            ],
+            "rows": [
+              [
+                "Smoke",
+                "On each QA deployment",
+                "2–5 min · open the service and submit one fresh controlled request",
+                "The exercised entry path worked for that request. Other units and roles still need checking."
+              ],
+              [
+                "Functional",
+                "On candidate entry in QA",
+                "10–20 min · check automatic routing and authorized and denied decisions",
+                "The specified action produced the expected first assignment or decision under the tested mapping and identities."
+              ],
+              [
+                "Regression",
+                "After a rule, code or mapping change in QA",
+                "15–30 min · rerun adjacent units and the allowed and denied decision paths",
+                "The selected previously working paths still meet their expectations on the changed candidate."
+              ],
+              [
+                "Exploratory",
+                "During a time-boxed session in QA",
+                "30 min · investigate switching roles, retrying submission or encountering a missing mapping",
+                "A tester follows new clues during the session. Notes say what was tried, what was learned and what still needs a repeatable case."
+              ],
+              [
+                "Automated end-to-end",
+                "After deployment to QA for a stable full-workflow scenario",
+                "5–10 min · drive submission through the service and storage, read assignment, then decide as the designated approver",
+                "The connected components completed this particular journey under the given data and settings."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "An end-to-end test follows a request across the components used in the journey. Automation describes who performed the steps. A person could run the same functional scenario by hand, and a machine could repeat it for regression after a repair. Choose a human observer for a confusing sequence where it helps to see what the approver sees. Choose automation for a repeatable sequence with stable observations and clean test data."
+          }
+        ]
+      },
+      {
+        "id": "capture-results",
+        "title": "Capture what actually happened",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In Kiwi TCMS, the test management system used here, a Test Run groups cases for execution against a build. A TestExecution is the result for a case in that run. A tester with permission to record results can enter a manual observation. A configured automation plugin can send results from a test framework. For an imported result, verify the correspondence between the test name, intended case, run and build, and attach the execution report. For a manual result, record the actions, observed assignment and final state."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "Kiwi TCMS 17.2 behavior is drawn from its documentation and published source code. This example has not been demonstrated on a live Kiwi TCMS and Jira setup."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Worked output from the fictional qualification record",
+            "value": "qa-204 · build-418 · qa-r17 · qa-routing-3\nR-17 · expected Purchasing approver · observed Purchasing approver\nFirst assignment actor: routing-rule\nRequester decision attempt: denied; request still pending\nAuthorized decision: recorded\nQA outcome: AC-01 and AC-02 passed"
+          },
+          {
+            "type": "text",
+            "value": "The qa-204 record tells the reader which conditions passed. It leaves the execution method unspecified. Preserve that uncertainty if asked how much of the run was automated. An imported count of passing tests also leaves open what each test observed. Look for the first assignment actor and recipient, and for state after a denied decision. An assertion that a page loaded supplies none of those observations."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "Set the limit of a conclusion by the actors, inputs, environment and outcome actually observed."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Smoke passes on one request, but unit B reaches the wrong approver",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Suppose a smoke check returns a successful submission for the first unit. That observation supplies no recipient evidence for the second unit. The fictional record illustrates the consequence in uat-80, the first user acceptance testing (UAT) decision. The integrated package had passed QA in qa-204. In uat-r8, using uat-routing-5, Purchasing unit B reached unit A’s approver. The designated business representative rejected the scenario. The earlier smoke check is an illustration, separate from those recorded results."
+          },
+          {
+            "type": "text",
+            "value": "The tester first compares the expected unit B group with the actual recipient and the environment’s mapping. The QA lead keeps the hold visible, asks the owner to correct the UAT mapping and selects the affected automatic-routing and permission cases for qa-209. The image digest stays the same. Repeat the business scenario against uat-r9 and uat-routing-6. The recorded uat-82 acceptance is the representative’s new decision. Retain the rejected decision to show what changed."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The QA lead requires evidence for both AC-01 and AC-02 on the identified candidate before the handoff. The business representative decides acceptance in UAT. A failed criterion or missing evidence holds the relevant handoff."
+          }
+        ]
+      },
+      {
+        "id": "handoff",
+        "title": "Put the results where the next owner will look",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The QA lead moves Jira feature CC-123 from Ready for QA to In QA on entry and attaches the run as a web link. The business analyst moves it to In UAT for business acceptance and retains that status through the uat-80 hold. Link the rejected decision, qa-209 and uat-82 so the reader can see who supplied each decision. No record in qa-204 establishes the proposed timing target AC-03."
+          },
+          {
+            "type": "text",
+            "value": "Two mistakes change the handoff. Reusing a request already assigned by the tester can make a functional pass look like proof of automatic routing. Reset the request and observe who made its first assignment. Reusing an earlier environment’s success after the mapping changed hides a recipient error. Keep the old run for its original environment and inspect the new run under the changed configuration."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In another test tool, organize the work around the question, the candidate and the observation that answers it. Keep a separate record for a changed environment and give the named decision maker the earlier result alongside the fresh evidence."
+          }
+        ]
+      }
+    ],
+    "evidence": "A run links the digest, environment revision, routing settings, chosen cases, actual results and limits of the conclusion. Its reviewer can distinguish a recorded release criterion from a proposed timing check.",
+    "example": "qa-204 supports AC-01 and AC-02 for build-418 under qa-routing-3. The rejected unit B result in uat-80 and its correction in uat-82 retain their own settings and decisions.",
+    "failure": "When a request reaches the wrong group, QA captures both groups and the effective mapping first. Hold the affected decision and rerun functional and adjacent regression cases after correction.",
+    "measure": "For each reported pass, sample whether a reviewer can name the candidate, setting and observation and explain which decision it supports.",
+    "sources": [
+      {
+        "title": "ISTQB · Certified Tester Foundation Level Syllabus v4.0.1",
+        "url": "https://istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Test Runs",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/guide/testrun.html"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Automation Frameworks plugins",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/plugins/automation-frameworks.html"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 published source · TestExecution.add_link",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/_modules/tcms/rpc/api/testexecution.html#add_link"
+      }
+    ]
+  },
+  {
+    "id": "defect-report",
+    "kind": "deep-dive",
+    "parent": "hold",
+    "audience": [
+      "Business Analyst",
+      "QA Engineer",
+      "Developer"
+    ],
+    "title": "Report the decision an unrelated employee could make",
+    "phase": "Prove",
+    "activity": "QA",
+    "summary": "An employee outside the approval group records a decision on a pending request. Before the test setup changes, capture who acted, what the request looked like afterward and which version allowed it. Those details let a second person investigate the failure and keep that version from advancing.",
+    "owner": "The quality assurance (QA) tester records the observation. The QA lead and Product Owner assess the impact and agree the urgency. The assigned developer receives the evidence for repair.",
+    "inputs": [
+      "TC-04, the test case for an unrelated employee’s decision attempt, and its failed execution in QA run qa-196",
+      "The deployed build and its digest, the unique identifier of the packaged software, with access to read the environment record and inspect test identities",
+      "Permission to report a defect in Jira and add its URL to the execution in Kiwi TCMS, the test management system"
+    ],
+    "steps": [
+      "Preserve the failed execution and its candidate before resetting any data. Reconstruct the pending request, role, attempted action and persisted outcome.",
+      "Check for an existing report of the same failure, then report or attach the correct Jira bug. Follow the resulting links in both systems.",
+      "Triage, the review of impact, urgency and ownership, separately links the bug to CC-123 in Jira and records the promotion hold."
+    ],
+    "detail": [
+      {
+        "id": "capture-at-failure",
+        "title": "Capture the state that makes this a defect",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The trigger is a failed permission check in the QA environment. Capture it while the tester can still identify the request and read its decision history. Allow roughly ten minutes for a first report in this exercise, plus time to recover a missing deployment detail or repeat the test. Record the version, role and observation before trying a different identity. An identity granted extra rights during investigation can change the very condition the report is meant to reproduce."
+          },
+          {
+            "type": "table",
+            "caption": "Fictional Jira Bug CC-131 · report and triage fields",
+            "columns": [
+              "Field",
+              "Entry"
+            ],
+            "rows": [
+              [
+                "Summary and report time",
+                "An unrelated employee can record a decision on a pending request · 5 March 2026, 10:00 UTC · reporter is the QA tester."
+              ],
+              [
+                "Criterion and evidence",
+                "CC-123 · AC-02 permits only an authorized approver to decide · TC-04 failed in qa-196. Preserve the case execution and permission evidence."
+              ],
+              [
+                "Candidate",
+                "QA · first increment from PR-40 (the proposed code change) · main-release-build produced build-412 · sha256:ad1985a0d6e0fe53eab9a6fdcd1d8acb4823434ae8e9ec257936d912fe95b78e"
+              ],
+              [
+                "Configuration and identity",
+                "QA mapping and environment revision identifiers for qa-196 are absent from the shared record. Recover them from the deployment and identity records if available. The acting test employee is outside the designated approver group."
+              ],
+              [
+                "Steps to reproduce",
+                "Create an eligible fresh request pending a decision. Confirm its designated approver and that the unrelated employee lacks that role. Sign in as that employee, attempt a decision, and reread the stored request and decision history."
+              ],
+              [
+                "Expected",
+                "The attempt is denied, no decision is recorded and the request remains pending."
+              ],
+              [
+                "Actual",
+                "TC-04 in qa-196 records the unrelated employee’s decision on build-412. The saved result establishes a permission failure."
+              ],
+              [
+                "Impact and order",
+                "High severity because an unauthorized person can decide. Priority is Fix before qualification. Developer owns the repair."
+              ],
+              [
+                "Jira states at triage",
+                "CC-131 moved from New to Triaged, with Resolution empty. CC-131 blocks CC-123. The feature remains In QA while promotion is held."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "Describe the observation separately from the suspected cause. The team can investigate an incorrect decision before it knows which line of code allowed it."
+          }
+        ]
+      },
+      {
+        "id": "link-in-both-systems",
+        "title": "What does Kiwi write, and where?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Kiwi TCMS 17.2 behavior is drawn from its documentation and published source code. This example has not been demonstrated on a live Kiwi TCMS and Jira setup."
+          },
+          {
+            "type": "text",
+            "value": "Open the failed TestExecution, the record for one test case in one run. If there is no existing Jira bug, Kiwi’s Report action can use its configured Jira adapter, the component that communicates with Jira. For creation through the application programming interface (API), the tracker needs a suitable target project, issue type and credentials with permission to create the bug. Check the destination before accepting it."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "On successful API creation the Jira adapter adds the new issue URL to the originating execution as a defect. The generated Jira description includes that execution’s URL and case information. The reporter must fill in the actual result. A manual creation form offered after a creation error still needs a person to finish reporting and verify the resulting links."
+          },
+          {
+            "type": "text",
+            "value": "If CC-131 already exists, open that execution and add the existing Jira issue URL as a defect. Saving the URL gives the tester a path from the execution to Jira. The separate “Add comment to Issue tracker” option requests a comment on the external issue. For Jira this requires a defect link, a recognized and configured tracker with enabled credentials and permission to comment there. The comment identifies the test run, links its URL and names the execution identifier. Inspect the issue to confirm that it arrived."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative inspection after reporting · use the actual links in a connected system",
+            "value": "Kiwi: qa-196 / TC-04 → defect URL ending /browse/CC-131\nJira: CC-131 description → originating execution URL on successful API report\nJira: CC-131 blocks CC-123 → separate issue link added at triage"
+          },
+          {
+            "type": "text",
+            "value": "An existing issue may have no Kiwi URL in its description. An optional comment and the issue link are different pieces of evidence. A link to CC-131 on a test execution also leaves the relationship between the bug and its feature for triage to record. Open CC-123 and check that its reverse relationship reads is blocked by CC-131."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Recover the candidate before assigning the repair",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Suppose the first report only says “employees can approve” and links the test case. That case describes what to do across many builds. The first responder is the reporting tester. Open its execution in qa-196, retrieve the build-412 digest and compare it with the package identified by the QA deployment record. Add the original observed result and note the missing mapping reference. The later mapping qa-routing-3 belongs to qa-204. Substituting it would send the developer to a different environment history."
+          },
+          {
+            "type": "text",
+            "value": "If the original setting cannot be recovered, record the gap and conduct a controlled repeat on an identified candidate. Record the repeat as a new observation with its own identity. A repeat on build-418 cannot reconstruct what ran on build-412. The QA lead can hold delivery on the witnessed unauthorized decision while the developer investigates the original evidence and QA obtains a repeatable setup."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The QA lead assesses severity from the effect on authorization. The Product Owner agrees priority with the QA lead in light of the next qualification decision. A valid unrelated-user decision on the tested candidate blocks advancement. The developer needs a new candidate and QA must confirm the repair."
+          }
+        ]
+      },
+      {
+        "id": "handoff",
+        "title": "Give triage a decision it can defend",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "When a similar report already exists, compare the candidate, acting role, expected state and stored decision. If triage confirms the same underlying defect, link the duplicate to the canonical bug in Jira and preserve the additional execution there. A similar title on a mapping error could instead point to a distinct defect. Keeping two canonical bugs for one repair can leave a hold on one after the other closes."
+          },
+          {
+            "type": "text",
+            "value": "Avoid attaching only a screenshot of an error message. A service might display denial while saving the decision, and the screenshot would miss the violation. Preserve a redacted observation of the resulting state or decision history. The developer repairs the earlier code in PR-41, QA records a new retest in qa-198 on build-415, and the triage owner subsequently closes CC-131 as Fixed. The accepted integrated build-418 later has its own qa-204."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In any tracker, tie a defect to one observed failure, its candidate and its expected outcome, and give a second person enough information to repeat it. Verify both the test-to-defect reference and the feature relationship before handing the report to the repair owner."
+          }
+        ]
+      }
+    ],
+    "evidence": "The original failed execution points to the Jira bug. The report identifies the candidate, approved role, expected state, observed decision and hold owner. The feature has a separately verified blocks relationship.",
+    "example": "An unrelated employee actually recorded a decision in TC-04 on build-412. That finding is the basis for CC-131. A wrong recipient under a later UAT mapping requires a separate investigation.",
+    "failure": "A report missing the candidate or the post-action state is returned to its reporter for evidence. Preserve the original failure and record any later reproduction on its own candidate.",
+    "measure": "Ask a second tester to locate the exact failed execution from the defect and test the described starting state. Record missing fields that prevent independent reproduction.",
+    "sources": [
+      {
+        "title": "ISTQB · Certified Tester Foundation Level Syllabus v4.0.1",
+        "url": "https://istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Issue tracker integration",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/modules/tcms.issuetracker.html"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 published source · JIRA",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/_modules/tcms/issuetracker/types.html#JIRA"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 published source · TestExecution.add_link",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/_modules/tcms/rpc/api/testexecution.html#add_link"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 published source · IssueTrackerType",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/_modules/tcms/issuetracker/base.html#IssueTrackerType.add_testexecution_to_issue"
+      },
+      {
+        "title": "Atlassian Support · Link work items",
+        "url": "https://support.atlassian.com/jira-software-cloud/docs/link-issues/"
+      },
+      {
+        "title": "Atlassian Support · What are work item statuses, priorities, and resolutions?",
+        "url": "https://support.atlassian.com/jira-cloud-administration/docs/what-are-issue-statuses-priorities-and-resolutions/"
+      }
+    ]
+  },
+  {
+    "id": "defect-lifecycle",
+    "kind": "deep-dive",
+    "parent": "hold",
+    "audience": [
+      "QA Lead",
+      "Product Owner",
+      "Developer"
+    ],
+    "title": "Decide whether CC-131 can close",
+    "phase": "Prove",
+    "activity": "QA",
+    "summary": "A developer has delivered a repair for a request that the wrong employee could approve. Before closing the bug, the tester checks that employee is now refused and that the right approver can still act. The person responsible for the hold needs both results and the version they came from.",
+    "owner": "The quality assurance (QA) lead owns triage, the decision about impact, urgency and next steps, with the Product Owner. The developer supplies a repair. A QA tester verifies it and the triage owner closes or reopens the Jira bug.",
+    "inputs": [
+      "Failed case TC-04 in qa-196, Jira bug CC-131 and the separate Jira relationship CC-131 blocks feature CC-123",
+      "The repair build and its image digest, the identifier of the exact package to test, with access to the QA environment and both test identities",
+      "Permission to add an execution link in Kiwi TCMS, the test management system, and permission for the triage owner to make the allowed Jira status change"
+    ],
+    "steps": [
+      "Check the impact and evidence before assigning the repair. Record who owns the hold and which outcome will clear it.",
+      "Follow the repair into the QA environment and compare the deployed digest to the proposed fix. Repeat the denied attempt with an unrelated employee, then exercise the authorized path on clean data.",
+      "Preserve the initial failure and new results. Use them to decide whether to close, reopen or retain the hold, and check the Jira status and resolution after the change."
+    ],
+    "detail": [
+      {
+        "id": "state-and-owner",
+        "title": "Who owns each move?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "A status says where work stands. A resolution records why an item is considered settled. Under this example workflow, New, Triaged, In progress and Ready for retest carry an empty resolution. The first triage discussion begins when QA reports an observed failure. Budget a short review, perhaps 15 minutes for this scoped bug. Diagnosis, the next build and retesting take separate time. A tester works in QA and in the test record; only the authorized triage owner makes the closure decision in Jira."
+          },
+          {
+            "type": "figure",
+            "src": "assets/figures/defect-lifecycle.svg",
+            "alt": "Jira defect states, with a verified repair leading to closure and a failed retest returning to the developer.",
+            "caption": "Illustrative Jira workflow for CC-131",
+            "text_equivalent": "QA reports TC-04 in qa-196 (New). QA and product assess the impact and ordering (Triaged). Triage can defer the bug with no resolution and return it to triage later. The developer repairs the code (In progress) and QA receives build-415 (Ready for retest). After qa-198 passes, the triage owner closes CC-131 with resolution Fixed. A failed retest, or a later recurrence after closure, can reopen the bug. Clear the resolution on reopening, return it to the developer and keep both the original failure and the repair evidence."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The QA lead assesses how badly the observed behavior violates the criterion. The Product Owner and QA lead set the order of work. For CC-131 they choose High severity and Fix before qualification because an unrelated employee can record a decision. The defect blocks the feature’s promotion."
+          }
+        ]
+      },
+      {
+        "id": "triage-routes",
+        "title": "Choose a disposition from the evidence",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "Illustrative triage decisions · the last four rows are possible branches",
+            "columns": [
+              "Finding",
+              "Decision and accountable role",
+              "Record before returning the item"
+            ],
+            "rows": [
+              [
+                "Accepted defect",
+                "QA lead moves New to Triaged, developer takes In progress.",
+                "Record affected criterion AC-02, failed TC-04, candidate, impact, urgency and release hold."
+              ],
+              [
+                "Confirmed duplicate",
+                "Triage owner links duplicates to the canonical bug. Close the duplicate with the configured duplicate resolution if available.",
+                "Preserve the new execution on the canonical record. Check that somebody still owns the repair and hold."
+              ],
+              [
+                "Defer",
+                "Product Owner and QA lead agree residual risk and the review date. Move Triaged to Deferred under this workflow.",
+                "Keep Resolution empty, identify the decision owner and what will bring it back to Triaged. Deferral alone grants no promotion."
+              ],
+              [
+                "Cannot reproduce",
+                "QA lead leaves investigation open and asks the reporter to compare environment, package, role and starting state.",
+                "Attach the unsuccessful repeat on its own candidate and the original failed execution. An unknown setting or changed build limits what the repeat establishes."
+              ],
+              [
+                "Failed retest or recurrence",
+                "Triage owner moves to Reopened and assigns the developer again.",
+                "Preserve the new failure, named candidate and earlier history. Clear an earlier resolution and reinstate or retain the hold."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "Equally serious symptoms may have different causes. Before linking a duplicate, compare whether the system sent work to the wrong recipient or allowed an unauthorized person to decide. A failed authorization test and an incorrect directory mapping can appear in the same feature while requiring different owners, repairs and retests."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "A fix is ready to test when someone can retrieve the changed candidate. Closing a defect requires an observation of that candidate under the conditions that exposed the problem."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Follow the failed test through the repair",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In the fictional record, PR-40, the first proposed change, produced build-412. In qa-196 the unrelated employee recorded a decision in TC-04. The lead holds promotion and the developer investigates from that specific failure. When PR-41 produces build-415 in the same pipeline, the developer records the repair build and moves CC-131 to Ready for retest. QA compares the deployed digest with the build receipt before rerunning the original test."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Fictional evidence trail reviewed by the triage owner",
+            "value": "qa-196 · TC-04 · build-412 · FAILED\nsha256:ad1985a0d6e0fe53eab9a6fdcd1d8acb4823434ae8e9ec257936d912fe95b78e\nqa-198 · build-415 · TC-04 and authorized path verified\nsha256:653039af804cc7ec40d01b3cc83d64dd1d4eee1c1aa9bc2cd0aee9c83a4d365d\nCC-131 · Closed · Resolution = Fixed · original failure retained"
+          },
+          {
+            "type": "text",
+            "value": "Use a fresh pending request. As the unrelated employee, attempt the decision and check that it is denied and still pending. On a suitable pending request use the designated approver and verify that the decision is recorded. The first path is confirmation testing, a repeat of the earlier failure. The second is regression testing, checking that the repair preserved a neighboring behavior. A change that denied everyone would satisfy only the first part."
+          },
+          {
+            "type": "text",
+            "value": "qa-198 confirms the repair and allowed behavior on build-415. The triage owner records the evidence and closes CC-131 as Fixed. Had the unauthorized decision still been recorded, the owner would preserve that new execution, move the bug to Reopened and return it to the developer. The earlier qa-196 failure remains available under either outcome."
+          }
+        ]
+      },
+      {
+        "id": "link-the-retest",
+        "title": "Attach the retest without losing the first failure",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Kiwi TCMS 17.2 behavior is drawn from its documentation and published source code. This example has not been demonstrated on a live Kiwi TCMS and Jira setup."
+          },
+          {
+            "type": "text",
+            "value": "A Kiwi TestExecution records the result of a case in one run. When the original execution is used to create a new Jira issue through the configured adapter’s application programming interface (API), the generated Jira description includes the originating execution URL and the execution stores the new issue’s URL as a defect. At retest CC-131 already exists. Create the new execution in qa-198 and add its existing Jira URL as a defect link. This gives the new result a route to the same investigation."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "For an existing Jira issue, adding the URL and posting a Jira comment are separate actions. The “Add comment to Issue tracker” option requests the write-back. Kiwi needs a recognized Jira URL marked as a defect, an enabled tracker with credentials, a user allowed to add the Kiwi link, and Jira permission for the adapter to comment. Verify the comment in Jira if it is part of the handoff."
+          },
+          {
+            "type": "text",
+            "value": "The adapter’s comment can identify the run, its URL and the execution identifier. Open the referenced result to see whether it passed. Record the actual retest outcome on CC-131 and let the authorized human make the transition. The optional comment supplies a reference and carries no closure authority. If the comment is missing, verify the Kiwi link separately and add the needed evidence in Jira under the team’s permissions."
+          }
+        ]
+      },
+      {
+        "id": "verify-the-hold",
+        "title": "Check the feature independently",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In Jira, CC-131 blocks CC-123, and the feature remains In QA during the early defect hold. Closing the bug after qa-198 clears that specific impediment. The integrated change PR-42 produces build-418 later and requires its own qa-204 evidence for the feature. The business analyst then moves CC-123 to In UAT for user acceptance testing. A business rejection in uat-80 over the unit B mapping has its own hold and recheck. It does not change the historic fix verified in qa-198."
+          },
+          {
+            "type": "text",
+            "value": "Two common mistakes are visible from the record. Editing the original execution to Passed destroys the evidence that justified the hold. Add a new execution instead. A reopened bug that still has Resolution = Fixed can disappear from unresolved-work reports. The workflow owner configures the reopen move to clear the field and checks both the existing item and subsequent reopens."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Keep the original failure and repair test as separate observations joined to the same defect in any test and issue tracking system. Give the closure decision to a named owner who can identify the changed candidate, verify the original case and explain which delivery hold the result clears."
+          }
+        ]
+      }
+    ],
+    "evidence": "The failure and confirmation point to the same Jira defect from different executions and different build digests. The Jira record contains the triage owner’s decision, the outcome and the feature link.",
+    "example": "CC-131 is Closed with resolution Fixed after the build-415 retest. Build-418 qualifies separately. At each point a reader can distinguish repair verification from feature qualification or business acceptance.",
+    "failure": "A failed retest goes back to the developer. A test on an unidentified candidate stays inconclusive. The QA lead first verifies the package, environment and acting role before deciding the next move.",
+    "measure": "Sample closed and reopened bugs. Check that a reader can recover the original failure, repair candidate and new execution, and that every reopened bug appears in unresolved-work reporting.",
+    "sources": [
+      {
+        "title": "ISTQB · Certified Tester Foundation Level Syllabus v4.0.1",
+        "url": "https://istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Issue tracker integration",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/modules/tcms.issuetracker.html"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 published source · JIRA",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/_modules/tcms/issuetracker/types.html#JIRA"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 published source · TestExecution.add_link",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/_modules/tcms/rpc/api/testexecution.html#add_link"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 published source · IssueTrackerType",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/_modules/tcms/issuetracker/base.html#IssueTrackerType.add_testexecution_to_issue"
+      },
+      {
+        "title": "Atlassian Support · What are work item statuses, priorities, and resolutions?",
+        "url": "https://support.atlassian.com/jira-cloud-administration/docs/what-are-issue-statuses-priorities-and-resolutions/"
+      },
+      {
+        "title": "Atlassian Support · Clear the resolution field when an issue is reopened in Jira Cloud",
+        "url": "https://support.atlassian.com/jira/kb/clear-the-resolution-field-when-an-issue-is-reopened-in-jira-cloud/"
+      },
+      {
+        "title": "Atlassian Support · Link work items",
+        "url": "https://support.atlassian.com/jira-software-cloud/docs/link-issues/"
+      }
+    ]
+  },
+  {
+    "id": "regression-scope",
+    "kind": "deep-dive",
+    "parent": "hold",
+    "audience": [
+      "Business Analyst",
+      "QA Lead",
+      "Release Manager"
+    ],
+    "title": "Choose what to retest before lifting a hold",
+    "phase": "Prove",
+    "activity": "QA",
+    "summary": "A buyer’s request reached the wrong desk even though an earlier check passed. Before the team can ask the business to accept the change, it must identify what changed, who else could be affected and which results still apply.",
+    "owner": "The quality assurance (QA) lead sets the rerun scope with the developer or routing-rule owner. The business analyst gives the resulting evidence to the designated business representative for a fresh user acceptance testing (UAT) decision.",
+    "inputs": [
+      "Open finding, expected and actual behavior, triggering request, who acted, and the earlier run with its candidate and settings.",
+      "The image digest (a fingerprint of the packaged application), environment revision (the deployed instance version) and the version of its routing configuration."
+    ],
+    "steps": [
+      "Preserve the original result and record the evidence that triggers the hold. Identify whether the code, mapping or both must change.",
+      "Repeat the failing scenario on the correct candidate, then check the neighboring behavior that the repair could disturb.",
+      "Record the new results on the feature and defect. Resume UAT only when the candidate identity, configuration and affected checks are accounted for."
+    ],
+    "evidence": "The reader should be able to follow the issue to two distinct observations: the failure in its original environment and the retest against the repair. The later acceptance decision has its own owner and record.",
+    "example": "The code defect CC-131 needed a new build. The later unit B rejection in uat-80 needed a corrected mapping on the same build-418 image.",
+    "failure": "Unexplained candidate changes, missing observations and failed neighboring cases keep the hold open. The QA lead records which condition prevented re-entry and who owns the next action.",
+    "measure": "Sample cleared holds and check whether each has a recorded reason for its scope, an identified repair candidate, the earlier result and an independent business decision where required.",
+    "sources": [
+      {
+        "title": "ISTQB · Certified Tester Foundation Level syllabus v4.0.1, sections 2.2.1 and 2.2.3",
+        "url": "https://istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Test Runs",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/guide/testrun.html"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Published TestRun API source",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/_modules/tcms/rpc/api/testrun.html"
+      },
+      {
+        "title": "Microsoft Azure Well-Architected Framework · Architecture strategies for safe deployment practices",
+        "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
+      }
+    ],
+    "detail": [
+      {
+        "id": "choose-scope",
+        "title": "Which part of the decision changed?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Confirmation testing repeats the behavior that exposed a defect. Regression testing looks for harm the repair might have caused elsewhere. If a developer changes who may decide a request, rejecting the unrelated employee confirms the repair. Letting the nominated approver complete a pending request checks the adjacent permission that the fix could accidentally remove. If routing changes for one purchasing unit, its neighbor becomes a useful comparison because an overbroad lookup could send both units to the same group."
+          },
+          {
+            "type": "text",
+            "value": "Start when a repair arrives or when someone reports a credible discrepancy against a candidate already cleared by QA. The QA lead and rule owner inspect the source change or mapping difference before selecting cases. An illustrative budget is 15 minutes to scope a narrow edit and 30 minutes on an isolated QA target for focused reruns. Widen the scope when the changed lookup is shared, the affected population is unknown or the defect crosses several permission boundaries. The observed failure and the impact of the repair determine the scope."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "A pass describes what happened to one candidate with particular settings and test data. Keep it as historical evidence. A later discovery can suspend its use for promotion without changing what the tester originally saw."
+          }
+        ]
+      },
+      {
+        "id": "merged-fix",
+        "title": "Which tests run on the merged code repair?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "A pull request (PR) proposes a code change for review and integration. Follow each one through the build and QA run that exercised it."
+          },
+          {
+            "type": "table",
+            "caption": "The three increments in the fictional main-release-build pipeline",
+            "columns": [
+              "Candidate and published digest",
+              "Observation",
+              "What it permits"
+            ],
+            "rows": [
+              [
+                "PR-40 · build-412 · sha256:ad1985a0d6e0fe53eab9a6fdcd1d8acb4823434ae8e9ec257936d912fe95b78e",
+                "qa-196: TC-04, the unrelated employee decision, was recorded. Expected denial and a request still pending.",
+                "File CC-131 against AC-02. Hold promotion and retain the failed execution."
+              ],
+              [
+                "PR-41 · build-415 · sha256:653039af804cc7ec40d01b3cc83d64dd1d4eee1c1aa9bc2cd0aee9c83a4d365d",
+                "qa-198: QA confirms the denial in TC-04 and checks the authorized decision path.",
+                "The triage owner closes CC-131 as Fixed after reviewing this retest. Keep both qa-196 and qa-198."
+              ],
+              [
+                "PR-42 · build-418 · sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c",
+                "qa-204: the later integrated candidate qualifies independently for AC-01 and AC-02 on qa-r17 with qa-routing-3.",
+                "Carry build-418 and its own QA evidence into UAT. Earlier results still describe their own candidates."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "After the repair merges, the build packages the integrated code and gives it a new digest. Start the rerun only after matching that digest to the running QA target. Submit a fresh pending request for the unauthorized action. Read back its state after the denial, then use a separately authorized identity to exercise the valid decision path. If a deny-all repair prevents both users from acting, TC-04 alone could look successful while purchasing approvals have stopped."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "A Kiwi Test Run groups executions of selected cases for a build. Select the repair build for a new run and retain the original execution. Include the full digest, environment revision and configuration as evidence alongside the build identifier. Kiwi TCMS 17.2 behavior is drawn from its documentation and published source code. This example has not been demonstrated on a live Kiwi TCMS and Jira setup."
+          }
+        ]
+      },
+      {
+        "id": "between-decisions",
+        "title": "A new observation arrives after QA passed",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Suppose a buyer reports a wrong recipient during UAT preparation after qa-204 but before the signatory decides. Treat this as a hypothetical observation separate from the recorded uat-80 decision. The analyst pauses the sign-off request and the QA lead holds onward promotion. Leave qa-204 intact. The analyst records the request and unit, expected and actual group, first actor, time, running digest, revision and mapping. Capture who observed the discrepancy. If an identity or setting cannot be recovered, label it unknown and arrange a clean replay."
+          },
+          {
+            "type": "text",
+            "value": "Open a linked Jira defect when the observed behavior fails the agreed criterion. Identify CC-123 as the affected feature and add web links to the prior QA run and UAT observation. Keep CC-123 In UAT while the decision is held in this example. The QA lead and Product Owner assess impact and priority, name the code or configuration owner, and state the re-entry conditions. Record the decision as pending until the designated representative acts. A later correction gets a new execution and decision record."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Unit B reached unit A’s approver",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In the recorded uat-80 decision on 11 March 2026, the designated business representative rejected the scenario on uat-r8 with uat-routing-5. Purchasing unit B should have reached its designated approver and instead reached unit A’s approver. Compare the two unit mappings against the business-approved group list. Changing an environment lookup can repair this failure with the application image held constant. A code change to the common lookup would require a new build, independent QA on its digest and UAT against that candidate."
+          },
+          {
+            "type": "table",
+            "caption": "Rerun scope for the mapping route",
+            "columns": [
+              "Role and place",
+              "Question to answer",
+              "Evidence boundary"
+            ],
+            "rows": [
+              [
+                "Rule owner · UAT configuration",
+                "Does the corrected row designate the intended group for unit B and preserve the neighboring unit’s mapping?",
+                "Compare the approved mapping changes and the running revision. The new UAT configuration is uat-routing-6."
+              ],
+              [
+                "QA lead · affected checks",
+                "Does the rule choose the correct recipient, refuse an unauthorized decision and permit the nominated approver?",
+                "qa-209 records a purchasing-mapping and permissions recheck. Individual request IDs, timestamps and per-case outcomes for that run are absent from the summary."
+              ],
+              [
+                "Business representative · UAT",
+                "Can a buyer submit, the intended approver receive the work and the business reach a final decision?",
+                "Repeat the scenario on uat-r9 with uat-routing-6 and the build-418 digest. uat-82 records acceptance on 12 March. Retain the rejection."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The QA lead clears the technical hold when the running target matches the planned candidate and the affected rechecks support re-entry. The designated business representative owns the fresh acceptance decision. Neither closing CC-131 nor correcting a row supplies that signature."
+          },
+          {
+            "type": "figure",
+            "src": "assets/figures/regression-scope.svg",
+            "alt": "Separate retest routes for an application repair and a routing-mapping correction.",
+            "caption": "Follow what changed to the evidence needed for re-entry.",
+            "text_equivalent": "A finding holds promotion or sign-off and preserves earlier evidence. On the code route, qa-196 fails on build-412. The repair produces build-415 with a new digest, qa-198 confirms the fix and checks adjacent behavior, and the triage owner closes CC-131. Later build-418 qualifies separately in qa-204. On the mapping route, retain the rejected uat-80 and the build-418 image digest, correct the configuration and link the affected rechecks in qa-209. Repeating the business scenario on uat-r9 with uat-routing-6 produces the new uat-82 decision on this route. On either route, missing identity or required evidence keeps the hold open. When re-entry conditions are met, the business representative can test and decide on the identified candidate."
+          },
+          {
+            "type": "text",
+            "value": "Two shortcuts leave the signatory with the wrong evidence. Overwriting uat-80 hides the reason the configuration was changed. Retesting only the corrected recipient omits the possibility that a member of the former group can still decide a request. Keep the old decision visible and explain how access was checked on the corrected candidate."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In any test management system, keep the original observation, the change and the retest as separately identifiable records. Choose confirmation and adjacent regression from the affected behavior, then ask the person who owns the business decision to act on the identified candidate."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "uat-planning",
+    "kind": "deep-dive",
+    "parent": "uat-runtime",
+    "audience": [
+      "Business Analyst",
+      "Designated Business Representative",
+      "QA Lead"
+    ],
+    "title": "Plan and record a business acceptance session",
+    "phase": "Prove",
+    "activity": "UAT",
+    "summary": "A purchasing buyer wants to know whether a request will reach someone who is both responsible for it and able to decide it. A business acceptance session puts that request in the hands of representative users and records who accepts the outcome.",
+    "owner": "The business analyst prepares user acceptance testing (UAT) using evidence from the quality assurance (QA) lead. A buyer and a designated approver exercise their real roles with fictional data. The designated business representative owns the decision.",
+    "inputs": [
+      "QA run qa-204 for build-418, the candidate’s image digest (its content fingerprint), its target UAT revision and routing configuration.",
+      "The approved unit-to-group mapping, clean test accounts, scope agreed with the business, and a signatory authorized to accept or reject that scope."
+    ],
+    "steps": [
+      "Verify the running candidate, expected recipients and participant permissions. Set the entry and exit criteria before starting.",
+      "Observe a fresh submission through the initial assignment and final decision. Record the first recipient, actor, result and any gap.",
+      "Ask the business signatory for a dated, scoped decision. Send the release reviewer the decision, its candidate and the supporting records."
+    ],
+    "evidence": "The sign-off identifies the candidate and configuration, scenario, decision, signatory role and time. Keep the earlier rejection, the reason for changing the mapping and the new decision together.",
+    "example": "uat-80 rejected a unit B request that reached unit A’s approver. After correcting the mapping and rechecking the affected behavior, the designated representative accepted the repeated scenario in uat-82.",
+    "failure": "An unavailable participant or unverified environment leaves the session blocked. A wrong recipient on a verified candidate supplies grounds for rejection. The analyst records what happened and the conditions for repeating the session.",
+    "measure": "Sample decisions and ask whether an independent reviewer can identify which business scenario, configuration, platform and representative the sign-off covers. Count decisions missing those details separately from rejected scenarios.",
+    "sources": [
+      {
+        "title": "ISTQB · Certified Tester Foundation Level syllabus v4.0.1, sections 2.2.1 and 2.2.3",
+        "url": "https://istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Test Runs",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/guide/testrun.html"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Published TestRun API source",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/_modules/tcms/rpc/api/testrun.html"
+      }
+    ],
+    "detail": [
+      {
+        "id": "session-plan",
+        "title": "What must be ready before the users arrive?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The analyst starts planning once the proposed candidate and the business criterion are known. A session can be scheduled before QA finishes, but the team waits for candidate-specific evidence before asking for a decision. For this example, reserve 30 to 45 minutes in the UAT environment for the buyer, approver and observer. Allow separate time for restoring test accounts or investigating a discrepancy. The fictional record contains decision times rather than session durations."
+          },
+          {
+            "type": "table",
+            "caption": "Illustrative plan for CC-123 purchasing approval",
+            "columns": [
+              "Plan item",
+              "What the analyst arranges"
+            ],
+            "rows": [
+              [
+                "Decision and scope",
+                "Decide whether a representative eligible purchase request reaches the intended approver automatically and can receive a final decision in this UAT setup."
+              ],
+              [
+                "Participants",
+                "A unit B buyer submits, a member of the designated unit B approver group checks their work queue and decides, the analyst captures observations, and the designated business representative signs."
+              ],
+              [
+                "Entry",
+                "Match the running UAT image to QA-qualified build-418 on linux/amd64. Record the active UAT revision and routing configuration. Confirm the expected group with the business owner independently of the installed table."
+              ],
+              [
+                "Data and access",
+                "Use a new fictional request, a buyer account without approval rights and an approver account with the expected group membership. Keep the setup administrator out of the two business actions."
+              ],
+              [
+                "Exit",
+                "An identified signatory records acceptance or rejection for this scenario and candidate. Incomplete steps, missing authority or ambiguous routing leave the decision pending."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "Bring a business mapping that says which group should receive unit B’s work. A copy of the running table gives the analyst a description of the configuration being tested. If the same copy supplies the expected answer, a mistyped group can agree with itself. If authentication fails or the buyer can see somebody else’s approval queue, resolve the identity problem before treating a missed step as a product defect."
+          }
+        ]
+      },
+      {
+        "id": "observe-session",
+        "title": "What does the representative actually observe?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Ask the buyer to submit the request without choosing an approver. Preserve the unit, time and request identifier while the approver opens the normal work queue. Read the first assignment event, including its actor and recipient. The analyst asks the designated approver to record a decision and checks the final request state. If a participant manually forwards the request to the correct person, mark the automatic-routing step unproven and retain the event sequence. A correct final screen can hide the original handoff."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "Capture the business consequence of the observed behavior. The system can record an approval successfully while sending the underlying request to the wrong organizational unit."
+          },
+          {
+            "type": "text",
+            "value": "A test mailbox or substitute notification channel is a session constraint. If participants used one, record what they saw and which live delivery behavior remains outside the exercise. Keep role membership and request records free of real customer data. Attach the controlled request reference or a redacted observation. Ask the signatory what the exercise covered before asking for a decision."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "In Kiwi a Test Run can group selected cases for a product build and record the people assigned to test. An execution result can support a business decision. The analyst still records the authorized signatory, scope and decision in the acceptance record. Kiwi TCMS 17.2 behavior is drawn from its documentation and published source code. This example has not been demonstrated on a live Kiwi TCMS and Jira setup."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Record the rejection and repeat the business task",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "QA had already qualified AC-01 and AC-02 in qa-204 for qa-r17 with qa-routing-3. Its example request R-17 went automatically to the Purchasing approver. On 11 March the UAT signatory observed a different business result on uat-r8 with uat-routing-5. Unit B should have reached unit B’s designated approver and actually reached unit A’s. The signatory recorded the rejection as uat-80. The QA pass and UAT rejection apply to different configurations and both belong in the handoff."
+          },
+          {
+            "type": "text",
+            "value": "The analyst records the mismatch on CC-123 and adds web links to the rejected decision and its evidence. Keep the feature In UAT under this team’s Jira workflow while the issue is investigated and promotion is held. The routing owner corrects the mapping. QA links qa-209, its affected purchasing-mapping and permissions recheck. The analyst verifies the same image with the revised settings, arranges fresh representative identities or clean sessions, and asks users to repeat the whole scenario."
+          },
+          {
+            "type": "text",
+            "value": "Two mistakes would leave the decision unsupported. Having the analyst approve their own notes when someone else owns the decision loses the delegated authority. Reusing the earlier request after a manual reassignment hides whether a new submission would route correctly. Ask the designated representative to decide on a fresh submission and link the outcome back to the rejection."
+          }
+        ]
+      },
+      {
+        "id": "signoff-record",
+        "title": "Read the evidence behind uat-82",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "Fictional UAT decision from the qualification record",
+            "columns": [
+              "Field",
+              "Recorded evidence"
+            ],
+            "rows": [
+              [
+                "Candidate",
+                "build-418 · linux/amd64 · sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c"
+              ],
+              [
+                "Earlier decision",
+                "uat-80 · rejected · 2026-03-11 10:00 UTC · uat-r8 / uat-routing-5 · unit B reached unit A’s approver."
+              ],
+              [
+                "Correction and re-entry",
+                "The UAT mapping was corrected. qa-209 rechecked the affected purchasing rule and permissions. The business scenario was repeated."
+              ],
+              [
+                "Accepted environment and scope",
+                "uat-r9 / uat-routing-6. Submit an eligible request, verify recipient, record final decision."
+              ],
+              [
+                "Decision owner and time",
+                "Designated business representative · accepted · uat-82 · 2026-03-12 11:00 UTC."
+              ],
+              [
+                "Evidence limits",
+                "The record identifies the signatory’s role, not a personal name. It gives the rejected recipient and the accepted scenario/outcome, without an accepted request ID, event-by-event recipient log or session transcript."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The business representative accepts the identified scenario on the recorded UAT configuration. The release reviewer uses that decision with QA evidence and a configuration review when assessing authorization for production."
+          },
+          {
+            "type": "text",
+            "value": "The analyst adds web links to qa-209 and uat-82 on CC-123 and retains uat-80 in the history. Provide the release reviewer with both the image digest and the local configuration, so they can examine how production group membership will be checked. Acceptance of this scenario does not establish organization-wide coverage, the proposed two-minute criterion or the product’s one-day decision target. Measuring those claims requires other evidence."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "A signed form, a test management record or an approved ticket can carry the same business decision if it identifies the candidate, setting, scope, observed result and authorized person or role. Retain a rejected attempt when a later decision supersedes it so a release reviewer can see what changed and why the new decision applies."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "config-change-qualification",
+    "kind": "deep-dive",
+    "parent": "policy",
+    "audience": [
+      "Business Analyst",
+      "Configuration Owner",
+      "QA Lead",
+      "Release Manager"
+    ],
+    "title": "Qualify a change to the production routing table",
+    "phase": "Prove",
+    "activity": "QA",
+    "summary": "Next week a rule maintainer might change which group receives a purchase request. Even if the application stays exactly the same, buyers could send work to people who cannot decide it, or to people who should never see it.",
+    "owner": "The configuration owner prepares the change and its reversal. The business owner confirms the intended group, the quality assurance (QA) lead checks routing and permissions, and the authorized release reviewer decides whether implementation may proceed.",
+    "inputs": [
+      "The known production mapping prod-routing-11, its deployed application image digest (the package’s content fingerprint) and the proposed change request for prod-routing-12.",
+      "An independently approved unit-to-group mapping, representative test accounts and a versioned copy of the prior settings that the operator can restore."
+    ],
+    "steps": [
+      "Compare the proposed settings with the actual baseline. Identify whose work queue or decision rights could change, including open requests.",
+      "Try the proposed mapping in a representative environment. Record the first automatic assignment and the permitted and denied decision paths.",
+      "Give the authorized reviewer the change, evidence, rollout limit and reversal instructions. Only after approval may an operator apply the reviewed settings and check the live result."
+    ],
+    "evidence": "A traceable request contains the old and proposed versions, exact difference, affected units and roles, named approval authority, qualification results, implementation record and restoration point. For prod-routing-12 these are proposed or outstanding.",
+    "example": "prod-routing-12 is a fictional future change from prod-routing-11. The accepted production record remains prod-r42 with prod-routing-11. No implementation, rollback or sign-off for prod-routing-12 is recorded.",
+    "failure": "If a test or controlled submission reaches the wrong group, the operator stops expansion, records the actual recipient, and follows the reviewed recovery plan. The service owner accounts for work routed during any exposure.",
+    "measure": "Count verified correct first recipients among all controlled submissions. Also count outstanding requests requiring reconciliation. A zero unassigned backlog can coexist with every request reaching the wrong group.",
+    "sources": [
+      {
+        "title": "Microsoft Azure Well-Architected Framework · Architecture strategies for safe deployment practices",
+        "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
+      },
+      {
+        "title": "GitHub Docs · Deployments and environments",
+        "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments"
+      },
+      {
+        "title": "GitHub Docs · Managing environments for deployment",
+        "url": "https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments"
+      },
+      {
+        "title": "Microsoft Learn · Snapshots in Azure App Configuration",
+        "url": "https://learn.microsoft.com/en-us/azure/azure-app-configuration/concept-snapshots"
+      }
+    ],
+    "detail": [
+      {
+        "id": "change-request",
+        "title": "What would the requester submit?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "A configuration is a set of values the application reads when deciding what to do. A routing table can change a business outcome without a new application build. Start when the purchasing owner proposes a new group for unit B. The configuration owner retrieves the effective production settings and checks them against the reviewed copy before preparing a difference, or diff. A version label alone cannot reveal someone’s unrecorded edit. If the copies differ, record the discrepancy and resolve the baseline before asking QA to test the proposal."
+          },
+          {
+            "type": "table",
+            "caption": "Illustrative change request, still awaiting review and qualification",
+            "columns": [
+              "Field",
+              "Proposed entry"
+            ],
+            "rows": [
+              [
+                "Purpose and requester",
+                "Purchasing rule maintainer requests that unit B’s eligible submissions go to its successor approver group. The business owner must confirm the intended membership and effective date."
+              ],
+              [
+                "Objects and authority",
+                "Prior prod-routing-11; proposed prod-routing-12. Configuration owner prepares the change. Purchasing owner verifies recipients. QA lead verifies test evidence. Authorized release reviewer decides on production use."
+              ],
+              [
+                "Boundary",
+                "New requests for unit B, the former and proposed approver groups, requester decision rights, and unit A as the neighboring unchanged unit. Inventory open B requests separately."
+              ],
+              [
+                "Unchanged application",
+                "Use the accepted build-418 image and verify its identity in the environment before reusing any application-level evidence."
+              ],
+              [
+                "Work item and state",
+                "Open a new Jira change work item, relate it to CC-123, and add web links to the mapping review, test record and disposition. Proposed status: Awaiting review. CC-123 remains Released in the recorded workflow."
+              ]
+            ]
+          },
+          {
+            "type": "code",
+            "language": "diff",
+            "caption": "Illustrative proposed mapping diff with invented group names",
+            "value": "--- prod-routing-11 (illustrative excerpt)\n+++ prod-routing-12 (proposed excerpt)\n purchasing:\n   unit-a: purchasing-a-approvers\n-  unit-b: purchasing-b-approvers\n+  unit-b: purchasing-b-successor-approvers"
+          },
+          {
+            "type": "text",
+            "value": "The names in this diff illustrate a possible request. The qualification file does not publish the underlying group keys for prod-routing-11. Obtain the approved business list independently, including the former group and one account outside both groups. Read access to the settings and group directory lets the reviewer verify membership. Keep permission to edit configuration and permission to approve the production operation with the assigned roles."
+          }
+        ]
+      },
+      {
+        "id": "qualify",
+        "title": "Which tests could catch a one-line routing mistake?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The QA lead sets up a representative test revision on the accepted image and loads a test-environment equivalent of the proposed mapping. Record the correspondence between test and production groups and confirm that the same selection rule applies. Plan roughly 30 to 45 minutes for this focused exercise after access is ready. Treat this as an estimate. If a shared default or group-membership rule changes, review affected units and widen the session before declaring the test complete."
+          },
+          {
+            "type": "table",
+            "caption": "Proposed test sheet; observations and sign-off are pending",
+            "columns": [
+              "Exercise",
+              "Expected observable result",
+              "What to retain"
+            ],
+            "rows": [
+              [
+                "Unit B buyer submits a fresh eligible request without naming an approver.",
+                "The first assignment is automatic. The actor is the routing rule and the recipient is the authorized successor group.",
+                "Case, request, first event, actual actor and recipient, effective configuration and digest."
+              ],
+              [
+                "Requester and former group member independently attempt to decide fresh pending B requests.",
+                "Each attempt is denied and each request remains pending. Confirm the former member has no overlapping grant that authorizes the action.",
+                "Account role, denial, request state read back after each attempt."
+              ],
+              [
+                "Member of the successor group decides a pending B request.",
+                "One authorized decision is recorded.",
+                "Actual actor, decision event and resulting state."
+              ],
+              [
+                "A unit A buyer submits under the same candidate.",
+                "The first assignment goes to A’s designated group. No manual routing is needed.",
+                "Independent expectation, first event and request reference."
+              ],
+              [
+                "Owner inspects requests already assigned before a switch.",
+                "Their treatment follows the separately approved business rule. Identify any request needing a deliberate reassignment or preserved decision.",
+                "Count, owner and disposition; resolve the policy before rollout if unknown."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "The test checks whether changed settings and existing code deliver the intended behavior together. Verify who actually receives a request and who can act after assignment. Both questions matter when group membership changes."
+          }
+        ]
+      },
+      {
+        "id": "authorize",
+        "title": "What is approved, and where is it enforced?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The release reviewer compares the exact reviewed diff with the tested configuration and checks the identified image. The example’s acceptance conditions are that the B and A routing checks give the expected first recipients, authorized and denied paths preserve the expected states, and there is a disposition for work in progress. A missing observation, unexplained difference, or absent business authorization keeps the request pending. The earlier uat-82 decision applied to the prior scenario and mapping review. Link it as history and seek a fresh decision on the proposed change."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "In GitHub Actions, a job referencing an environment must satisfy that environment’s configured protection rules before it proceeds. Required reviewers depend on plan and repository visibility; when several people or teams are listed as required reviewers, one approval can release that job. Record distinct business and QA decisions separately if the team requires both."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "Only the authorized operator applies a reviewed and approved version. Start with controlled exposure, verify the effective settings on the running target, and use a controlled request to check its first recipient. The release reviewer authorizes a larger rollout only after the agreed observations are available."
+          },
+          {
+            "type": "text",
+            "value": "The proposed implementation record would capture who applied which configuration, the time, target revision, application digest, request and observed group. The accepted production baseline in the teaching record is prod-r42 with prod-routing-11 and digest sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c. A future request should re-read the actual baseline before execution in case a different approved change has occurred."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "If the proposed group receives the wrong work",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The earlier recorded incident shows why the reversal plan includes already-routed work. A controlled purchase request on prod-r41 with prod-routing-10 went to the wrong approver, leading the team to halt exposure. Eight requests needed reconciliation. Seven were reassigned and one authorized decision was retained. The corrected rollout used prod-r42 with prod-routing-11. These observations belong to INC-7. They establish neither deployment nor recovery of the later proposed prod-routing-12."
+          },
+          {
+            "type": "text",
+            "value": "For a hypothetical prod-routing-12 failure, the first operator action would be to stop expansion and preserve the effective settings and first assignment for the triggering request. Compare expected and actual groups. If the observed wrong recipient is attributable to the changed row, restore the reviewed prod-routing-11 settings under the authorized reversal procedure and verify the version actually serving. Use fresh controlled requests to recheck B, A and decision rights before resuming. If the baseline changed meanwhile, have the configuration owner reconcile it before restoring settings."
+          },
+          {
+            "type": "text",
+            "value": "Restoring a row affects future lookup decisions. It may leave existing work in the wrong queue. The service owner would list affected requests from the exposure interval, assess decisions already taken, and record each correction or justified retention. On the new Jira change record, link any incident and the observations, then record the hold or reversal and its owner. A mistaken success claim based on a zero backlog conceals misrouting. Counting a proposed restore as a completed rollback conceals whether the active configuration was ever verified."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Azure App Configuration snapshots can retain immutable sets of selected configuration values, giving an operator a specific version to reference during qualification and recovery. With a different configuration store, retain an equally identifiable prior version and verify the running selection, business authorization and affected requests each time settings change."
+          }
+        ]
+      }
+    ]
+  }
+]

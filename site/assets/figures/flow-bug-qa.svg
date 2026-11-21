@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 510 833" role="img" aria-labelledby="title desc">
+<title id="title">Who hands off QA defect CC-131?</title><desc id="desc">Developer publishes PR-40 as build-412. Kiwi execution TC-04 in qa-196 fails and stores the CC-131 URL. Triage links the Jira issue to CC-123 and holds promotion. PR-41 yields a fresh image, build-415. In qa-198 a new TC-04 execution confirms denial. A separate check verifies authorized approval. If requested and permitted, an optional comment on CC-131 links back to the Kiwi run and identifies the execution. The triage owner closes as Fixed or reopens after a failed retest. QA lead releases the hold only on success. PR-42 later integrates the change as build-418, which gets its own qa-204 qualification.</desc>
+<defs><marker id="tip" viewBox="0 0 9 10" refX="8" refY="5" markerWidth="9" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 0 L9 5 L0 10 z" fill="#345765"/></marker></defs>
+<path fill="#f5f7f6" d="M0 0H510V833H0z"/>
+<text x="16" y="32" font-family="Arial, sans-serif" font-size="23" font-weight="700" text-anchor="start" fill="#162f40">Who hands off QA defect CC-131?</text>
+<text x="16" y="59" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#162f40">One pipeline builds all three increments (main-release-build).</text>
+<text x="85.0" y="97" font-family="Arial, sans-serif" font-size="16" font-weight="700" text-anchor="middle" fill="#425c69">Developer / build</text>
+<path d="M170.0 78V764" stroke="#c9d3d5"/>
+<text x="255.0" y="97" font-family="Arial, sans-serif" font-size="16" font-weight="700" text-anchor="middle" fill="#425c69">QA / Kiwi TCMS</text>
+<path d="M340.0 78V764" stroke="#c9d3d5"/>
+<text x="425.0" y="97" font-family="Arial, sans-serif" font-size="16" font-weight="700" text-anchor="middle" fill="#425c69">Triage / Jira</text>
+<g data-label-box=""><rect x="8" y="115" width="150" height="109" rx="7" fill="#ffffff" stroke="#92a5ae" stroke-width="1.5"/>
+<text x="20" y="141" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">PR-40</text>
+<text x="20" y="166" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">First increment</text>
+<text x="20" y="188" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">build-412</text>
+<text x="20" y="210" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">ad1985a0…</text>
+</g>
+<path d="M158 157H178" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="180" y="115" width="150" height="131" rx="7" fill="#fff0e1" stroke="#aa622a" stroke-width="1.5"/>
+<text x="192" y="141" font-family="Arial, sans-serif" font-size="16" font-weight="700" text-anchor="start" fill="#162f40">qa-196 · failed</text>
+<text x="192" y="166" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">TC-04 allowed</text>
+<text x="192" y="188" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">an unauthorized</text>
+<text x="192" y="210" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">decision. Store</text>
+<text x="192" y="232" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">the CC-131 URL.</text>
+</g>
+<path d="M330 157H350" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="352" y="115" width="150" height="109" rx="7" fill="#fff0e1" stroke="#aa622a" stroke-width="1.5"/>
+<text x="364" y="141" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">CC-131</text>
+<text x="364" y="166" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Link bug to the</text>
+<text x="364" y="188" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">CC-123 story.</text>
+<text x="364" y="210" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Hold promotion.</text>
+</g>
+<path d="M427 224V263H83V285" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="8" y="286" width="150" height="109" rx="7" fill="#ffffff" stroke="#92a5ae" stroke-width="1.5"/>
+<text x="20" y="312" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">PR-41</text>
+<text x="20" y="337" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Repair the code.</text>
+<text x="20" y="359" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">New build-415</text>
+<text x="20" y="381" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">653039af…</text>
+</g>
+<path d="M158 327H178" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="180" y="286" width="150" height="131" rx="7" fill="#e1f0e9" stroke="#4e816c" stroke-width="1.5"/>
+<text x="192" y="312" font-family="Arial, sans-serif" font-size="16" font-weight="700" text-anchor="start" fill="#162f40">qa-198 · retest</text>
+<text x="192" y="337" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">TC-04 denied.</text>
+<text x="192" y="359" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">Link CC-131.</text>
+<text x="192" y="381" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">Also verify valid</text>
+<text x="192" y="403" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">approval.</text>
+</g>
+<g data-label-box=""><rect x="352" y="286" width="150" height="131" rx="7" fill="#f6f5fa" stroke="#80758b" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="364" y="312" font-family="Arial, sans-serif" font-size="16" font-weight="700" text-anchor="start" fill="#162f40">Optional link</text>
+<text x="364" y="337" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">Jira comment</text>
+<text x="364" y="359" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">links to qa-198</text>
+<text x="364" y="381" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">and names the</text>
+<text x="364" y="403" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">Kiwi execution.</text>
+</g>
+<path d="M352 350H332" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)" stroke-dasharray="5 4"/>
+<path d="M255 417V439H427V461" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="352" y="462" width="150" height="109" rx="7" fill="#e1f0e9" stroke="#4e816c" stroke-width="1.5"/>
+<text x="364" y="488" font-family="Arial, sans-serif" font-size="16" font-weight="700" text-anchor="start" fill="#162f40">Review retest</text>
+<text x="364" y="513" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">On pass, set</text>
+<text x="364" y="535" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">Closed with</text>
+<text x="364" y="557" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">resolution Fixed.</text>
+</g>
+<path d="M352 517H332" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="180" y="462" width="150" height="87" rx="7" fill="#e1f0e9" stroke="#4e816c" stroke-width="1.5"/>
+<text x="192" y="488" font-family="Arial, sans-serif" font-size="16" font-weight="700" text-anchor="start" fill="#162f40">Release hold</text>
+<text x="192" y="513" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">QA lead checks</text>
+<text x="192" y="535" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">the evidence.</text>
+</g>
+<path d="M427 571V603" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)" stroke-dasharray="5 4"/>
+<g data-label-box=""><rect x="352" y="604" width="150" height="109" rx="7" fill="#f6f5fa" stroke="#80758b" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="364" y="630" font-family="Arial, sans-serif" font-size="16" font-weight="700" text-anchor="start" fill="#162f40">If retest fails</text>
+<text x="364" y="655" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">Set Reopened.</text>
+<text x="364" y="677" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">Clear resolution.</text>
+<text x="364" y="699" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">Keep the hold.</text>
+</g>
+<path d="M255 549V579H83V603" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="8" y="604" width="150" height="131" rx="7" fill="#ffffff" stroke="#92a5ae" stroke-width="1.5"/>
+<text x="20" y="630" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Later · PR-42</text>
+<text x="20" y="655" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Integrate and</text>
+<text x="20" y="677" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">build again.</text>
+<text x="20" y="699" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">build-418</text>
+<text x="20" y="721" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">041f649d…</text>
+</g>
+<path d="M158 652H178" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="180" y="604" width="150" height="109" rx="7" fill="#e1f0e9" stroke="#4e816c" stroke-width="1.5"/>
+<text x="192" y="630" font-family="Arial, sans-serif" font-size="16" font-weight="700" text-anchor="start" fill="#162f40">qa-204</text>
+<text x="192" y="655" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">Qualify the</text>
+<text x="192" y="677" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">integrated image</text>
+<text x="192" y="699" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#425c69">on its own digest.</text>
+</g>
+<text x="16" y="785" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#162f40">Keep qa-196. The optional link points from Jira back to Kiwi.</text>
+<text x="16" y="810" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#162f40">Adding the comment requires reporter selection and permission.</text>
+</svg>

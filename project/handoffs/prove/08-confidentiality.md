@@ -1,0 +1,10 @@
+# Independent public-release review · ACCEPT · 21 November 2026
+
+I reviewed the nine generated Prove pages as an unsigned reader, including their source lesson data, page descriptions, link destinations, example snippets, both SVGs and their Python sources. I compared the run, build, image and configuration identifiers against the fictional dataset and downloadable qualification record.
+
+- The role accounts and purchasing groups are invented. The Jira examples use teaching IDs and a path suffix. The pages contain no private tracker host, account credential, customer record or installation screenshot. The 21 distinct external link targets consist of the public source repository and 20 publisher sources. The lesson pages load their scripts and images locally.
+- The eight lessons using Kiwi identify 17.2 and disclose that the integration example comes from documentation and published source. I opened the public Kiwi guide and tracker implementation pages and confirmed that they identify 17.2. The moving `stable` URLs could later serve another version. This review did not use a live Kiwi or Jira installation.
+- The six proposed cases, the failed and repaired runs, the integrated QA evidence and the two UAT decisions are distinguishable on the rendered pages. The production diff labels its group keys as invented, treats `prod-routing-12` as pending and attributes the earlier eight affected requests to the fictional INC-7 on the prior rollout.
+- The new diagrams use locally generated shapes and teaching labels. Their metadata, filenames and text alternatives contain no private information. The map download has no embedded text or EXIF chunks. Site credits identify the adapted design, and the project license and font notices accompany the build.
+
+**Finding and recheck.** The first defect diagram omitted the Closed-to-Reopened recurrence described in its text equivalent. I checked the revised generated SVG and its source. The labeled recurrence arrow now runs from Closed to Reopened. No publication blocker remains in the material examined.

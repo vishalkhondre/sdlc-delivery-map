@@ -1,11 +1,14 @@
 """Exercise the built learning site at a GitHub Pages-style project subpath."""
+import argparse
 import functools
 import http.server
 import json
 import os
+import subprocess
 import threading
 from pathlib import Path
 from playwright.sync_api import sync_playwright
+from validate import search_probes
 
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / "dist"
@@ -24,8 +27,182 @@ class ProjectSite(http.server.SimpleHTTPRequestHandler):
         pass
 
 
-def main():
-    lessons = [item for file in sorted((ROOT / "content").glob("0*.json"))
+def check_search(page, base, topics, integration):
+    for query, key in search_probes(integration).items():
+        page.goto(base + "topics.html")
+        page.locator("#topic-search").fill(query)
+        route = f"topics/{key}.html"
+        link = page.locator(f'.topic-row:visible a[href="{route}"]')
+        assert link.count() == 1, f"{query!r} should find {key}"
+        link.click()
+        page.wait_for_url(base + route)
+        assert page.locator("h1").inner_text() == topics[key]["title"]
+        if topics[key].get("kind") == "deep-dive":
+            assert page.get_by_role("heading", name=topics[key]["detail"][0]["title"], exact=True).is_visible()
+
+
+def check_detail_routes(page, base, lessons):
+    titles = {item["id"]: item["title"] for item in lessons}
+    for item in lessons:
+        if item.get("kind") != "deep-dive":
+            continue
+        parent = item["parent"]
+        page.goto(base + f"topics/{parent}.html")
+        link = page.locator("#go-deeper").get_by_role("link", name=item["title"], exact=True)
+        link.focus()
+        page.keyboard.press("Enter")
+        page.wait_for_url(base + f'topics/{item["id"]}.html')
+        assert page.locator("h1").inner_text() == item["title"]
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1"), item["id"]
+        page.set_viewport_size({"width": 1440, "height": 900})
+        for section in item["detail"]:
+            jump = page.get_by_role("navigation", name="On this page").get_by_role(
+                "link", name=section["title"], exact=True)
+            destination = jump.get_attribute("href")
+            assert destination.startswith("#") and page.locator(destination).count() == 1
+        page.set_viewport_size({"width": 390, "height": 844})
+        summary = page.locator(".mobile-contents summary")
+        summary.focus()
+        page.keyboard.press("Enter")
+        mobile_toc = page.get_by_role("navigation", name="On this page")
+        failure = mobile_toc.locator('a[href="#worked-failure"]')
+        failure.focus()
+        page.keyboard.press("Enter")
+        page.wait_for_url(base + f'topics/{item["id"]}.html#worked-failure')
+        parent_link = page.get_by_role("navigation", name="Breadcrumb").get_by_role(
+            "link", name=titles[parent], exact=True)
+        parent_link.focus()
+        page.keyboard.press("Enter")
+        page.wait_for_url(base + f"topics/{parent}.html")
+
+
+def check_integration_catalog(page, base, lessons):
+    page.goto(base + "tour.html")
+    dives = {f"topics/{item['id']}.html" for item in lessons if item.get("kind") == "deep-dive"}
+    tour = page.locator("#tour-stops .tour-deeper a")
+    assert set(tour.evaluate_all("links => links.map(a => a.getAttribute('href'))")) == dives
+
+    page.goto(base + "topics.html")
+    page.locator("#clear-search").click()
+    for kind, label in (("deep-dive", "Deep dive"), ("flow", "Flow")):
+        expected = [f"topics/{item['id']}.html" for item in lessons if item.get("kind") == kind]
+        group = page.locator(f'section[data-index-phase="{label}"]')
+        page.get_by_label("Section", exact=True).select_option(label)
+        assert group.get_by_role("heading", level=2, name=label, exact=True).is_visible()
+        visible = page.locator(".topic-row:visible a")
+        actual = visible.evaluate_all("links => links.map(a => a.getAttribute('href'))")
+        assert sorted(actual) == sorted(expected), label
+    page.locator("#clear-search").click()
+
+
+def check_overview_routes_at_phone_width(page, base, lessons):
+    routes = ["index.html", "tour.html", "topics.html", "references.html"]
+    routes.extend(f"topics/{item['id']}.html" for item in lessons if item.get("kind", "overview") == "overview")
+    for route in routes:
+        page.goto(base + route)
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1"), route
+
+    # The six reference additions must work for someone following the page by keyboard.
+    references = {"evidence-record": "figure", "hold": "figure", "measure": "figure",
+                  "handoffs": "figure", "policy": "table", "environments": "table"}
+    topics = {item["id"]: item for item in lessons}
+    for key, kind in references.items():
+        page.goto(base + f"topics/{key}.html")
+        section, block = next((section, block) for section in topics[key].get("detail", [])
+                              for block in section["blocks"] if block["type"] == kind)
+        contents = page.locator(".mobile-contents")
+        contents.locator("summary").press("Enter")
+        contents.get_by_role("link", name=section["title"], exact=True).press("Enter")
+        page.wait_for_url(base + f"topics/{key}.html#{section['id']}")
+        reference = page.locator(f"#{section['id']}")
+        page.keyboard.press("Tab")
+        if kind == "figure":
+            summary = reference.locator(".figure-description summary")
+            assert summary.evaluate("el => el === document.activeElement"), key
+            page.keyboard.press("Enter")
+            description = reference.locator(".figure-description[open]")
+            expected = block["text_equivalent"]
+            entries = expected if isinstance(expected, list) else [expected]
+            for entry in entries:
+                assert entry in description.inner_text(), key
+            assert reference.get_by_role("img", name=block["alt"], exact=True).is_visible(), key
+        else:
+            region = reference.get_by_role("region", name=block["caption"], exact=True)
+            assert region.evaluate("el => el === document.activeElement"), key
+            assert region.locator("thead th[scope=col]").count() == len(block["columns"]), key
+            assert region.locator("tbody tr").count() == len(block["rows"]), key
+            if region.evaluate("el => el.scrollWidth > el.clientWidth + 1"):
+                page.keyboard.press("ArrowRight")
+                page.wait_for_function("el => el.scrollLeft > 0", arg=region.element_handle())
+    print(f"Checked {len(routes)} overview and navigation pages at 390px and six keyboard reference routes")
+
+
+def check_flow_routes(page, base, lessons):
+    flows = [item for item in lessons if item.get("kind") == "flow"]
+    assert len(flows) == 6
+    page.goto(base + "tour.html#flows")
+    links = page.locator("#flows a")
+    assert links.evaluate_all("(links) => links.map(a => a.getAttribute('href'))") == [
+        f"topics/{flow['id']}.html" for flow in flows
+    ]
+    links.first.focus()
+    page.keyboard.press("Enter")
+    for index, item in enumerate(flows):
+        page.wait_for_url(base + f'topics/{item["id"]}.html')
+        assert page.locator("h1").inner_text() == item["title"]
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
+        assert page.locator("#next-decision .handoffs a").count() == len(item["touches"])
+        overview = item["touches"][0]
+        page.locator(f'#next-decision a[href="../topics/{overview}.html"]').click()
+        page.locator(f'#related-flows a[href="../topics/{item["id"]}.html"]').click()
+        if index + 1 < len(flows):
+            page.get_by_role("navigation", name="Reading order").get_by_role("link", name="Next topic").click()
+
+
+def check_build_reading_order(page, base):
+    order = ("local-dev-loop", "branch-commit-conventions", "code-review-practice",
+             "ci-integration-tests", "merge-rules", "image-build")
+    page.goto(base + "topics/ci-security-checks.html")
+    pilot_pager = page.get_by_role("navigation", name="Reading order")
+    assert pilot_pager.get_by_role("link", name="Next topic").count() == 0
+    page.goto(base + f"topics/{order[0]}.html")
+    for prior, current in zip(order, order[1:]):
+        pager = page.get_by_role("navigation", name="Reading order")
+        pager.get_by_role("link", name="Next topic").click()
+        page.wait_for_url(base + f"topics/{current}.html")
+        previous_link = pager.get_by_role("link", name="Previous topic")
+        assert previous_link.get_attribute("href") == f"{prior}.html"
+
+
+def check_figure_labels(page, base):
+    scripts = Path(__file__).resolve().parent
+    measure = (scripts / "figure_label_bounds.js").read_text()
+    fixture = scripts / "tests/fixtures/regression-card.svg"
+    page.set_content(fixture.read_text())
+    assert any("bottom of its box" in error for error in page.evaluate(measure)), (
+        "The original regression-scope card must fail its bottom padding check")
+    page.locator("rect").evaluate("rect => rect.setAttribute('height', '132')")
+    assert not page.evaluate(measure), "Increasing the card height should clear the label"
+    page.locator("text").evaluate("label => label.setAttribute('x', '330')")
+    assert any("right of its box" in error for error in page.evaluate(measure)), (
+        "A label outside its box must still be checked against that box")
+
+    figures = sorted((ROOT / "site/assets/figures").rglob("*.svg"))
+    assert figures, "No instructional figures found"
+    errors = []
+    for width, height in ((1280, 900), (320, 812)):
+        page.set_viewport_size({"width": width, "height": height})
+        for figure in figures:
+            route = figure.relative_to(ROOT / "site").as_posix()
+            response = page.goto(base + route)
+            assert response.ok, f"Missing built figure: {route}"
+            errors.extend(f"{route} at {width}px: {error}" for error in page.evaluate(measure))
+    assert not errors, "\n".join(errors)
+    print(f"Checked label bounds in {len(figures)} instructional figures at desktop and phone widths")
+
+
+def main(integration=False):
+    lessons = [item for file in sorted((ROOT / "content").glob("[0-9][0-9]-*.json"))
                for item in json.loads(file.read_text())]
     handler = functools.partial(ProjectSite, directory=str(DIST))
     with http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler) as server:
@@ -70,7 +247,11 @@ def main():
                 return_link.click()
                 assert page.locator(f"#{card_target}").get_attribute("aria-label") == "Record UAT decision"
                 page.go_back()
-                assert "Edition " in page.locator("footer small").inner_text()
+                footer = page.locator("footer small").inner_text()
+                label = "Integration preview · Unbound" if os.getenv("SDLC_INTEGRATION_PREVIEW") == "1" else "Edition "
+                assert footer.startswith(label), footer
+                commit = subprocess.check_output(["git", "rev-parse", "--short=8", "HEAD"], cwd=ROOT, text=True).strip()
+                assert footer.endswith(f" · Commit {commit}"), footer
                 page.emulate_media(color_scheme="light")
                 badge = page.locator(".activity-tag")
                 light_ink = badge.evaluate("el => getComputedStyle(el).color")
@@ -80,10 +261,10 @@ def main():
                 page.goto(base + "topics.html")
                 search = page.locator("#topic-search")
                 assert page.get_by_label("Section", exact=True).count() == 1
-                for query, lesson in (("rollback", "recover"), ("median", "measure"),
-                                      ("feature flag", "rollout"), ("security", "qa-tests")):
-                    search.fill(query)
-                    assert page.locator(f'.topic-row:visible a[href="topics/{lesson}.html"]').count() == 1
+                if integration:
+                    check_integration_catalog(page, base, lessons)
+                check_search(page, base, {item["id"]: item for item in lessons}, integration)
+                page.goto(base + "topics.html")
                 search.fill("unfindable-test-phrase")
                 assert page.locator(".topic-row:visible").count() == 0
                 search.fill(lessons[0]["title"])
@@ -93,13 +274,40 @@ def main():
                 page.locator("#clear-search").click()
                 phase = "Prove"
                 page.locator("#phase-select").select_option(phase)
-                assert page.locator(".topic-row:visible").count() == sum(t["phase"] == phase for t in lessons)
+                assert page.locator(".topic-row:visible").count() == sum(
+                    t["phase"] == phase and t.get("kind", "overview") == "overview" for t in lessons)
                 page.goto(base + "tour.html")
                 assert page.locator("#tour-stops a").count() > 1
+                define_links = page.locator("#intent .tour-deeper a")
+                expected = [f"topics/{item['id']}.html" for item in lessons
+                            if item.get("kind") == "deep-dive" and item["phase"] == "Define"]
+                assert define_links.evaluate_all("(links) => links.map(a => a.getAttribute('href'))") == expected
+                for section_phase, stop in (("Prove", "qualification"), ("Release", "release"), ("Learn", "learning")):
+                    order = [item["id"] for item in lessons
+                             if item.get("kind") == "deep-dive" and item["phase"] == section_phase]
+                    page.goto(base + f"tour.html#{stop}")
+                    links = page.locator(f"#{stop} .tour-deeper a")
+                    assert links.evaluate_all("(links) => links.map(a => a.getAttribute('href'))") == [
+                        f"topics/{key}.html" for key in order
+                    ]
+                    links.first.focus()
+                    page.keyboard.press("Enter")
+                    page.wait_for_url(base + f"topics/{order[0]}.html")
+                    for previous, current in zip(order, order[1:]):
+                        pager = page.get_by_role("navigation", name="Reading order")
+                        pager.get_by_role("link", name="Next topic").click()
+                        page.wait_for_url(base + f"topics/{current}.html")
+                        assert pager.get_by_role("link", name="Previous topic").get_attribute("href") == f"{previous}.html"
                 page.set_viewport_size({"width": 375, "height": 812})
                 for route in ("index.html", "topics.html", "tour.html", target, "topics/uat-decision.html"):
                     page.goto(base + route)
                     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1"), f"Viewport overflow: {route}"
+                page.set_viewport_size({"width": 390, "height": 844})
+                if integration:
+                    check_overview_routes_at_phone_width(page, base, lessons)
+                check_detail_routes(page, base, lessons)
+                check_build_reading_order(page, base)
+                check_flow_routes(page, base, lessons)
                 plain = browser.new_context(java_script_enabled=False)
                 text_page = plain.new_page()
                 text_page.goto(base)
@@ -108,6 +316,7 @@ def main():
                 text_page.locator(".topic-row a").first.click()
                 assert text_page.locator("#article #sources a").count() > 0
                 plain.close()
+                check_figure_labels(page, base)
                 assert not errors, "; ".join(errors)
                 browser.close()
         finally:
@@ -116,4 +325,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--integration", action="store_true", help="also require the full edition search probes")
+    main(parser.parse_args().integration)

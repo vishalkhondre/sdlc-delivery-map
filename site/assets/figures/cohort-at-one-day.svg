@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 468 389" role="img" aria-labelledby="title desc">
+<title id="title">Where were the requests at one day?</title><desc id="desc">Four bars use the same submitted cohort. The dashed line marks half the cohort.</desc>
+<defs><marker id="tip" viewBox="0 0 9 10" refX="8" refY="5" markerWidth="9" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 0 L9 5 L0 10 z" fill="#345765"/></marker></defs>
+<path fill="#f5f7f6" d="M0 0H468V389H0z"/>
+<text x="16" y="32" font-family="Arial, sans-serif" font-size="23" font-weight="700" text-anchor="start" fill="#162f40">Where were the requests at one day?</text>
+<text x="16" y="61" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="start" fill="#425c69">All 100 submissions had 24 hours of follow-up.</text>
+<text x="292.0" y="92" font-family="Arial, sans-serif" font-size="16" font-weight="700" text-anchor="middle" fill="#162f40">50%</text>
+<text x="16" y="121" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#162f40">Submitted</text>
+<rect x="170" y="105" width="244" height="20" fill="#dce3e6"/>
+<rect x="170" y="105" width="244.00" height="20" fill="#1b2a4e"/>
+<text x="424" y="121" font-family="Arial, sans-serif" font-size="18" font-weight="700" text-anchor="start" fill="#162f40">100</text>
+<text x="16" y="161" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#162f40">Assigned correctly</text>
+<rect x="170" y="145" width="244" height="20" fill="#dce3e6"/>
+<rect x="170" y="145" width="224.48" height="20" fill="#0f7c82"/>
+<text x="424" y="161" font-family="Arial, sans-serif" font-size="18" font-weight="700" text-anchor="start" fill="#162f40">92</text>
+<text x="16" y="201" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#162f40">Decided</text>
+<rect x="170" y="185" width="244" height="20" fill="#dce3e6"/>
+<rect x="170" y="185" width="97.60" height="20" fill="#316594"/>
+<text x="424" y="201" font-family="Arial, sans-serif" font-size="18" font-weight="700" text-anchor="start" fill="#162f40">40</text>
+<text x="16" y="241" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#162f40">Still open</text>
+<rect x="170" y="225" width="244" height="20" fill="#dce3e6"/>
+<rect x="170" y="225" width="146.40" height="20" fill="#75608f"/>
+<text x="424" y="241" font-family="Arial, sans-serif" font-size="18" font-weight="700" text-anchor="start" fill="#162f40">60</text>
+<path d="M292.0 97V251" stroke="#f5f7f6" stroke-width="4"/>
+<path d="M292.0 97V251" stroke="#273848" stroke-width="2" stroke-dasharray="5 4"/>
+<text x="16" y="276" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Decided and open split the cohort.</text>
+<text x="16" y="298" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Assignment is measured on the same requests.</text>
+<g data-label-box=""><rect x="16" y="313" width="436" height="65" rx="7" fill="#e7eef7" stroke="#61809d" stroke-width="1.5"/>
+<text x="28" y="339" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">0 of 100 assigned correctly within two minutes</text>
+<text x="28" y="364" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">The 92 correct assignments took 3–19 minutes.</text>
+</g>
+</svg>

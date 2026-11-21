@@ -16,7 +16,7 @@
       "Give the selected feature a measurable objective and testable boundaries. Agree who can accept the result and when the Product Owner will review production evidence."
     ],
     "evidence": "A feature brief links the problem, alternatives considered, chosen scope, success signal and criteria. The first Jira card in the diagram represents this upstream reasoning.",
-    "example": "Requesters say a decision takes two days. Sampling shows that many requests spend their first morning unassigned. The team prioritizes automatic routing for one eligible request type and leaves approver reminders for another decision.",
+    "example": "CC-100 starts with a two-day median from submission to decision. The team chooses automatic routing for one eligible request type. To learn how much of the wait comes before assignment, the analyst needs assignment times from comparable requests. The example has no baseline for that interval.",
     "failure": "If a sample reveals that work waits mainly after assignment, revisit the proposed change. Capture what changed the team's understanding so the same assumption is not repeated.",
     "measure": "A new team member can explain why this feature was selected, identify a plausible alternative and describe what observation would cause the Product Owner to reconsider.",
     "sources": [
@@ -83,7 +83,7 @@
     "measure": "Ask both whether the known version is healthy and whether users achieved the intended result. Each question has its own owner, review time and evidence.",
     "sources": [
       {
-        "title": "Microsoft Azure Well-Architected Framework · Safe deployments",
+        "title": "Microsoft Azure Well-Architected Framework · Architecture strategies for safe deployment practices",
         "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
       },
       {
@@ -125,6 +125,21 @@
         "title": "GitHub Docs · Pull requests",
         "url": "https://docs.github.com/en/pull-requests/reference/pull-requests"
       }
+    ],
+    "detail": [
+      {
+        "id": "handoffs-figure",
+        "title": "Read the four arrow styles",
+        "blocks": [
+          {
+            "type": "figure",
+            "src": "assets/figures/map-arrow-legend.svg",
+            "alt": "Four labeled arrow samples illustrate a next step, a handoff, a failure or recovery, and an evidence link.",
+            "caption": "One route from the delivery map for each arrow style",
+            "text_equivalent": "Solid navy means next step in the same lane, from Feature branch to Open pull request. Solid teal means handoff between lanes, from Open pull request in the repository to Run CI checks in GitHub Actions. Dashed red means failure or recovery path, from failed QA verification to Hold release. Dashed gray means linked record or evidence, from Record UAT decision to Validation summary in Confluence."
+          }
+        ]
+      }
     ]
   },
   {
@@ -144,7 +159,7 @@
       "Move an identifiable set of requests first. Reconcile completed, transferred and still-open cases. Retire the old path when the transition conditions hold and the responsible owner has recorded the result."
     ],
     "evidence": "A retirement record identifies affected users and integrations, communication, case reconciliation, the replacement route and owners for any remaining records. Capture the final service state after cutover.",
-    "example": "A new purchasing platform replaces the approval app. The team directs new submissions to the new platform while older requests remain available to their existing approvers. It checks for requests stranded between the two queues before closing the old path.",
+    "example": "Suppose a new purchasing platform replaces the approval app. The team directs new submissions to the new platform while older requests remain available to their existing approvers. It checks for requests stranded between the two queues before closing the old path.",
     "failure": "An unnoticed integration can continue submitting to a retired endpoint. Investigate residual traffic and establish a supported route before the final shutdown. Keep a contact for transition problems.",
     "measure": "Track remaining users and callers, outstanding requests, misdirected submissions and unresolved support cases. A quiet dashboard alone can hide a client that stopped sending work after the change.",
     "sources": [

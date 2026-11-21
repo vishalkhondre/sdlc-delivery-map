@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 545" role="img" aria-labelledby="title desc">
+<title id="title">Feature and defect status in Jira</title>
+<desc id="desc">Two independent workflows. The feature waits for business acceptance and the bug closes after retesting. Reopening the bug clears the resolution.</desc>
+<defs><marker id="arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7z" fill="#17666e"/></marker></defs>
+<rect width="680" height="545" rx="12" fill="#f5f7fa"/><path d="M311 24v465" stroke="#b7c8d7"/>
+<text x="22" y="35" fill="#183456" font-family="Arial, sans-serif" font-size="21" font-weight="bold">Feature · CC-123</text>
+<text x="329" y="35" fill="#183456" font-family="Arial, sans-serif" font-size="21" font-weight="bold">Bug · CC-131</text>
+<text x="22" y="60" fill="#183456" font-family="Arial, sans-serif" font-size="16" font-weight="normal">Tracks delivery of automatic routing</text>
+<text x="329" y="60" fill="#183456" font-family="Arial, sans-serif" font-size="16" font-weight="normal">Tracks the authorization defect</text>
+<g data-label-box="">
+<rect x="22" y="84" width="158" height="36" rx="6" fill="white" stroke="#98adbe"/>
+<text x="32" y="108" fill="#183456" font-family="Arial, sans-serif" font-size="16" font-weight="bold">In development</text>
+</g>
+<g data-label-box="">
+<rect x="22" y="145" width="158" height="36" rx="6" fill="white" stroke="#98adbe"/>
+<text x="32" y="169" fill="#183456" font-family="Arial, sans-serif" font-size="16" font-weight="bold">In review</text>
+</g>
+<path d="M98 120 V141" fill="none" stroke="#17666e" stroke-width="2" marker-end="url(#arrow)"/>
+<g data-label-box="">
+<rect x="22" y="206" width="158" height="36" rx="6" fill="white" stroke="#98adbe"/>
+<text x="32" y="230" fill="#183456" font-family="Arial, sans-serif" font-size="16" font-weight="bold">Ready for QA</text>
+</g>
+<path d="M98 181 V202" fill="none" stroke="#17666e" stroke-width="2" marker-end="url(#arrow)"/>
+<g data-label-box="">
+<rect x="22" y="267" width="158" height="36" rx="6" fill="white" stroke="#98adbe"/>
+<text x="32" y="291" fill="#183456" font-family="Arial, sans-serif" font-size="16" font-weight="bold">In QA</text>
+</g>
+<path d="M98 242 V263" fill="none" stroke="#17666e" stroke-width="2" marker-end="url(#arrow)"/>
+<g data-label-box="">
+<rect x="22" y="328" width="158" height="36" rx="6" fill="white" stroke="#98adbe"/>
+<text x="32" y="352" fill="#183456" font-family="Arial, sans-serif" font-size="16" font-weight="bold">In UAT</text>
+</g>
+<path d="M98 303 V324" fill="none" stroke="#17666e" stroke-width="2" marker-end="url(#arrow)"/>
+<g data-label-box="">
+<rect x="22" y="389" width="158" height="36" rx="6" fill="white" stroke="#98adbe"/>
+<text x="32" y="413" fill="#183456" font-family="Arial, sans-serif" font-size="16" font-weight="bold">Ready for release</text>
+</g>
+<path d="M98 364 V385" fill="none" stroke="#17666e" stroke-width="2" marker-end="url(#arrow)"/>
+<g data-label-box="">
+<rect x="22" y="450" width="158" height="36" rx="6" fill="white" stroke="#98adbe"/>
+<text x="32" y="474" fill="#183456" font-family="Arial, sans-serif" font-size="16" font-weight="bold">Released</text>
+</g>
+<path d="M98 425 V446" fill="none" stroke="#17666e" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M180 350 H202 V318 H163 V325" fill="none" stroke="#17666e" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="207" y="342" fill="#183456" font-family="Arial, sans-serif" font-size="14" font-weight="normal">Hold until</text>
+<text x="207" y="361" fill="#183456" font-family="Arial, sans-serif" font-size="14" font-weight="normal">accepted</text>
+<g data-label-box="">
+<rect x="329" y="84" width="158" height="36" rx="6" fill="white" stroke="#98adbe"/>
+<text x="339" y="108" fill="#183456" font-family="Arial, sans-serif" font-size="16" font-weight="bold">New</text>
+</g>
+<g data-label-box="">
+<rect x="329" y="162" width="158" height="36" rx="6" fill="white" stroke="#98adbe"/>
+<text x="339" y="186" fill="#183456" font-family="Arial, sans-serif" font-size="16" font-weight="bold">Triaged</text>
+</g>
+<path d="M392 120 V158" fill="none" stroke="#17666e" stroke-width="2" marker-end="url(#arrow)"/>
+<g data-label-box="">
+<rect x="329" y="240" width="158" height="36" rx="6" fill="white" stroke="#98adbe"/>
+<text x="339" y="264" fill="#183456" font-family="Arial, sans-serif" font-size="16" font-weight="bold">In progress</text>
+</g>
+<path d="M392 198 V236" fill="none" stroke="#17666e" stroke-width="2" marker-end="url(#arrow)"/>
+<g data-label-box="">
+<rect x="329" y="318" width="158" height="36" rx="6" fill="white" stroke="#98adbe"/>
+<text x="339" y="342" fill="#183456" font-family="Arial, sans-serif" font-size="16" font-weight="bold">Ready for retest</text>
+</g>
+<path d="M392 276 V314" fill="none" stroke="#17666e" stroke-width="2" marker-end="url(#arrow)"/>
+<g data-label-box="">
+<rect x="329" y="396" width="158" height="36" rx="6" fill="white" stroke="#98adbe"/>
+<text x="339" y="420" fill="#183456" font-family="Arial, sans-serif" font-size="16" font-weight="bold">Closed</text>
+</g>
+<path d="M392 354 V392" fill="none" stroke="#17666e" stroke-width="2" marker-end="url(#arrow)"/>
+<g data-label-box="">
+<rect x="531" y="162" width="128" height="36" rx="6" fill="white" stroke="#98adbe"/>
+<text x="541" y="186" fill="#183456" font-family="Arial, sans-serif" font-size="16" font-weight="bold">Deferred</text>
+</g>
+<path d="M487 172 H527" fill="none" stroke="#17666e" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M531 188 H491" fill="none" stroke="#17666e" stroke-width="2" marker-end="url(#arrow)"/>
+<g data-label-box="">
+<rect x="531" y="318" width="128" height="36" rx="6" fill="white" stroke="#98adbe"/>
+<text x="541" y="342" fill="#183456" font-family="Arial, sans-serif" font-size="16" font-weight="bold">Reopened</text>
+</g>
+<path d="M487 336 H527" fill="none" stroke="#17666e" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M590 318 V258 H491" fill="none" stroke="#17666e" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M487 414 H590 V358" fill="none" stroke="#17666e" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="401" y="377" fill="#183456" font-family="Arial, sans-serif" font-size="14" font-weight="normal">Retest passed</text>
+<text x="508" y="442" fill="#183456" font-family="Arial, sans-serif" font-size="14" font-weight="normal">Clear resolution</text>
+<text x="508" y="459" fill="#183456" font-family="Arial, sans-serif" font-size="14" font-weight="normal">when reopening</text>
+<text x="333" y="458" fill="#183456" font-family="Arial, sans-serif" font-size="14" font-weight="normal">Resolution: Fixed</text>
+<text x="22" y="528" fill="#183456" font-family="Arial, sans-serif" font-size="16" font-weight="normal">A separate issue link records that the bug blocks the feature.</text>
+</svg>

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 544" role="img" aria-labelledby="title desc">
+<title id="title">PR-42: a hypothetical failed check</title><desc id="desc">In this hypothetical example, open the failed required check and inspect its output and tested revision. Push the fix to PR-42 and inspect the new run. A red or missing required result blocks merge. A green result returns the PR to review. CC-123 links to the PR and preserves links to the failed and passing runs.</desc>
+<defs><marker id="tip" viewBox="0 0 9 10" refX="8" refY="5" markerWidth="9" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 0 L9 5 L0 10 z" fill="#345765"/></marker></defs>
+<path fill="#f5f7f6" d="M0 0H440V544H0z"/>
+<text x="16" y="32" font-family="Arial, sans-serif" font-size="23" font-weight="700" text-anchor="start" fill="#162f40">PR-42: a hypothetical failed check</text>
+<g data-label-box=""><rect x="16" y="54" width="408" height="87" rx="7" fill="#fff0e1" stroke="#aa622a" stroke-width="1.5"/>
+<text x="28" y="80" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Open the failed required check</text>
+<text x="28" y="105" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Inspect the tested revision. The unit check found</text>
+<text x="28" y="127" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">an empty assignment history after submission.</text>
+</g>
+<path d="M220 141V163" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="16" y="164" width="408" height="65" rx="7" fill="#ffffff" stroke="#92a5ae" stroke-width="1.5"/>
+<text x="28" y="190" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Fix the cause on the same PR</text>
+<text x="28" y="215" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Push to PR-42 and open the new run.</text>
+</g>
+<path d="M220 229V251" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="16" y="252" width="408" height="65" rx="7" fill="#e7eef7" stroke="#61809d" stroke-width="1.5"/>
+<text x="28" y="278" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Did the required check pass?</text>
+<text x="28" y="303" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Match the result to the updated revision.</text>
+</g>
+<path d="M220 317V334" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round"/>
+<path d="M220 334H114V356" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<path d="M220 334H326V356" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="16" y="357" width="196" height="87" rx="7" fill="#fff0e1" stroke="#aa622a" stroke-width="1.5"/>
+<text x="28" y="383" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Red or missing</text>
+<text x="28" y="408" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Keep merge blocked.</text>
+<text x="28" y="430" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Inspect and repair.</text>
+</g>
+<g data-label-box=""><rect x="228" y="357" width="196" height="87" rx="7" fill="#e1f0e9" stroke="#4e816c" stroke-width="1.5"/>
+<text x="240" y="383" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Passed</text>
+<text x="240" y="408" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Resume PR review.</text>
+<text x="240" y="430" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Check merge rules.</text>
+</g>
+<text x="16" y="482" font-family="Arial, sans-serif" font-size="18" font-weight="700" text-anchor="start" fill="#162f40">CC-123 stays In review.</text>
+<text x="16" y="506" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#162f40">Link PR-42 and its failed and passing runs here.</text>
+<text x="16" y="527" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#162f40">This pre-merge repair stays on the story.</text>
+</svg>

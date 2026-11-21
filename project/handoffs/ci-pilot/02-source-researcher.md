@@ -1,0 +1,5 @@
+# Worked-example brief
+
+Follow the illustrative PR-42 for CC-123. AC-01 requires the first assignment actor and recipient after submission. AC-02 requires denial and an unchanged pending request for an unauthorized decision. The coverage example is 31 of 50 new executable lines, against an illustrative minimum of 80%. Branch and line denominators must be identified. Keep CC-123 In review while an example required check fails. A separate security triage record is a hypothetical example, distinct from the historical QA defect CC-131. Avoid invented production observations.
+
+The shared check names are unit tests, lint, new-line coverage, quality gate and dependency review (required); type check (informational). The coverage policy uses a separately identified new-line metric. Show whether the scanner or a CI check actually enforces each rule. Do not introduce a Kiwi example into a CI lesson unless required. Any later Kiwi behavior must name the verified version and disclose the documentation/source basis and absence of a live Kiwi–Jira demonstration.

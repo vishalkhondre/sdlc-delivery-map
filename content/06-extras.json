@@ -36,7 +36,7 @@
         "url": "https://dora.dev/capabilities/deployment-automation/"
       },
       {
-        "title": "GOV.UK · How to set performance metrics",
+        "title": "GOV.UK · How to set performance metrics for your service",
         "url": "https://www.gov.uk/service-manual/measuring-success/how-to-set-performance-metrics-for-your-service"
       }
     ]
@@ -54,10 +54,10 @@
     "steps": [
       "Start in the qualification record at production.actual_digest. Compare it with the authorized digest and both tested digests. Read the runtime revision and configuration separately. Different configuration names are expected across environments. Look for evidence that the relevant role mapping was checked.",
       "Follow the candidate back to the integrated commit and build run. Read the QA observations. The assignment actor identifies automatic routing; the actual recipient tests the rule. The negative decision attempt and resulting request state test authorization. UAT adds a business scenario and a designated decision maker.",
-      "Open the CSV. Each row is a different eligible submission observed for 1,440 minutes. Blank assignment and decision fields mean that event had not occurred by the end of observation. Filter open_at_one_day to true, count the rows and divide by all 100.",
+      "Open the CSV. Each row is a different eligible submission observed for 1,440 minutes. A blank correct-assignment or decision time means the export has no record of that event by the cutoff. Filter open_at_one_day to true, count the rows and divide by all 100.",
       "Trace in the opposite direction. Start at the feature objective, find the criteria, then the qualified version, smoke result and product review. Identify which decision you could still justify if the passing smoke test were the only production evidence."
     ],
-    "evidence": "In the corrected prod-r42 pilot, 24 of 24 eligible requests reached the correct approver within two minutes. The later CSV follows a different 100 submissions. For the 92 with a correct assignment, the minimum was 3 minutes and the maximum was 19. None of the 100 met the two-minute window. EX-093 through EX-100 have a blank assignment time: these eight had no correct assignment by 24 hours. The Service Owner owns their investigation and reconciliation. INC-7 concerned eight earlier pilot requests and is excluded from this cohort.",
+    "evidence": "In the corrected prod-r42 pilot, 24 of 24 eligible requests reached the correct approver within two minutes. The later CSV follows a different 100 submissions. For the 92 with a correct assignment, the minimum was 3 minutes and the maximum was 19. None of the 100 met the two-minute window. EX-093 through EX-100 have a blank assignment time: these eight had no recorded correct assignment by 24 hours. The Service Owner owns their investigation and reconciliation. INC-7 concerned eight earlier pilot requests and is excluded from this cohort.",
     "example": "The first 40 decisions in the CSV each took less than one day. Sixty other records are open at 24 hours. A statistic calculated from those first 40 alone drops most of the eligible requests. The cohort median for decisions was not reached within the one-day window.",
     "failure": "Matching digests cannot establish that the correct groups were configured in Prod. Conversely, the cohort cannot show which release handled a particular request without an exposure or revision link. Real teams record that link where it is needed for analysis.",
     "measure": "After inspecting the files, explain why the team can report a successful rollout and still open follow-up work. Point to the smoke observation and the unresolved share as your two pieces of evidence.",
@@ -75,8 +75,23 @@
         "url": "https://dora.dev/capabilities/deployment-automation/"
       },
       {
-        "title": "GOV.UK · How to set performance metrics",
+        "title": "GOV.UK · How to set performance metrics for your service",
         "url": "https://www.gov.uk/service-manual/measuring-success/how-to-set-performance-metrics-for-your-service"
+      }
+    ],
+    "detail": [
+      {
+        "id": "candidate-evidence",
+        "title": "Follow the evidence in either direction",
+        "blocks": [
+          {
+            "type": "figure",
+            "src": "assets/figures/flow-traceability.svg",
+            "alt": "Evidence chain from the reviewed change through acceptance and authorization to the running production revision.",
+            "caption": "Trace the candidate forward or begin at a production observation and work back.",
+            "text_equivalent": "PR-42’s integrated commit produces build-418 and its published digest for linux/amd64. qa-204 tests that candidate on qa-r17 with qa-routing-3. uat-80 rejects unit B’s wrong recipient. The routing mapping changes while the image digest stays fixed. The team records affected QA checks in qa-209 and a fresh uat-82 acceptance on uat-r9 with uat-routing-6. “May we deploy?” is answered by the recorded authorization for that digest after configuration review. “What ran?” is answered by prod-rollout-87: prod-r41 on prod-routing-10 failed with INC-7, while prod-r42 on prod-routing-11 with the same digest passed controlled smoke and observation. Read the links backwards from smoke and actual revision through authorization, decisions, digest and build to the integrated commit and PR-42."
+          }
+        ]
       }
     ]
   }
