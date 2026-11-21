@@ -8,3 +8,5 @@ A fresh reviewer followed the tour and the six new pages, checking each against 
 | Q7 | merge-rules names five required results: unit tests, lint, new-line coverage, quality gate and dependency review. Type check is informational. The supplemental database result informs the reviewer. |
 | Q1–Q6 | The original six CI pilot pages retain the failing test, untouched lint file, 31/50 coverage calculation, manually assigned fixture, SonarQube disposition and dependency triage answers. code-review-practice also demonstrates the fixture correction. |
 | Q8 and Q14 | criteria-to-tests and jira-workflow retain the candidate-specific evidence and seven map-step status handoffs. The later cross-cutting flows are outside this gate. |
+
+In the final preview check, Next topic stopped at the branch overview's last child. The new pager connects the six Build lessons across their five parents. A second check caught an extra Next link on the pilot security lesson. After correction, the reviewer followed all six Build pages and all six original pilot pages in both directions and checked all twelve parent breadcrumbs. Both sequences end at their intended final lesson.
