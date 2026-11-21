@@ -49,7 +49,7 @@ TOUR = [
     ("learning", "Release & Learn", "Decide what to do next", "The Product Owner reviews the time to assignment, the time to decision and the requests still open after one day. Requesters and approvers explain what they experienced.",
      ("measure", "feedback"), "Forty of 100 requests reached a decision by one day. Did the cohort reach its one-day median target?", "With a full day of follow-up, 60% remained open at one day. Fewer than half had received a decision, so the median was not reached by that milestone."),
 ]
-TOUR_DEPTH_PHASES = {"intent": "Define", "qualification": "Prove", "release": "Release"}
+TOUR_DEPTH_PHASES = {"intent": "Define", "qualification": "Prove", "release": "Release", "learning": "Learn"}
 BUILD_READING_ORDER = ("local-dev-loop", "branch-commit-conventions", "code-review-practice",
                        "ci-integration-tests", "merge-rules", "image-build")
 BRANCHES = {
@@ -74,6 +74,12 @@ BRANCHES = {
     "rollback-rollforward": [("flow-bug-prod", "Reconcile the requests affected by INC-7")],
     "data-change-coordination": [("rollback-rollforward", "Check compatibility before restoring a revision")],
     "release-notes-practice": [("evidence-record", "Verify the availability claim"), ("flow-bug-prod", "Read the rollout and recovery history")],
+    "instrumentation": [("alert-design", "Turn a routing observation into an alert")],
+    "alert-design": [("incident-lifecycle", "Act on a confirmed routing failure")],
+    "incident-lifecycle": [("flow-bug-prod", "Check the eight request dispositions"), ("hotfix-flow", "Follow the alternative code-repair path")],
+    "hotfix-flow": [("change-approval", "Check emergency authority"), ("rollback-rollforward", "Choose a compatible recovery")],
+    "outcome-analysis": [("evidence-record", "Check the cohort and rollout evidence"), ("feedback-to-backlog", "Decide what to investigate on CC-100")],
+    "feedback-to-backlog": [("outcome-analysis", "Reproduce the cohort counts"), ("refinement-ready", "Refine the proposed follow-up")],
     "release-plan": [("release", "Publish the accepted version")],
     "release": [("policy", "Check production eligibility")],
     "rollout": [("observe", "Observe the running revision")],
@@ -355,7 +361,7 @@ def topic_page(key, topics, area_by_id):
     elif kind == "flow":
         nav_name = "Flows"
         same_phase = [topics[k] for k in keys]
-    if kind == "deep-dive" and phase in {"Prove", "Release"}:
+    if kind == "deep-dive" and phase in {"Prove", "Release", "Learn"}:
         keys = [k for k, item in topics.items() if item.get("kind") == kind and item["phase"] == phase]
     elif key in BUILD_READING_ORDER:
         keys = [topic_id for topic_id in BUILD_READING_ORDER if topic_id in topics]
@@ -413,7 +419,7 @@ def topic_page(key, topics, area_by_id):
                           (f'<ul class="handoffs">{choices}</ul>' if choices else '')+
                           (f'<a href="../tour.html#{tour_id}">Open this stop in the guided tour</a> · ' if tour_id else '')+
                           f'<a href="../index.html#{back_id}">Return to the map</a>'))
-    if key == "evidence-record":
+    if key in {"evidence-record", "outcome-analysis"}:
         files = sorted((SITE/"assets"/"examples").glob("*"))
         if files:
             links = [f'<li><a href="../assets/examples/{e(f.name)}" download>{e(f.stem.replace("-", " ").replace("_"," ").capitalize())} ({e(f.suffix.lstrip(".").upper())})</a></li>' for f in files if f.is_file()]
