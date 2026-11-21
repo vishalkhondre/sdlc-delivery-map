@@ -49,11 +49,15 @@ TOUR = [
     ("learning", "Release & Learn", "Decide what to do next", "The Product Owner reviews the time to assignment, the time to decision and the requests still open after one day. Requesters and approvers explain what they experienced.",
      ("measure", "feedback"), "Forty of 100 requests reached a decision by one day. Did the cohort reach its one-day median target?", "With a full day of follow-up, 60% remained open at one day. Fewer than half had received a decision, so the median was not reached by that milestone."),
 ]
+BUILD_READING_ORDER = ("local-dev-loop", "branch-commit-conventions", "code-review-practice",
+                       "ci-integration-tests", "merge-rules", "image-build")
 BRANCHES = {
     "define": [("criteria", "Agree the business rules"), ("measure", "Plan how to measure the result")],
     "branch": [("pull-request", "Open the change for review")],
     "pull-request": [("ci", "Run the required checks"), ("branch", "Address review feedback")],
     "merge": [("build", "Build the integrated revision")],
+    "image-build": [("evidence-record", "Open the qualification record and its download"),
+                    ("qa-rollout", "Follow the candidate into QA")],
     "build": [("digest", "Identify the output"), ("qa-rollout", "Select the QA candidate")],
     "digest": [("registry", "Locate the artifact"), ("qa-rollout", "Deploy by digest")],
     "qa-rollout": [("registry", "Pull the candidate"), ("qa-revision", "Confirm the running version")],
@@ -333,6 +337,10 @@ def topic_page(key, topics, area_by_id):
     elif kind == "flow":
         nav_name = "Flows"
         same_phase = [topics[k] for k in keys]
+    if key in BUILD_READING_ORDER:
+        keys = [topic_id for topic_id in BUILD_READING_ORDER if topic_id in topics]
+    elif parent:
+        keys = [topic_id for topic_id in keys if topic_id not in BUILD_READING_ORDER]
     ordinal=keys.index(key)
     nav_items=''.join(f'<li><a href="{e(item["id"])}.html"'+(' aria-current="page"' if item["id"]==key else '')+f'>{e(item["title"])}</a></li>' for item in same_phase)
     map_key = parent or key
@@ -359,7 +367,7 @@ def topic_page(key, topics, area_by_id):
         result.append(section("go-deeper", "Go deeper", f'<ul>{links}</ul>'))
     branches = BRANCHES.get(key, [])
     if parent:
-        branches = [(parent, "Return to the overview")]
+        branches = [(parent, "Return to the overview"), *branches]
     elif kind == "flow":
         branches = [(other, "Workflow step") for other in t["touches"]]
     if not branches:

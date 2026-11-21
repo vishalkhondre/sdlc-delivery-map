@@ -75,6 +75,21 @@ def check_detail_routes(page, base, lessons):
         page.wait_for_url(base + f"topics/{parent}.html")
 
 
+def check_build_reading_order(page, base):
+    order = ("local-dev-loop", "branch-commit-conventions", "code-review-practice",
+             "ci-integration-tests", "merge-rules", "image-build")
+    page.goto(base + "topics/ci-security-checks.html")
+    pilot_pager = page.get_by_role("navigation", name="Reading order")
+    assert pilot_pager.get_by_role("link", name="Next topic").count() == 0
+    page.goto(base + f"topics/{order[0]}.html")
+    for prior, current in zip(order, order[1:]):
+        pager = page.get_by_role("navigation", name="Reading order")
+        pager.get_by_role("link", name="Next topic").click()
+        page.wait_for_url(base + f"topics/{current}.html")
+        previous_link = pager.get_by_role("link", name="Previous topic")
+        assert previous_link.get_attribute("href") == f"{prior}.html"
+
+
 def main(integration=False):
     lessons = [item for file in sorted((ROOT / "content").glob("[0-9][0-9]-*.json"))
                for item in json.loads(file.read_text())]
@@ -156,6 +171,7 @@ def main(integration=False):
                     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1"), f"Viewport overflow: {route}"
                 page.set_viewport_size({"width": 390, "height": 844})
                 check_detail_routes(page, base, lessons)
+                check_build_reading_order(page, base)
                 plain = browser.new_context(java_script_enabled=False)
                 text_page = plain.new_page()
                 text_page.goto(base)
