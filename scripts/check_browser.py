@@ -90,6 +90,33 @@ def check_build_reading_order(page, base):
         assert previous_link.get_attribute("href") == f"{prior}.html"
 
 
+def check_figure_labels(page, base):
+    scripts = Path(__file__).resolve().parent
+    measure = (scripts / "figure_label_bounds.js").read_text()
+    fixture = scripts / "tests/fixtures/regression-card.svg"
+    page.set_content(fixture.read_text())
+    assert any("bottom of its box" in error for error in page.evaluate(measure)), (
+        "The original regression-scope card must fail its bottom padding check")
+    page.locator("rect").evaluate("rect => rect.setAttribute('height', '132')")
+    assert not page.evaluate(measure), "Increasing the card height should clear the label"
+    page.locator("text").evaluate("label => label.setAttribute('x', '330')")
+    assert any("right of its box" in error for error in page.evaluate(measure)), (
+        "A label outside its box must still be checked against that box")
+
+    figures = sorted((ROOT / "site/assets/figures").rglob("*.svg"))
+    assert figures, "No instructional figures found"
+    errors = []
+    for width, height in ((1280, 900), (320, 812)):
+        page.set_viewport_size({"width": width, "height": height})
+        for figure in figures:
+            route = figure.relative_to(ROOT / "site").as_posix()
+            response = page.goto(base + route)
+            assert response.ok, f"Missing built figure: {route}"
+            errors.extend(f"{route} at {width}px: {error}" for error in page.evaluate(measure))
+    assert not errors, "\n".join(errors)
+    print(f"Checked label bounds in {len(figures)} instructional figures at desktop and phone widths")
+
+
 def main(integration=False):
     lessons = [item for file in sorted((ROOT / "content").glob("[0-9][0-9]-*.json"))
                for item in json.loads(file.read_text())]
@@ -192,6 +219,7 @@ def main(integration=False):
                 text_page.locator(".topic-row a").first.click()
                 assert text_page.locator("#article #sources a").count() > 0
                 plain.close()
+                check_figure_labels(page, base)
                 assert not errors, "; ".join(errors)
                 browser.close()
         finally:

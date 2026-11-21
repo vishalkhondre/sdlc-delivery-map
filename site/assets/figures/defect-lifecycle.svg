@@ -5,27 +5,41 @@
 <rect width="620" height="654" rx="12" fill="#f3f6f8"/>
 <text x="24" y="39" font-family="Arial,sans-serif" font-size="25" font-weight="700" fill="#183452">CC-131 · Authorization defect</text>
 <text x="24" y="68" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">Jira states in the example team&#x27;s workflow</text>
+<g data-label-box="">
 <rect x="24" y="93" width="244" height="67" rx="8" stroke="#97acba" fill="#ffffff"/>
 <text x="38" y="120" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#183452">New</text>
 <text x="38" y="145" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">QA reports TC-04 · qa-196</text>
+</g>
+<g data-label-box="">
 <rect x="24" y="184" width="244" height="67" rx="8" stroke="#97acba" fill="#ffffff"/>
 <text x="38" y="211" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#183452">Triaged</text>
 <text x="38" y="236" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">QA and product assess</text>
+</g>
+<g data-label-box="">
 <rect x="329" y="184" width="244" height="67" rx="8" stroke="#97acba" fill="#ffffff"/>
 <text x="343" y="211" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#183452">Deferred</text>
 <text x="343" y="236" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">Resolution stays unset</text>
+</g>
+<g data-label-box="">
 <rect x="24" y="284" width="244" height="67" rx="8" stroke="#97acba" fill="#ffffff"/>
 <text x="38" y="311" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#183452">In progress</text>
 <text x="38" y="336" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">Developer fixes the cause</text>
+</g>
+<g data-label-box="">
 <rect x="24" y="382" width="244" height="67" rx="8" stroke="#97acba" fill="#ffffff"/>
 <text x="38" y="409" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#183452">Ready for retest</text>
 <text x="38" y="434" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">QA receives build-415</text>
+</g>
+<g data-label-box="">
 <rect x="329" y="382" width="244" height="67" rx="8" stroke="#97acba" fill="#fff2e3"/>
 <text x="343" y="409" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#183452">Reopened</text>
 <text x="343" y="434" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">Failure still observable</text>
+</g>
+<g data-label-box="">
 <rect x="24" y="499" width="244" height="67" rx="8" stroke="#97acba" fill="#e2f3ef"/>
 <text x="38" y="526" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#183452">Closed</text>
 <text x="38" y="551" font-family="Arial,sans-serif" font-size="17" font-weight="400" fill="#183452">Resolution set to Fixed</text>
+</g>
 <path d="M145 160V181" fill="none" stroke="#235e70" stroke-width="2.5" marker-end="url(#tip)"/>
 <path d="M145 251V281" fill="none" stroke="#235e70" stroke-width="2.5" marker-end="url(#tip)"/>
 <path d="M145 351V379" fill="none" stroke="#235e70" stroke-width="2.5" marker-end="url(#tip)"/>

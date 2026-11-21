@@ -14,9 +14,11 @@ def text(x, y, words, size=17, weight=400):
 
 
 def state(x, y, name, evidence, tint="#ffffff"):
+    parts.append('<g data-label-box="">')
     parts.append(f'<rect x="{x}" y="{y}" width="244" height="67" rx="8" stroke="#97acba" fill="{tint}"/>')
     text(x + 14, y + 27, name, 20, 700)
     text(x + 14, y + 52, evidence)
+    parts.append("</g>")
 
 
 def arrow(path):

@@ -18,10 +18,12 @@ def label(x, y, value, size=17, color="#152f50", bold=False, center=False):
 
 
 def box(x, y, width, height, title, note, background="#ffffff", border="#b2c2cf"):
+    parts.append('<g data-label-box="">')
     parts.append(f'<rect x="{x}" y="{y}" width="{width}" height="{height}" rx="8" '
                  f'fill="{background}" stroke="{border}"/>')
     label(x + 13, y + 24, title, bold=True)
     label(x + 13, y + 45, note, size=15)
+    parts.append("</g>")
 
 
 def path(d, arrow=True):
