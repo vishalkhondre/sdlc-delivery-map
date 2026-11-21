@@ -185,6 +185,15 @@
         "build": "build-422",
         "image_digest": "sha256:ad1985a0d6e0fe53eab9a6fdcd1d8acb4823434ae8e9ec257936d912fe95b78e",
         "qa_run": "qa-196"
+      },
+      "test_management_evidence": {
+        "tool": "Kiwi TCMS",
+        "map_label": "Test Management Tool",
+        "failed_execution": "TC-04 in qa-196 against build-422",
+        "defect_reference": "The Kiwi execution stores the URL of CC-131 in Jira.",
+        "jira_evidence": "For an API-created issue, verify the originating execution URL in the description. For an existing issue, verify any requested tracker comment separately.",
+        "feature_link": "Triage links CC-131 to CC-123 in Jira.",
+        "retest": "Keep the failed qa-196 execution. Record the TC-04 retest in qa-198 on build-423. The triage owner decides closure or reopening in Jira."
       }
     },
     "configuration_follow_up": {

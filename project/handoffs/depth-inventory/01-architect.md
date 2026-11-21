@@ -1,6 +1,6 @@
 # Architect handoff for Gate 1
 
-The inventory pairs all 40 proposed deep dives with existing overview IDs, and identifies what six cross-cutting flows follow. Each row specifies the intended learner, handoff, worked sample and primary sources to check. The six proposed overview additions reuse figures or use decision tables. The CI pilot is limited to the six approved subjects. The owner has four decisions to make before authoring begins.
+The inventory pairs all 40 proposed deep dives with existing overview IDs, and identifies what six cross-cutting flows follow. Each row specifies the intended learner, handoff, worked sample and primary sources to check. The six proposed overview additions reuse figures or use decision tables. The CI pilot is limited to the six approved subjects. The owner selected Kiwi TCMS for the named example. Three decisions remain before authoring begins.
 
 Use content/dataset.json for shared values. The accepted feature trace and existing downloads remain authoritative for edition 1.0.2. The proposed records are fictional fixtures for later lessons. PR-42 can open before PR-47 and merge later. The maintenance and integrated build sequences are distinct. A code repair changes the digest; the uat-80 rejection required a mapping change and requalification on the same digest. TC-05 and TC-06 exercise the proposed inclusive two-minute limit. Never cite qa-204 as proof of AC-03. The eight outstanding post-pilot submissions have a different population and ownership task from the eight already reconciled during INC-7.
 
@@ -13,3 +13,5 @@ On 21 November 2026 the architect opened the following versioned SonarQube Serve
 - [Quality gates](https://docs.sonarsource.com/sonarqube-server/2025.1/instance-administration/analysis-functions/quality-gates)
 - [Introduction to pull request analysis](https://docs.sonarsource.com/sonarqube-server/2025.1/analyzing-source-code/pull-request-analysis/introduction)
 - [Editing issues](https://docs.sonarsource.com/sonarqube-server/2025.1/user-guide/issues/managing)
+
+For Prove and the QA defect flow, use the checked Kiwi sources and direction table in the inventory. The failed execution stores the Jira issue URL. New-issue reporting and optional commenting on an existing issue leave different evidence in Jira. Verify both endpoints before drawing the arrows.
