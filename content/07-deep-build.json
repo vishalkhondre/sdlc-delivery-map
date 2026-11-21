@@ -16,7 +16,7 @@
     "inputs": [
       "The developer’s pull request (PR-42) for feature CC-123 proposes a change to main, the shared branch. The test merge tree is the file snapshot GitHub prepares by temporarily combining the proposal with main.",
       "The workflow in .github/workflows/, its event and checked-out revision",
-      "Pinned test dependencies, synthetic routing data and the required check names on main"
+      "The exact versions of the tools used by the tests, fictional requests for checking routing, and the names of the checks the shared branch requires."
     ],
     "steps": [
       "Open PR-42’s Checks tab and select the run for the current proposal. Confirm the event and tested revision in its log.",
@@ -205,11 +205,7 @@
         "blocks": [
           {
             "type": "text",
-            "value": "Find the event, the checkout and the producer of each named result. Trace the dependency only where one job consumes another’s output, then locate the repository rule that turns a result into a merge decision."
-          },
-          {
-            "type": "text",
-            "value": "For the custom changed-line coverage check, diff-cover is an off-the-shelf alternative. From the same tested revision, export coverage.py’s results as Cobertura XML with coverage xml and give diff-cover the saved target revision as its comparison base. Its --fail-under=80 option returns a failing exit status below the threshold. Check the file paths, included lines and comparison base against the team’s 31-of-50 example before adopting it; the custom script reads JSON."
+            "value": "On another platform, trace each required result to the job that produced it and the revision it actually checked. An off-the-shelf alternative to the custom JSON script is diff-cover: export Cobertura XML with coverage xml and compare against the saved target revision. Set --fail-under=80 to return a failure below the threshold, then confirm that the same files and lines reproduce the 31-of-50 example."
           }
         ]
       }
@@ -410,7 +406,7 @@
     "owner": "The developer who proposed the change investigates the first failure. The module owner reviews changes outside the feature, and the maintainer of the automated checks owns the rule configuration and check scope.",
     "inputs": [
       "The pull request (PR) and the job log, which records the commands and their results. Identify the version checked and the version of the shared code it targets.",
-      "A read-only checkout, the repository’s Python tool lockfile, pyproject.toml and the paths selected for checking"
+      "A read-only copy of the code. The lockfile lists exact tool versions, and the pyproject.toml file contains the project settings. Identify which directories the job checks."
     ],
     "steps": [
       "Open the named check on the PR. Read the first diagnostic with its path, location and rule. Confirm the revision, installed tool version and command.",
@@ -592,7 +588,7 @@
       "CI maintainer"
     ],
     "summary": "The team wants to know how much of the changed code its tests actually ran. In this example the tests reach 31 of 50 new lines, below the team’s minimum. Even reaching every line would leave a second question: did the test check that the right person received the request?",
-    "owner": "The developer writes tests for behavior the existing tests missed. The reviewer checks their starting state and assertions. Repository maintainers set the merge policy, and the maintainer of the automated checks owns the collection and comparison jobs.",
+    "owner": "The developer writes tests for behavior the existing tests missed. The reviewer checks their starting state and the results the tests expect. Repository maintainers set the merge policy, and the maintainer of the automated checks owns the collection and comparison jobs.",
     "inputs": [
       "The test merge tree, the snapshot made by temporarily combining the proposed change with its target branch. Record both that tested version and the target version so the comparison can be repeated.",
       "The unit test run for that tree, coverage.py data with executable, executed and missing lines, and the team’s new-line threshold"
@@ -785,7 +781,7 @@
         "blocks": [
           {
             "type": "text",
-            "value": "For the custom changed-line coverage check, diff-cover is an off-the-shelf alternative. From the same tested revision, export coverage.py’s results as Cobertura XML with coverage xml and give diff-cover the saved target revision as its comparison base. Its --fail-under=80 option returns a failing exit status below the threshold. Check the file paths, included lines and comparison base against the team’s 31-of-50 example before adopting it; the custom script reads JSON."
+            "value": "Carry the team’s changed-line policy to another tool by using the same tested revision, target revision and set of executable lines. An off-the-shelf alternative to the custom JSON script is diff-cover: export Cobertura XML with coverage xml and compare against the saved target revision. Set --fail-under=80 to return a failure below the threshold, then confirm that the same files and lines reproduce the 31-of-50 example."
           }
         ]
       }
@@ -806,7 +802,7 @@
     "owner": "The developer investigates the finding. The quality gate owner maintains the rules that determine whether the analysis passes. A reviewer with project-level Administer Issues permission can record a justified false positive.",
     "inputs": [
       "PR-42, the pull request containing the proposed change. Identify its source commit (the saved version under review), the target branch it would join and its SonarQube project.",
-      "A Python quality profile, a custom quality gate, a scanner and a project analysis token",
+      "A quality profile (the list of code rules to run), a quality gate (the conditions that decide whether the result passes), and a scanner (the program that analyzes the code). The scanner needs a project analysis token, a credential that lets it send results to SonarQube.",
       "A GitHub repository bound to the SonarQube project for PR reporting, and a required Actions job named quality gate"
     ],
     "steps": [
@@ -950,7 +946,7 @@
         "blocks": [
           {
             "type": "text",
-            "value": "For the custom changed-line coverage check, diff-cover is an off-the-shelf alternative. From the same tested revision, export coverage.py’s results as Cobertura XML with coverage xml and give diff-cover the saved target revision as its comparison base. Its --fail-under=80 option returns a failing exit status below the threshold. Check the file paths, included lines and comparison base against the team’s 31-of-50 example before adopting it; the custom script reads JSON."
+            "value": "Keep the scanner’s bug rule separate from the changed-line coverage rule when moving this pipeline to another platform. An off-the-shelf alternative to the custom JSON script is diff-cover: export Cobertura XML with coverage xml and compare against the saved target revision. Set --fail-under=80 to return a failure below the threshold, then confirm that the same files and lines reproduce the 31-of-50 example."
           }
         ]
       }
