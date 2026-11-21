@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 664 526" role="img" aria-labelledby="title desc">
+<title id="title">From the reviewed change to the QA result</title>
+<desc id="desc">Follow the integrated commit to build-418, the published digest and platform, the QA configuration, and the observed routing and authorization results. The scan, component list and build provenance describe the image.</desc>
+<defs><marker id="tip" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5 0 7z" fill="#15636c"/></marker></defs>
+<rect width="664" height="526" rx="12" fill="#f4f7f9"/>
+<text x="22" y="35" font-family="Arial,sans-serif" font-weight="bold" font-size="23" fill="#173251">From the reviewed change to the QA result</text>
+<rect x="22" y="59" width="319" height="66" rx="7" fill="white" stroke="#9aafbd"/>
+<text x="36" y="85" font-family="Arial,sans-serif" font-weight="bold" font-size="19" fill="#173251">Integrate the change</text>
+<text x="36" y="110" font-family="Arial,sans-serif" font-weight="normal" font-size="16" fill="#173251">PR-42 · commit 3ab862b…</text>
+<rect x="22" y="151" width="319" height="66" rx="7" fill="white" stroke="#9aafbd"/>
+<text x="36" y="177" font-family="Arial,sans-serif" font-weight="bold" font-size="19" fill="#173251">Build and publish</text>
+<text x="36" y="202" font-family="Arial,sans-serif" font-weight="normal" font-size="16" fill="#173251">build-418 · one recorded candidate</text>
+<path d="M173 127 V146" fill="none" stroke="#15636c" stroke-width="2" marker-end="url(#tip)"/>
+<rect x="22" y="243" width="319" height="66" rx="7" fill="white" stroke="#9aafbd"/>
+<text x="36" y="269" font-family="Arial,sans-serif" font-weight="bold" font-size="19" fill="#173251">Identify the artifact</text>
+<text x="36" y="294" font-family="Arial,sans-serif" font-weight="normal" font-size="16" fill="#173251">sha256:041f649d… · linux/amd64</text>
+<path d="M173 219 V238" fill="none" stroke="#15636c" stroke-width="2" marker-end="url(#tip)"/>
+<rect x="22" y="335" width="319" height="66" rx="7" fill="white" stroke="#9aafbd"/>
+<text x="36" y="361" font-family="Arial,sans-serif" font-weight="bold" font-size="19" fill="#173251">Check what runs in QA</text>
+<text x="36" y="386" font-family="Arial,sans-serif" font-weight="normal" font-size="16" fill="#173251">qa-r17 · configuration qa-routing-3</text>
+<path d="M173 311 V330" fill="none" stroke="#15636c" stroke-width="2" marker-end="url(#tip)"/>
+<rect x="22" y="427" width="319" height="66" rx="7" fill="#deefec" stroke="#9aafbd"/>
+<text x="36" y="453" font-family="Arial,sans-serif" font-weight="bold" font-size="19" fill="#173251">Record observed behavior</text>
+<text x="36" y="478" font-family="Arial,sans-serif" font-weight="normal" font-size="16" fill="#173251">qa-204 · AC-01 and AC-02</text>
+<path d="M173 403 V422" fill="none" stroke="#15636c" stroke-width="2" marker-end="url(#tip)"/>
+<path d="M342 183 H377" fill="none" stroke="#15636c" stroke-width="2" marker-end="url(#tip)"/>
+<rect x="383" y="132" width="260" height="223" rx="7" fill="#eef1f6" stroke="#b2c1d0"/>
+<text x="397" y="161" font-family="Arial,sans-serif" font-weight="bold" font-size="17" fill="#173251">Evidence about the image</text>
+<text x="397" y="198" font-family="Arial,sans-serif" font-weight="bold" font-size="16" fill="#173251">Scan</text>
+<text x="397" y="220" font-family="Arial,sans-serif" font-weight="normal" font-size="15" fill="#173251">Which known risks were found?</text>
+<text x="397" y="258" font-family="Arial,sans-serif" font-weight="bold" font-size="16" fill="#173251">Component list (SBOM)</text>
+<text x="397" y="280" font-family="Arial,sans-serif" font-weight="normal" font-size="15" fill="#173251">What was packaged?</text>
+<text x="397" y="318" font-family="Arial,sans-serif" font-weight="bold" font-size="16" fill="#173251">Build provenance</text>
+<text x="397" y="340" font-family="Arial,sans-serif" font-weight="normal" font-size="15" fill="#173251">How and from what was it built?</text>
+<text x="22" y="513" font-family="Arial,sans-serif" font-weight="normal" font-size="15" fill="#173251">The test result links the running image and its configuration to what QA observed.</text>
+</svg>

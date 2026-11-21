@@ -1,0 +1,5 @@
+# Independent accuracy review · ACCEPT · 21 November 2026
+
+A fresh reviewer inspected the six new rendered Build pages against the vendor sources, course dataset and qualification record. The Dockerfile initially copied a different directory from the source path reviewed in CODEOWNERS and lint. The corrected image copies src/routing/. Both the developer's shell and the supplemental test job now put src on Python's import path. The test explains how a unique increasing sequence per request identifies the first persisted event. The Testcontainers transfer note correctly starts a separate container from the test, using driver=None for a Psycopg-compatible URL. The image workflow and illustrative push receipt use Docker Hub, as on the map.
+
+The reviewer reopened the rendered changes and accepted all six lessons. The PR head remains unknown, and the integrated commit and digest match build-418/qa-204. The queue, approval and platform-manifest cases were checked against published mechanisms. This was a static review of examples; no external application or registry was exercised.

@@ -1,0 +1,3 @@
+# Author handoff
+
+The six new lessons cover a small local check, branch and commit naming, the peer review thread, a database-backed integration test, the merge rules and the published image. Each starts with a decision a business analyst can follow and includes a worked failure and handoff. The database exercise supplements the original pilot policy; it creates its own PostgreSQL database and observes the stored assignment through a new connection. Sample commands and outputs are illustrative. The historical PR head is unknown. The image lesson links the integrated commit, digest and linux/amd64 to the qualification record.

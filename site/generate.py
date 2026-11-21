@@ -54,6 +54,8 @@ BRANCHES = {
     "branch": [("pull-request", "Open the change for review")],
     "pull-request": [("ci", "Run the required checks"), ("branch", "Address review feedback")],
     "merge": [("build", "Build the integrated revision")],
+    "image-build": [("evidence-record", "Open the qualification record and its download"),
+                    ("qa-rollout", "Follow the candidate into QA")],
     "build": [("digest", "Identify the output"), ("qa-rollout", "Select the QA candidate")],
     "digest": [("registry", "Locate the artifact"), ("qa-rollout", "Deploy by digest")],
     "qa-rollout": [("registry", "Pull the candidate"), ("qa-revision", "Confirm the running version")],
@@ -359,7 +361,7 @@ def topic_page(key, topics, area_by_id):
         result.append(section("go-deeper", "Go deeper", f'<ul>{links}</ul>'))
     branches = BRANCHES.get(key, [])
     if parent:
-        branches = [(parent, "Return to the overview")]
+        branches = [(parent, "Return to the overview"), *branches]
     elif kind == "flow":
         branches = [(other, "Workflow step") for other in t["touches"]]
     if not branches:
