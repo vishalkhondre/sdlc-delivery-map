@@ -24,7 +24,7 @@ jobs:
       - name: Check lesson structure, sources and hotspots
         run: python scripts/validate.py source
       - name: Check reviewed edition
-        if: github.base_ref == 'main' || github.workflow == 'Deploy to GitHub Pages'
+        if: github.event_name != 'pull_request' || github.base_ref == 'main'
         env:
           BASE: ${{ github.event.pull_request.base.sha }}
         run: |
