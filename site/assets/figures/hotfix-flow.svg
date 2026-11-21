@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 474 1276" role="img" aria-labelledby="title desc">
+<title id="title">Which code can we repair safely?</title><desc id="desc">Hypothetical urgent code repair. INC-7 used a configuration change. Identify the serving revision, code and data, then decide whether main is suitable. If main is safe, start from it. Otherwise verify the source of production and branch from its matching release tag. Review the fix, build a new digest, repeat the failing check and adjacent routing and authorization tests, and obtain business acceptance. The emergency authority records the decision, scope and an owner and deadline for any deferred test. In a limited pilot, smoke-test the actual revision and first recipient. Hold expansion on failure. After success, verify affected requests and observe the pilot. The QA lead must pass the deferred export test before the Service Owner can expand exposure. Missing or failed evidence holds expansion. Carry a release-branch fix back to main under review or verify an existing fix. Close follow-ups with evidence.</desc>
+<defs><marker id="tip" viewBox="0 0 9 10" refX="8" refY="5" markerWidth="9" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 0 L9 5 L0 10 z" fill="#345765"/></marker></defs>
+<path fill="#f5f7f6" d="M0 0H474V1276H0z"/>
+<text x="16" y="32" font-family="Arial, sans-serif" font-size="23" font-weight="700" text-anchor="start" fill="#162f40">Which code can we repair safely?</text>
+<text x="16" y="60" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#162f40">Hypothetical code fix. INC-7 used a mapping correction.</text>
+<g data-label-box=""><rect x="16" y="81" width="442" height="87" rx="7" fill="#e7eef7" stroke="#61809d" stroke-width="1.5"/>
+<text x="28" y="107" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Can main safely repair the running service?</text>
+<text x="28" y="132" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Match the running revision to its source and data.</text>
+<text x="28" y="154" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Check for unrelated changes before picking a base.</text>
+</g>
+<path d="M237 168V184" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round"/>
+<path d="M237 184H121V204" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<path d="M237 184H353V204" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="16" y="205" width="210" height="109" rx="7" fill="#ffffff" stroke="#92a5ae" stroke-width="1.5"/>
+<text x="28" y="231" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Yes · use main</text>
+<text x="28" y="256" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Start from reviewed</text>
+<text x="28" y="278" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">main at a compatible</text>
+<text x="28" y="300" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">commit.</text>
+</g>
+<g data-label-box=""><rect x="248" y="205" width="210" height="109" rx="7" fill="#ffffff" stroke="#92a5ae" stroke-width="1.5"/>
+<text x="260" y="231" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">No · use release</text>
+<text x="260" y="256" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Branch from the tag</text>
+<text x="260" y="278" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">verified against the</text>
+<text x="260" y="300" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">running version.</text>
+</g>
+<path d="M121 314V332H353V314" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round"/>
+<path d="M237 332V351" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="16" y="352" width="442" height="87" rx="7" fill="#ffffff" stroke="#92a5ae" stroke-width="1.5"/>
+<text x="28" y="378" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Review the repair and build a fresh image</text>
+<text x="28" y="403" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Peer-review the small change. Run required checks.</text>
+<text x="28" y="425" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Keep the incident, commit and new digest linked.</text>
+</g>
+<path d="M237 439V460" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="16" y="461" width="442" height="87" rx="7" fill="#ffffff" stroke="#92a5ae" stroke-width="1.5"/>
+<text x="28" y="487" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Qualify the new digest</text>
+<text x="28" y="512" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Repeat the failure, nearby routing and permissions.</text>
+<text x="28" y="534" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Get a business decision for the corrected behavior.</text>
+</g>
+<path d="M237 548V569" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="16" y="570" width="442" height="109" rx="7" fill="#ffffff" stroke="#92a5ae" stroke-width="1.5"/>
+<text x="28" y="596" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Authorize the emergency scope</text>
+<text x="28" y="621" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Name the digest, settings, risk and recovery path.</text>
+<text x="28" y="643" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Give each permitted deferral an owner and deadline.</text>
+<text x="28" y="665" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Missing evidence or authority keeps the hold.</text>
+</g>
+<path d="M237 679V700" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="16" y="701" width="442" height="87" rx="7" fill="#e7eef7" stroke="#61809d" stroke-width="1.5"/>
+<text x="28" y="727" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Did the limited pilot route correctly?</text>
+<text x="28" y="752" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Send a controlled request to the serving revision.</text>
+<text x="28" y="774" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Check its first assignment against the approved rule.</text>
+</g>
+<path d="M237 788V804" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round"/>
+<path d="M237 804H121V824" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<path d="M237 804H353V824" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="16" y="825" width="210" height="131" rx="7" fill="#fff0e1" stroke="#aa622a" stroke-width="1.5"/>
+<text x="28" y="851" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">No · hold expansion</text>
+<text x="28" y="876" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Contain exposure.</text>
+<text x="28" y="898" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Recover service and</text>
+<text x="28" y="920" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">reconcile requests.</text>
+<text x="28" y="942" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Requalify any repair.</text>
+</g>
+<g data-label-box=""><rect x="248" y="825" width="210" height="131" rx="7" fill="#e1f0e9" stroke="#4e816c" stroke-width="1.5"/>
+<text x="260" y="851" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Yes · observe</text>
+<text x="260" y="876" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Check affected work.</text>
+<text x="260" y="898" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Keep the pilot limited</text>
+<text x="260" y="920" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">while the team reviews</text>
+<text x="260" y="942" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">its observations.</text>
+</g>
+<path d="M353 956V977" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="16" y="978" width="442" height="109" rx="7" fill="#e7eef7" stroke="#61809d" stroke-width="1.5"/>
+<text x="28" y="1004" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Before wider exposure</text>
+<text x="28" y="1029" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">QA must pass the deferred export test.</text>
+<text x="28" y="1051" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">The Service Owner checks that result and the pilot.</text>
+<text x="28" y="1073" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Expand only if both pass. Otherwise keep the hold.</text>
+</g>
+<path d="M237 1087V1108" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="16" y="1109" width="442" height="109" rx="7" fill="#ffffff" stroke="#92a5ae" stroke-width="1.5"/>
+<text x="28" y="1135" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Keep the shipped fix on main</text>
+<text x="28" y="1160" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Release-branch fix? Return it through a reviewed PR.</text>
+<text x="28" y="1182" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Already on main? Verify inclusion without reapplying.</text>
+<text x="28" y="1204" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Link the completed checks and follow-up evidence.</text>
+</g>
+<text x="16" y="1257" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#162f40">A new build needs its own acceptance and authorization.</text>
+</svg>

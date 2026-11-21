@@ -1273,5 +1273,1068 @@
         ]
       }
     ]
+  },
+  {
+    "id": "instrumentation",
+    "kind": "deep-dive",
+    "parent": "observe",
+    "audience": [
+      "Business Analyst",
+      "Software Engineer",
+      "Service Owner",
+      "On-call Operator"
+    ],
+    "title": "Instrument approval routing",
+    "phase": "Learn",
+    "activity": "Prod",
+    "summary": "When a buyer submits a purchase, the team needs to see who received it first and how long it took to get there. A request can disappear from the waiting queue as soon as it reaches the wrong person. Keep enough history to detect that mistake and follow one purchase back to the software and settings that handled it.",
+    "owner": "The service instrumentation owner defines what the app records. The purchasing owner maintains the approved routing expectation. The operator checks that the records can be found and used.",
+    "inputs": [
+      "Read access to the approved mapping from purchasing unit to approver role, including its effective time, and to the deployment record for the serving revision (the deployed version that handled the request).",
+      "A synthetic eligible request, an authorized test account, permission to inspect its assignment history and read restricted logs and traces. Use nonpersonal group keys and request references that carry no business details."
+    ],
+    "steps": [
+      "Record the eligible submission and each committed assignment transition, including who caused it. Correlate the records by an opaque request key.",
+      "Compare the first recipient and actor with the independently approved business rule that applied at submission. Keep the first wrong event even if someone later corrects the request.",
+      "Exercise one controlled request through the running revision. Recover its timeline and compare the aggregate signal with the individual events before widening exposure."
+    ],
+    "evidence": "On CC-123 in Jira, the work tracker, add web links to the controlled observation and the deployment record. Record the revision, settings, result and restricted evidence reference. Leave the feature Ready for release during a held pilot. The Release Manager records Released after the rollout evidence supports that transition.",
+    "example": "The recorded controlled submission on prod-r41 reached the wrong approver even though it had been assigned. On prod-r42 a fresh controlled test reached the designated test approver. The two deployment records identify different settings for the same packaged image.",
+    "failure": "If the first actor, effective mapping or serving revision cannot be established, mark verification unknown and hold pilot expansion. The operator checks the saved business transition, then follows the event through collection. The instrumentation owner restores missing evidence and the team repeats the controlled check.",
+    "measure": "During a drill, ask another operator to find one submission, reconstruct the first assignment and distinguish a manual repair from automatic routing. Compare business submissions with distinct recorded requests to identify duplicates and gaps.",
+    "sources": [
+      {
+        "title": "OpenTelemetry · Signals",
+        "url": "https://opentelemetry.io/docs/concepts/signals/"
+      },
+      {
+        "title": "OpenTelemetry · Logs Data Model",
+        "url": "https://opentelemetry.io/docs/specs/otel/logs/data-model/"
+      },
+      {
+        "title": "Prometheus · Instrumentation",
+        "url": "https://prometheus.io/docs/practices/instrumentation/"
+      }
+    ],
+    "detail": [
+      {
+        "id": "choose-signals",
+        "title": "Which question does each signal answer?",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "Three ways to inspect the same work",
+            "columns": [
+              "Signal",
+              "Question from the on-call operator",
+              "What to open"
+            ],
+            "rows": [
+              [
+                "Log: a time-stamped event record",
+                "Who first received this purchase?",
+                "Find its submission and immutable assignment history by request key. Compare the original actor, recipient and effective business expectation."
+              ],
+              [
+                "Metric: a measurement over time",
+                "Is this happening to more requests?",
+                "Read counts of unresolved mismatches, empty assignments past their deadline and the last completed check. Compare separate controlled and ordinary populations where measuring outcomes."
+              ],
+              [
+                "Trace: the path of an operation across components",
+                "Did the submission reach the routing worker?",
+                "Open the trace ID from the log. Inspect its spans, the timed pieces of work for the request handler, rule lookup and assignment write. Verify the committed outcome in business history."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "Capture events when the submission and assignment become durable. A log written before a database transaction succeeds can describe a purchase that never changed hands. One design saves the transition and an event to publish in the same transaction. If the publisher retries, consume each event once by its stable event key. For concurrent changes use the stored per-request sequence to identify the first assignment. Arrival order at the monitoring service can differ."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "The OpenTelemetry log model distinguishes the time an event happened from the time a collector observed it. Trace and span identifiers can connect a log to a trace when that context exists. The purchasing fields below are application choices."
+          }
+        ]
+      },
+      {
+        "id": "event-contract",
+        "title": "Capture the assignment as it happened",
+        "blocks": [
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative event settings for the routing service",
+            "value": "Record on: committed eligible submission and assignment transition\nCorrelation: stable event key, request key, per-request sequence, trace ID when available\nContext: event time in UTC, source actor, actual recipient group, serving revision, effective mapping version\nIndependent verifier: expected group from the purchasing owner’s approved mapping effective at submission\nPopulation: ordinary or controlled"
+          },
+          {
+            "type": "text",
+            "value": "The app reports the recipient it actually persisted. An independent check enriches that event with the expected role. The checker needs the submitting unit and its rule effective at that moment, including exceptions. Reading “expected” from the same misconfigured table that supplied “actual” makes both values wrong in the same way. If the independent rule is missing or ambiguous, report an unknown comparison and assign it for review."
+          },
+          {
+            "type": "code",
+            "language": "jsonl",
+            "caption": "Illustrative log excerpts from a rehearsal of the first pilot failure",
+            "value": "{\"event\":\"submitted\",\"time\":\"2026-03-13T09:00:00Z\",\"request_key\":\"training-purchase\",\"trace_id\":\"43214321432143214321432143214321\",\"population\":\"controlled\",\"revision\":\"prod-r41\",\"config\":\"prod-routing-10\",\"event_key\":\"training-event-1\",\"request_sequence\":1,\"purchasing_unit\":\"training-unit\"}\n{\"event\":\"first_assignment_checked\",\"time\":\"2026-03-13T09:00:30Z\",\"actor\":\"routing-rule\",\"expected\":\"approved-group\",\"actual\":\"other-group\",\"expectation_source\":\"purchasing-approved-reference\",\"request_key\":\"training-purchase\",\"trace_id\":\"43214321432143214321432143214321\",\"population\":\"controlled\",\"revision\":\"prod-r41\",\"config\":\"prod-routing-10\",\"event_key\":\"training-event-2\",\"request_sequence\":2,\"purchasing_unit\":\"training-unit\",\"expected_rule_version\":\"training-approved-map\",\"expected_rule_effective_from\":\"2026-03-13T08:00:00Z\"}"
+          },
+          {
+            "type": "text",
+            "value": "These two shortened log lines share one request reference and a fabricated trace identifier. The times, groups and trace illustrate the shape an operator would see. The downloadable record identifies the failed attempt and setting, but supplies no individual production request ID, group names or trace. A later assignment or decision must append a separate event."
+          }
+        ]
+      },
+      {
+        "id": "follow-request",
+        "title": "Find one request without expanding every chart",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Start at the time and revision in the rollout record. Restrict the search to the routing service, then look up the known controlled request key. Sort its transitions by sequence, check the first actor and recipient, and open the trace identifier for the selected transition. A worker may handle the assignment asynchronously. Propagate the trace context with its work when appropriate, or correlate by request key if it started another trace. A trace may be sampled out. The committed business history still needs to support reconciliation."
+          },
+          {
+            "type": "text",
+            "value": "Keep request keys, trace IDs, revision identifiers and recipient detail in appropriately restricted event records. In a metric, each distinct combination of labels creates another time series. Use a short list of values such as environment and outcome for shared charts. A separate request ID on every measurement makes a chart expensive to store and difficult to interpret. Never place purchase text or personal identifiers in a label."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "An aggregate is useful for deciding where to look. A durable event explains what happened to a particular request and preserves evidence for a repair."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Why did a healthy queue hide the wrong approver?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In prod-rollout-87 the 09:00 UTC attempt ran prod-r41 with prod-routing-10 on 13 March. A controlled purchase reached the wrong approver and expansion stopped. The empty-queue count alone could look healthy. The instrumentation owner should be able to show the disagreement between the expected group and the first actual recipient. If the trace shows a successful write, read what that write saved. The Service Owner needs a fresh controlled pass on the corrected mapping and an account of existing work before treating recovery as verified."
+          },
+          {
+            "type": "text",
+            "value": "Time to first correct automatic assignment is a separate measure. In the hypothetical timing example, the first recipient is wrong at 30 seconds and the first correct automatic assignment occurs at 100 seconds. That meets the proposed two-minute window and still leaves a wrong-recipient event. A manual reassignment cannot supply a qualifying automatic assignment. Distinct timestamps, actors and roles let one history answer both questions."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "For a rollout rehearsal, allow ten minutes for an operator to submit a controlled purchase, look it up and explain the first assignment using both records. Fail the evidence check if any required observation is missing. During ordinary operation keep the checker running continuously, including times of low traffic."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Any logging, metrics and tracing stack can implement this event contract. Keep an independent business expectation, a stable request key and evidence of the first committed assignment when you change products."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "alert-design",
+    "kind": "deep-dive",
+    "parent": "alert",
+    "audience": [
+      "On-call Operator",
+      "Service Owner",
+      "Business Analyst"
+    ],
+    "title": "Design an actionable routing alert",
+    "phase": "Learn",
+    "activity": "Prod",
+    "summary": "A purchase sitting unassigned and a purchase sent to the wrong person both need attention. An empty waiting queue can hide the second problem. Decide how to detect each condition, whom to contact and what the responder should check first.",
+    "owner": "The Service Owner sets the thresholds and response policy. The monitoring engineer maintains the rules and notification routes. The on-call responder investigates the request and decides whether to contain the impact or declare an incident.",
+    "inputs": [
+      "The approved purchasing mapping, saved first-assignment events, eligible submission times, deployment record and history of cases still requiring action. The monitoring service needs read-only access to the signals used in its checks.",
+      "A responder authorized to halt pilot expansion, an agreed incident contact, a private evidence lookup and a tested route for urgent pages and routine work."
+    ],
+    "steps": [
+      "Define the business symptom for each signal and who can do something about it. Include a way to discover if the measurement itself has stopped.",
+      "Write and rehearse the rule using healthy, late, wrong-recipient and missing-data inputs. Send a test notification through the intended channel and confirm who receives it.",
+      "On a page, identify the affected revision and compare the first recorded assignment against the approved expectation. Contain ongoing harm, record the decision and follow affected requests to resolution."
+    ],
+    "evidence": "Keep the rule version, notification time, affected revision and configuration, private evidence link, response owner and disposition. If the incident is a Jira work item, use the configured “relates to” link between it and CC-123. If it lives in another system, add its web link to CC-123. Add the rollout record as a web link in either case. The operator holds expansion. Under this workflow the Release Manager leaves CC-123 Ready for release until recovery evidence supports the move to Released.",
+    "example": "A controlled purchase on prod-r41 went to the wrong approver with prod-routing-10. The assignment comparison can detect this even when the number of purchases waiting for an assignee is zero. The record establishes the failed controlled check; the sample rules and notification show how a team could implement detection.",
+    "failure": "If monitoring evidence disappears, treat routing correctness as unknown. The on-call responder checks the measurement path and uses an independently observed controlled purchase while the Service Owner holds expansion. A delayed or missing page also needs an owner to repair the notification route.",
+    "measure": "During a drill record time from a known committed mismatch to receipt by the intended on-call responder, then to the first containment decision. Separately review missed cases, noisy pages and overdue tickets still without an owner.",
+    "sources": [
+      {
+        "title": "Prometheus · Alerting rules",
+        "url": "https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/"
+      },
+      {
+        "title": "Prometheus · Query functions",
+        "url": "https://prometheus.io/docs/prometheus/latest/querying/functions/"
+      },
+      {
+        "title": "Prometheus · Alertmanager configuration",
+        "url": "https://prometheus.io/docs/alerting/latest/configuration/"
+      },
+      {
+        "title": "Google SRE · Monitoring Distributed Systems",
+        "url": "https://sre.google/sre-book/monitoring-distributed-systems/"
+      }
+    ],
+    "detail": [
+      {
+        "id": "rule-inputs",
+        "title": "Choose symptoms someone can act on",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "Three measurements exported by one production verifier",
+            "columns": [
+              "Signal",
+              "How it is derived",
+              "Action on a bad value"
+            ],
+            "rows": [
+              [
+                "Unresolved mismatches",
+                "Compare the first actor with the required routing-rule actor and the actual group with the independently approved group effective at submission. A manual assignment to the correct group still fails this check. Retain confirmed discrepancies until reconciled.",
+                "An incorrect recipient can see or act on work. Page on any open discrepancy and hold the pilot. A later correct assignment alone does not clear the case."
+              ],
+              [
+                "Overdue and unassigned",
+                "Count distinct ordinary eligible requests whose submission is more than two minutes old and that still have no assignee.",
+                "Send persistent backlog to the operations queue. Also report completed late assignments when measuring the timing objective. A current queue alone misses delays that have cleared."
+              ],
+              [
+                "Last complete check",
+                "Record the time of the last successful full comparison, including a check that the source records are current and the approved mapping can be read. Export explicit zero counts on a healthy scan with no cases.",
+                "Page on stale or missing evidence. No purchases during a quiet period is a valid result if the verifier has checked its inputs."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "A request routed to a wrong group can leave the backlog immediately. A manual assignment to the correct role can make the screen look right while hiding a broken automatic rule. Inspect the first recorded actor and recipient against a business-owned reference independent of the active application lookup. If that reference cannot supply an expected group, the comparison is incomplete."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "Page on a symptom that needs timely human action. Give the responder enough context to investigate the cause without claiming that a routing failure proves the software itself is defective."
+          }
+        ]
+      },
+      {
+        "id": "rules",
+        "title": "Read the threshold and its clock",
+        "blocks": [
+          {
+            "type": "code",
+            "language": "yaml",
+            "caption": "Illustrative Prometheus rule group for a single production verifier",
+            "value": "groups:\n  - name: purchasing-routing\n    interval: 30s\n    rules:\n      - alert: PurchaseRecipientMismatch\n        expr: routing_unresolved_mismatches{job=\"routing-verifier\",environment=\"prod\"} > 0\n        labels: {severity: page}\n        annotations:\n          summary: \"First assignment disagrees with the approved routing rule\"\n      - alert: PurchaseAssignmentOverdue\n        expr: routing_overdue_unassigned{job=\"routing-verifier\",environment=\"prod\"} > 0\n        for: 2m\n        labels: {severity: ticket}\n      - alert: PurchaseRoutingEvidenceMissing\n        expr: |\n          time() - routing_last_complete_check_timestamp_seconds{job=\"routing-verifier\",environment=\"prod\"} > 180\n          or absent_over_time(routing_last_complete_check_timestamp_seconds{job=\"routing-verifier\",environment=\"prod\"}[3m])\n          or absent_over_time(routing_unresolved_mismatches{job=\"routing-verifier\",environment=\"prod\"}[3m])\n          or absent_over_time(routing_overdue_unassigned{job=\"routing-verifier\",environment=\"prod\"}[3m])\n        labels: {severity: page}"
+          },
+          {
+            "type": "text",
+            "value": "The verifier checks every thirty seconds. Publish confirmed mismatches even if a different request has an unknown expectation. Retain unresolved known cases, keep incomplete counts marked as such and withhold the last-complete timestamp update whenever an expected mapping, source or comparison is missing. When no new data can be read, preserve the last known counts. Only a complete scan with no cases can report a healthy zero. This example assumes one continuously scraped verifier with all three named series and matching target labels. An unresolved mismatch fires on the first rule evaluation that sees it. An overdue item has already exceeded the inclusive two-minute assignment goal. The separate two-minute rule wait requires the backlog condition to persist across evaluations, possibly across different requests. It does not extend the goal for any buyer."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "Prometheus evaluates the expression on its configured schedule. A rule with a for duration remains pending while the condition continues to match. Alertmanager routes firing alerts to receivers and can group, delay or silence notifications. Delivery time includes collection, evaluation, grouping and transport."
+          },
+          {
+            "type": "text",
+            "value": "The third rule checks both a stale last-success value and absence of individual measurements during the three-minute lookback. A scrape reporting success by itself does not prove that the verifier processed current data. If the comparison job or its inputs stop advancing, the old timestamp should age into a page. A monitoring server that has itself stopped cannot fire its own rule. Use a separately observed test of the page-delivery path and name an owner for that failure."
+          }
+        ]
+      },
+      {
+        "id": "delivery",
+        "title": "Send the right message during and outside staffed hours",
+        "blocks": [
+          {
+            "type": "code",
+            "language": "yaml",
+            "caption": "Illustrative Alertmanager route excerpt · receivers are configured separately",
+            "value": "route:\n  receiver: operations-queue\n  group_by: [alertname, environment]\n  routes:\n    - matchers: ['severity=\"page\"']\n      receiver: routing-on-call\n      group_wait: 0s\n    - matchers: ['severity=\"ticket\"']\n      receiver: operations-queue"
+          },
+          {
+            "type": "text",
+            "value": "Under this example policy, a wrong recipient or loss of routing evidence pages the on-call responder at any hour. The lower-severity backlog alert creates a durable ticket even in quiet hours. The operations team reviews tickets during its staffed window, 08:00–18:00 UTC here, and hands remaining cases to the next shift. If users report broader impact or the pilot is affected, the responder can escalate immediately. Choose the staffing window and escalation threshold with the Service Owner. Keep restricted request details in the evidence system."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative notification for the incident rehearsal",
+            "value": "PAGE · PurchaseRecipientMismatch · production\nA controlled purchase reached an unexpected group on its first assignment.\nTriage using prod-rollout-87: inspect prod-r41 / prod-routing-10, then compare the first actor and group with the approved mapping.\nOwner: routing on-call. Hold expansion and account for requests already sent."
+          },
+          {
+            "type": "text",
+            "value": "The compact rule carries a static description. The notification above includes the context a responder or a separately configured enrichment step can add from the deployment record. The rule alone cannot supply a revision, request reference or cause. Test both receipt and access to the linked private evidence with the on-call role."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "A zero backlog during INC-7",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In the fictional production record, a controlled request on the 09:00 UTC attempt of 13 March reached the wrong approver. Stop widening exposure immediately on that observation. There is no need to wait for the next alert evaluation to act on known harm. The on-call responder records INC-7 and the Service Owner coordinates the response. Inspect other affected requests. Seven were reassigned and one authorized decision was retained. A notification clearing after a metric drops cannot establish that every affected purchase was reconciled."
+          },
+          {
+            "type": "text",
+            "value": "For a rehearsal, allow ten minutes with the operator and an observer. First send a synthetic purchase to the wrong group while the unassigned count is zero. Expect the urgent route to fire. Then keep an eligible purchase unassigned beyond the age threshold and through the rule wait. Expect a ticket. Finally stop refreshing the last-success time while scraping continues, then remove a measurement entirely. Both conditions should lead to the evidence-missing route. Also verify that an empty healthy workload produces no alert. Use recorded drill inputs, short-lived test routing and a receiver the team can actually inspect."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The Service Owner accepts a new rule after a responder receives the expected notification, opens the relevant records and names the first action. A failed drill holds adoption of the rule as a rollout safeguard. During a pilot, a known mismatch or an inability to verify the routing holds expansion."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In another monitoring product, preserve the three distinctions: assigned to the wrong group, still awaiting a recipient, and unable to observe the answer. Recreate the thresholds and delivery policy, then repeat the low-traffic, incorrect-recipient and missing-data drills against the new system."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "incident-lifecycle",
+    "kind": "deep-dive",
+    "parent": "incident",
+    "phase": "Learn",
+    "activity": "Prod",
+    "audience": [
+      "On-call Responder",
+      "Service Owner",
+      "Product Owner",
+      "Business Analyst"
+    ],
+    "title": "Manage a routing incident from the first report to the last affected request",
+    "summary": "A purchase reached the wrong approver during a limited release. Stopping the rollout protected the next group of buyers, but somebody still had to find the purchases already sent to the wrong place. Follow the incident record to see who made each decision and how the team knew it could finish.",
+    "owner": "The on-call responder declares the incident and starts containment. The Service Owner coordinates the response as incident commander in this exercise. The operator verifies the running service, and the purchasing owner verifies the disposition of affected work.",
+    "inputs": [
+      "A controlled purchase, its original automated assignment event, an independently approved unit-to-approver mapping, and the production revision and settings that served it. A revision is a deployed version of the service.",
+      "Authority to halt expansion and limit existing exposure, access to inspect request and decision history, an incident record, and an agreed private route to support and the purchasing team."
+    ],
+    "steps": [
+      "Declare the incident on the first confirmed wrong recipient. Halt expansion, limit ongoing exposure, identify a response lead and start a running log.",
+      "Have the operator verify the correction on the serving target and the purchasing owner account for each affected request. Keep technical observations and business dispositions separately visible.",
+      "Have the Service Owner decide on expansion, communicate the scope and assign improvement actions with owners and verification conditions. Link the review and the evidence to the original feature."
+    ],
+    "detail": [
+      {
+        "id": "declare",
+        "title": "Who takes control when a controlled purchase goes astray?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "At the production check, compare the first assignment made by the application with the group the purchasing owner approved for that unit. A request being assigned promptly can conceal a wrong recipient. The responder preserves the evidence, declares INC-7 and halts expansion. If the pilot can still send requests incorrectly, the responder and operator restrict that path or arrange a safe handoff for work already entering it. Record what remains exposed."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative response settings for the purchasing pilot",
+            "value": "Declaration trigger: one confirmed controlled assignment to the wrong group\nInitial owner: on-call responder until the Service Owner accepts coordination\nOperations lead: deployment operator\nBusiness impact and request reconciliation: Service Owner with purchasing owner\nUpdates: designated communicator to purchasing support and affected pilot leads"
+          },
+          {
+            "type": "text",
+            "value": "In a rehearsal, use the first ten minutes to identify the affected target, choose a safe containment action and tell support what to do with a new report. In the first update, name the symptom, affected scope as currently known, workaround if verified, and time of the next update. While harm continues, an agreed update every thirty minutes gives support a predictable place to look. These intervals are illustrative team choices. The record gives no actual declaration or communication timestamps."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The Service Owner accepts command explicitly and records who now has each responsibility. The operator changes production under the authorized recovery procedure. A communications lead sends updates to affected teams so the operator can concentrate on diagnosis."
+          }
+        ]
+      },
+      {
+        "id": "timeline",
+        "title": "Read the timeline without filling in its gaps",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "INC-7 evidence on 13 March 2026, UTC",
+            "columns": [
+              "Record",
+              "What happened",
+              "Decision supported"
+            ],
+            "rows": [
+              [
+                "09:00 attempt · prod-rollout-87",
+                "prod-r41 used prod-routing-10. A controlled purchase went to the wrong approver.",
+                "The team halted expansion. Preserve the first assignment and the failed attempt."
+              ],
+              [
+                "Containment and repair · exact action times unavailable",
+                "The same accepted software image was retained. The production purchasing group mapping and membership were checked.",
+                "Keep the failed routing context alongside the corrected settings."
+              ],
+              [
+                "11:00 attempt · prod-rollout-87",
+                "prod-r42 used prod-routing-11. The controlled routing check passed.",
+                "Proceed with limited observation. Recheck ordinary submissions as well as controlled requests."
+              ],
+              [
+                "11:00–13:00 corrected pilot",
+                "24 of 24 distinct eligible requests reached the correct group within two minutes. Two separate controlled submissions passed. Serving errors did not increase.",
+                "The Service Owner then expanded exposure. The record gives no exact expansion or incident closure time."
+              ],
+              [
+                "Impact ledger · disposition times unavailable",
+                "Eight eligible requests required reconciliation. Seven were reassigned and one authorized decision was retained.",
+                "Account for all eight before signing off the incident impact review."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "The incident links to the deployment record, the settings change, the qualification evidence and Jira feature CC-123. In this workflow CC-123 remains Ready for release during the failed attempt. After corrected smoke and observation the Release Manager records Released. Closing the response and closing product learning are separate decisions."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "Jira Cloud can link two work items if linking is enabled and the user has permission. Choose a configured relationship such as “relates to” for a follow-up and check its direction. For an incident log hosted elsewhere, add its web link to the feature. A link alone supplies no incident disposition."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "What if fresh requests route correctly but old ones are still wrong?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Imagine the corrected revision passes its controlled check and the operator proposes closing INC-7. A previously misdirected purchase is still in the wrong queue. The Service Owner keeps impact reconciliation open, assigns the purchasing owner to investigate, and tells support which records still need attention. Reassess exposure if the investigation finds ongoing harm."
+          },
+          {
+            "type": "text",
+            "value": "For each affected request, record a restricted reference, original first recipient, independently expected group, current decision state, disposition, person accountable and verification. For an open request, confirm the new owner can see and act on it. For an already decided request, use the decision history and the actor’s authority at that time. Escalate uncertain authority to the business owner before changing a decision."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "A fresh submission proves the repaired path works for that submission. The per-request ledger proves whether people already affected recovered their work."
+          },
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "Reading only the latest assignee erases the evidence of an earlier wrong assignment. Closing the incident when the alert clears can leave buyers waiting in the wrong queue."
+          }
+        ]
+      },
+      {
+        "id": "review",
+        "title": "Write a review somebody can act on",
+        "blocks": [
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Worked incident review extract · recorded findings and proposed actions",
+            "value": "Incident: INC-7, linked rollout prod-rollout-87 and feature CC-123\nImpact: wrong recipient on the limited pilot; eight requests reconciled\nDetection: controlled submission compared with the expected recipient\nRestoration: prod-r42 / prod-routing-11, same image, controlled check passed\nBusiness result: seven reassignments verified; one authorized decision retained\nProposed prevention action: configuration owner to rehearse an independent group check\nProposed detection action: Service Owner to test that a misroute reaches on-call"
+          },
+          {
+            "type": "text",
+            "value": "Keep technical cause, contributing conditions, incident decisions and unanswered questions separate. The record supports a correction to production mapping. It gives no evidence about who introduced the wrong value. In Jira give each agreed improvement an owner, due point and evidence of completion. For example, before the next pilot, the configuration owner supplies a witnessed mapping rehearsal and the Service Owner supplies evidence of a test notification. The Product Owner prioritizes longer-term work. Link actions to INC-7 and review them at the next service review until accepted. These are proposed tasks, with no assigned issue keys or claimed completions."
+          },
+          {
+            "type": "text",
+            "value": "Report the disposition to support using group names and affected scope. Keep individual request references in the restricted ledger. The later product review also found eight submissions without a recorded correct assignment at 24 hours. Those belong to a different population and investigation."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "An incident tool, a private shared document or a Jira issue can hold the same decision log. Carry over the declaration trigger, named handoff, separate restoration and impact decisions, and a review action that another person can verify."
+          }
+        ]
+      }
+    ],
+    "evidence": "Keep the first wrong recipient, actual revision and settings, containment, the two rollout attempts, business observation, all eight dispositions and the owner for each review action. Capture decision times as they happen in a real response.",
+    "example": "In INC-7 the corrected service and two hours of observation justified expanding the purchasing pilot. Seven verified reassignments and one retained authorized decision accounted for the eight requests that needed attention.",
+    "failure": "If a repair changes only future routing, the Service Owner retains the outstanding ledger and its owners. A new wrong first recipient stops expansion and returns the operator to containment.",
+    "measure": "Track declaration, containment, verified restoration, completion of business reconciliation and follow-up closure as separate milestones. Report only elapsed durations whose start and end times were actually captured.",
+    "sources": [
+      {
+        "title": "Google SRE Workbook · Incident Response",
+        "url": "https://sre.google/workbook/incident-response/"
+      },
+      {
+        "title": "Google SRE Book · Postmortem Culture: Learning from Failure",
+        "url": "https://sre.google/sre-book/postmortem-culture/"
+      },
+      {
+        "title": "Atlassian Support · Link work items",
+        "url": "https://support.atlassian.com/jira-software-cloud/docs/link-issues/"
+      }
+    ]
+  },
+  {
+    "id": "hotfix-flow",
+    "kind": "deep-dive",
+    "parent": "recover",
+    "phase": "Learn",
+    "activity": "Prod",
+    "audience": [
+      "On-call Developer",
+      "QA Lead",
+      "Release Manager",
+      "Business Analyst"
+    ],
+    "title": "Deliver an urgent code repair without losing the verified release path",
+    "summary": "A buyer can send a purchase to the wrong approver even when the approved routing table is correct. If the application itself makes the mistake, the team needs a new version of the software. This example follows an urgent repair from choosing the right starting code to checking the people and requests it affects.",
+    "owner": "The on-call developer prepares the fix and a peer reviews it. The quality assurance (QA) lead owns the test evidence. The business representative decides acceptance, the emergency change authority accepts any reduced scope and authorizes production under the example policy, and the Service Owner controls exposure.",
+    "inputs": [
+      "The incident, defect, first failing assignment event, independently approved group, effective production configuration, running revision, image digest (package fingerprint) and source commit that built it.",
+      "Authority to contain harm, an operator able to inspect production, a developer with access to the appropriate source line, independent reviewer and business tester availability, test identities, a recovery option and the emergency change policy."
+    ],
+    "steps": [
+      "Hold the affected route. Confirm a code fault, choose a source base compatible with production and link the defect, incident and controlled change in Jira.",
+      "Make the smallest repair, review the change, run required checks and produce a fresh package. Qualify that exact package, document retained and deferred tests, and obtain the applicable decisions.",
+      "Roll out to a limited group and observe the actual target. Address already affected requests, bring the fix into ongoing development, and complete any time-bound deferred verification."
+    ],
+    "detail": [
+      {
+        "id": "start-from-production",
+        "title": "Choose code that can safely go to production today",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "This is a hypothetical emergency after delivery of the purchasing feature. In recorded incident INC-7, prod-r41 used the wrong production mapping and prod-r42 corrected it on the same image. Here, suppose a repeated submission selects a default group even though the mapping and purchasing group membership are correct. The responder first contains the active path, preserves the original event and checks the effective settings and code path with the operator. Demonstrate the error on a safe replica of the running version using a synthetic request before choosing a code repair."
+          },
+          {
+            "type": "text",
+            "value": "A release tag names the saved source version used for a release. For the existing v1.3.0, compare the tag’s target with the integrated PR-42 commit on the build-418 receipt and the digest the runtime reports. The current production record also names prod-routing-11. The tag alone cannot reproduce that setting. Confirm changes made since the tag and check the current data format. Two versions can have compatible source history but incompatible data."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative emergency change intake",
+            "value": "Defect: repeat submission routes outside the approved purchasing group\nContainment: restrict the affected route; support handles held requests\nRequired inputs: running code and settings, source changes since release, compatible data\nDecision owners: QA lead for test scope, business representative for acceptance, emergency change authority for production\nEvidence links: incident, related Jira defect, repair pull request and candidate record"
+          },
+          {
+            "type": "text",
+            "value": "For an exercise, allow fifteen minutes for the on-call team to establish the baseline and triage the proposed route. Review and tests start as soon as people are available. Allow a separate observation window for ordinary pilot requests after a controlled check. Agree its size and duration before widening access. An urgent date does not establish a safe minimum observation window."
+          }
+        ]
+      },
+      {
+        "id": "choose-and-build",
+        "title": "Keep unrelated changes out of the repair",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Compare the shared branch, main, with the serving source. Use main when the team can qualify its entire change set for production today. If main also requires an unapproved change to stored purchases, create a repair branch from the verified release tag instead. The developer makes the narrow change and opens a pull request (PR), a proposal for a peer to review before merging. Keep the same peer and required checks on the chosen target line. Issue a new release identifier and retain the previous tag."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "GitHub branch protection can require approving reviews and status checks for branches matching its rules. Check that the emergency release branch is actually covered. Inspect the results of the required tests on the reviewed revision. The ability to merge cannot tell you that a production change is authorized."
+          },
+          {
+            "type": "text",
+            "value": "Run the protected build for the reviewed, integrated change. Record the source commit, build, full digest and platform. Promote that artifact through tests and deployment without rebuilding it between environments. A change after qualification creates a new selection and needs new evidence."
+          },
+          {
+            "type": "figure",
+            "src": "assets/figures/hotfix-flow.svg",
+            "caption": "Choose, qualify and carry forward an emergency code fix",
+            "alt": "A hypothetical hotfix branches by release base. Wider exposure requires a passing pilot and the deferred QA export test.",
+            "text_equivalent": "First identify the production revision, code and configuration. If main is safe with the running data, use reviewed main. If it contains unrelated changes that are unsafe to ship, branch from the verified release tag matching production. Peer-review the smallest repair, run required checks, and build once for a fresh digest. Repeat the failed test and adjacent routing and permission checks on this candidate. Obtain the business decision and emergency authorization for the exact digest and settings. Give any expressly deferred low-risk test an owner and deadline. Expose a limited pilot and check the first recipient on the serving revision. If the check fails, halt and recover. On success, reconcile affected requests and complete the pilot observation and require the QA lead’s deferred export check to pass before the Service Owner expands exposure. If the test or the pilot result is missing or fails, keep the hold. Bring a release-branch repair back to main by reviewed pull request, or verify it is already there. Record the results and close follow-up actions with their owners. INC-7 was a configuration repair."
+          }
+        ]
+      },
+      {
+        "id": "qualification",
+        "title": "Which tests can the team defer?",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "Illustrative emergency qualification policy",
+            "columns": [
+              "Decision",
+              "Checks and evidence",
+              "Who can act"
+            ],
+            "rows": [
+              [
+                "Keep before release",
+                "Reproduce the failed repeat-submission case. On the repaired digest verify one correct first automatic assignment, no duplicate assignment on retry, correct routing for a neighboring unit, and both permitted and denied decisions. Check pending requests and compatibility with the recovery version.",
+                "QA lead records actual results and stops promotion on any failure, ambiguous recipient or missing candidate identity."
+              ],
+              [
+                "Keep a business decision",
+                "Repeat the affected purchase scenario with the authorized representative on the candidate and reviewed settings. Keep the business decision and separate approval for the production target.",
+                "The representative signs the focused acceptance. The designated emergency authority reviews it and the remaining risk."
+              ],
+              [
+                "Eligible for a scoped exception",
+                "For a narrow routing-only repair, the unchanged historical reporting export could be tested later if dependency review finds no shared affected path, policy allows deferral, the pilot is limited and monitoring and safe reversal are available.",
+                "The authority records why the remaining risk is acceptable, who owns the export test and when it is due. The QA lead runs it before broader exposure under this example policy."
+              ],
+              [
+                "Use full qualification",
+                "If the repair also changes shared permissions, schema, report inputs or other unknown paths, stop using the narrow exception. Exercise affected integrations and the full applicable suite plus business acceptance on the new candidate.",
+                "The QA lead revises scope and the emergency authority reviews it. If sufficient coverage cannot fit the window, keep containment in place."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "This example allows expedited scheduling and specific low-risk deferred work only under the recorded exception. Mandatory repository checks, a new digest, affected routing and permission checks, independent review, business acceptance, production authorization and controlled verification remain required. A previous green result on build-418 cannot qualify the new image."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "An urgent request includes another team’s unfinished change",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Suppose the general development build also introduces a new request field which the previous production version cannot read. The release reviewer finds that restoring the earlier version could strand open purchases. The reviewer holds the candidate, records the unsafe dependency on the emergency change and asks the developer to apply the routing repair to the known release base. If that base itself cannot read today’s requests, keep the hold and choose a compatible repair with the data owner."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative change record at the hold point; no actual hotfix was shipped",
+            "value": "Selection: current main refused for this rollout\nReason: unrelated data change prevents the planned recovery\nNext candidate: reviewed routing repair on verified release base; new digest required\nQA evidence: original retry case, adjacent routing, permission and compatibility checks required\nUnrelated export: eligible for a written exception only; QA lead due before expansion\nProduction authorization: pending until the candidate and decisions are recorded"
+          },
+          {
+            "type": "text",
+            "value": "In Jira, link the hypothetical new bug to CC-123 using the configured “relates to” work-item link. Add web links to the separately maintained incident and change records. Triage moves it from New to Triaged and then In progress. The developer attaches the repair PR and candidate. From Ready for retest, a passing verification lets the triage owner close the bug with resolution Fixed. A failed retest returns it to Reopened with an empty resolution. Track authorization, rollout, reconciliation and deferred work separately. The delivered feature keeps its Released history. The earlier CC-131 was repaired on build-415 before build-418 was qualified. Reusing that issue for a new production fault would obscure both histories."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "An expedited route changes how quickly the team obtains evidence and who accepts residual risk. The package, target, verified behavior and authority must still be identifiable."
+          }
+        ]
+      },
+      {
+        "id": "verify-and-propagate",
+        "title": "Finish the deployment and carry the fix forward",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "After any approval wait, recheck the authorization against the same digest, settings and target. The operator verifies the serving revision, runs a controlled purchasing submission, repeats the submission and reads its first assignment and decision history. A wrong group, second assignment, unauthorized decision or unknown target holds expansion. Recover to a compatible state and preserve the failed attempt. When the controlled test passes, the Service Owner checks ordinary pilot observations, reconciles prior requests and checks the agreed deferred work before expanding."
+          },
+          {
+            "type": "text",
+            "value": "If the release branch carried the fix, open a reviewed PR to bring it back to main. Git cherry-pick can replay a selected change as a new commit. Resolve any conflicts against current main and rerun its relevant tests. If the patch was already merged on main or was independently implemented there, verify the behavior and record the evidence instead of replaying it twice. Link the original and follow-on PRs and their test results to the bug."
+          },
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "Moving the old tag to the new commit makes the previous release hard to reconstruct. Leaving a release-branch fix out of main lets a future ordinary deployment reintroduce the fault."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Any release system can identify the running source, isolate the smallest repair, qualify a new package and record who authorized its exposure. Keep the route back to the usual development line and the due point for every deferred check when adopting a different branching or change-management model."
+          }
+        ]
+      }
+    ],
+    "evidence": "Record the incident and separate defect, verified base, PR and checks, new source/build/digest, target settings, exact reruns and outcomes, business sign-off, exception and emergency authorization, pilot result, affected-request dispositions and propagation to main.",
+    "example": "This hypothetical code repair would need a new package and its own test and acceptance records. The recorded INC-7 repair on prod-r42 kept the accepted build-418 digest and corrected the production mapping.",
+    "failure": "A missing independent review, uncertain recovery path, unqualified digest or failed affected check holds the proposed rollout. The on-call developer and QA lead identify the next repair or verification, while the Service Owner keeps users protected.",
+    "measure": "Follow one emergency repair from the incident to the observed production version and the tested fix on main. Check whether each deferred test met its due point and whether repaired behavior persisted through the next ordinary release.",
+    "sources": [
+      {
+        "title": "Google SRE Book · Release Engineering",
+        "url": "https://sre.google/sre-book/release-engineering/"
+      },
+      {
+        "title": "GitHub Docs · About protected branches",
+        "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches"
+      },
+      {
+        "title": "Microsoft Learn · Architecture strategies for safe deployment practices",
+        "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
+      },
+      {
+        "title": "Git · git-cherry-pick",
+        "url": "https://git-scm.com/docs/git-cherry-pick"
+      },
+      {
+        "title": "Atlassian Support · Link work items",
+        "url": "https://support.atlassian.com/jira-software-cloud/docs/link-issues/"
+      }
+    ]
+  },
+  {
+    "id": "outcome-analysis",
+    "kind": "deep-dive",
+    "phase": "Learn",
+    "parent": "measure",
+    "activity": "Deep dive",
+    "audience": [
+      "Business analyst",
+      "Product Owner",
+      "Service Owner"
+    ],
+    "title": "Read the one-day outcome from every submission",
+    "summary": "Forty purchases received a decision during their first day. Sixty others were still waiting. To judge the promise made to buyers, start the clock for every eligible purchase and keep the open ones in the count.",
+    "owner": "The business analyst prepares the comparison. The Product Owner interprets it against the objective on CC-100, the Jira epic that groups work toward this business goal. The Service Owner investigates gaps in correct assignments.",
+    "inputs": [
+      "Read access to one-day-cohort.csv and qualification-record.json on the worked evidence page. The production record identifies the release and exposure. The CSV (a table of comma-separated values) provides elapsed times for individual purchases.",
+      "The agreed target, the earlier two-day median decision time, a definition of an eligible submission and a full day of follow-up for each. Use a local Python 3 interpreter for the worked calculation."
+    ],
+    "steps": [
+      "Start with new purchases from in-scope purchasing units that were subject to the automatic routing rule at submission. Verify eligibility and exposure against the submission and deployment records before looking at outcomes. Join assignment and decision events by request identifier, keeping the purchase even if a later event is missing.",
+      "Check the export for duplicate identifiers, unavailable observation time and contradictions in the recorded one-day state. Calculate the two milestones separately and keep all 100 eligible submissions as the denominator.",
+      "Give CC-100 the counts, population, window, target and remaining questions. Send the Service Owner the cases needing investigation."
+    ],
+    "detail": [
+      {
+        "id": "population",
+        "title": "Choose the purchases before counting their outcomes",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Run the review after every selected purchase has had a full day to reach a decision. Allow about ten minutes for an analyst to reproduce this small download on a laptop. Checking a real export against deployment, submission and telemetry records can take longer. A cohort is the group selected under one declared rule. Its denominator is the number of eligible submissions, including those still waiting."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative measurement settings for the worked file",
+            "value": "Population: eligible purchases exposed to prod-r42 after the corrected pilot\nUnit: one distinct request, time zero at original submission\nHorizon: 1,440 elapsed minutes per purchase\nAssignment: first correct automatic assignment, window ≤ 2 minutes\nDecision: first final decision by an authorized approver, target ≤ 1 day\nExclude: pilot requests, controlled smoke submissions and the earlier incident"
+          },
+          {
+            "type": "text",
+            "value": "A purchase submitted just before the report closes still needs its own full day. Mark it as awaiting follow-up and report how many are immature. Delay the fixed-window comparison or use a declared method for unequal follow-up. A repeated delivery of the same event does not create a second submission. If duplicated request rows disagree, inspect their source events before publishing a result."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "A blank event time does not establish a zero-minute wait. For an open request observed for one day, you know the decision has not occurred by the cutoff. Its eventual decision time is unknown. This is right-censoring. A missing stream of events requires a separate data-quality check."
+          }
+        ]
+      },
+      {
+        "id": "reproduce",
+        "title": "Reproduce the counts from the download",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Save the following as a Python file beside one-day-cohort.csv and run it with Python 3 from that folder. It reads the named columns, checks the full-day horizon and reports the earliest elapsed minute by which at least half of all submissions reached each milestone. Keep the original file intact."
+          },
+          {
+            "type": "code",
+            "language": "python",
+            "caption": "Illustrative Python 3 check for the supplied one-day CSV",
+            "value": "import csv\n\nwith open(\"one-day-cohort.csv\", newline=\"\", encoding=\"utf-8\") as source:\n    rows = list(csv.DictReader(source))\n\nids = [row[\"request\"] for row in rows]\nif not ids or any(not key.strip() for key in ids) or len(set(ids)) != len(ids):\n    raise ValueError(\"Missing or duplicate request identifiers\")\n\nassigned, decided, missing = [], [], []\nfor row in rows:\n    horizon = int(row[\"followup_minutes\"])\n    if horizon != 1440:\n        raise ValueError(\"Reconcile incomplete or differently defined follow-up\")\n    assignment = row[\"correct_assignment_minutes\"]\n    decision = row[\"decision_minutes\"]\n    for value in (assignment, decision):\n        if value != \"\" and not 0 <= int(value) <= horizon:\n            raise ValueError(\"Event outside the declared time window\")\n    expected_open = \"true\" if decision == \"\" else \"false\"\n    if row[\"open_at_one_day\"] != expected_open:\n        raise ValueError(\"Decision time and one-day state disagree\")\n    if assignment == \"\":\n        missing.append(row[\"request\"])\n    else:\n        assigned.append(int(assignment))\n    if decision != \"\":\n        decided.append(int(decision))\n\nprint(\"submitted, decided, open:\", len(rows), len(decided), len(rows) - len(decided))\nprint(\"assigned, within two minutes:\", len(assigned), sum(m <= 2 for m in assigned))\nprint(\"missing correct assignment:\", \", \".join(missing))\nfor name, times in [(\"assignment\", assigned), (\"decision\", decided)]:\n    rank = (len(rows) + 1) // 2\n    milestone = sorted(times)[rank - 1] if len(times) >= rank else \"unreached\"\n    print(name, \"one-half milestone (minutes):\", milestone)"
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Output from the downloadable 100-row cohort",
+            "value": "submitted, decided, open: 100 40 60\nassigned, within two minutes: 92 0\nmissing correct assignment: EX-093, EX-094, EX-095, EX-096, EX-097, EX-098, EX-099, EX-100\nassignment one-half milestone (minutes): 11\ndecision one-half milestone (minutes): unreached"
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "Python’s CSV dictionary reader uses the header row as field names. With its usual settings a populated numeric cell arrives as text, and an empty field in this file arrives as an empty string. Convert only recorded times. The explicit state check catches a blank decision paired with a claim that the request was closed."
+          }
+        ]
+      },
+      {
+        "id": "read-the-result",
+        "title": "Interpret assignment and decision separately",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "Results for the same 100 submissions",
+            "columns": [
+              "Question",
+              "Result",
+              "What the result supports"
+            ],
+            "rows": [
+              [
+                "Did correct assignment meet the operational window?",
+                "92 observed correct assignments took 3–19 minutes. Zero of 100 met two minutes, inclusive.",
+                "All 92 observed events arrived too late for the proposed time criterion. Eight had no recorded correct assignment by day one. The file supplies no pre-release assignment timings."
+              ],
+              [
+                "How long until half were assigned correctly?",
+                "The fiftieth observed correct assignment occurred at 11 minutes.",
+                "At least half of the whole group reached that event by 11 minutes. A median calculated only from the 92 recorded assignments would answer a narrower question."
+              ],
+              [
+                "Did the group reach its one-day decision target?",
+                "40 decisions and 60 open, giving a 60% one-day open share.",
+                "Fewer than 50 decisions occurred by the cutoff. The group missed the target. Its exact median and its change from the two-day baseline remain unknown."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "In the corrected two-hour pilot, 24 of 24 ordinary eligible submissions met the two-minute routing window. Two additional controlled checks were excluded. Earlier, eight affected requests in INC-7 needed reconciliation. Neither group is in this later file. Give EX-093 through EX-100 to the Service Owner to check both the actual assignment and event capture. The file cannot tell whether they were never assigned, assigned incorrectly or had missing telemetry."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The Product Owner uses the earliest time by which at least half of eligible requests reach the milestone. Keep that definition when the sample size is even. A missed product objective triggers investigation and a decision on CC-100. CC-123 retains its Released status."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Worked failure · sorting away the longest waits",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Suppose a dashboard starts with decisions and joins them back to submissions. It returns 40 rows. Every returned request finished inside one day, so a reader could mistake that subset for a successful outcome. Check EX-041: a correct assignment was recorded after ten minutes, but its decision is blank and it was open at one day. EX-093 also belongs in the denominator, even though both event times are blank."
+          },
+          {
+            "type": "text",
+            "value": "The analyst rebuilds from distinct submissions, preserving unmatched rows, and verifies that 40 decided plus 60 open equals 100. The first fifty decisions would be needed to reach the chosen middle milestone. Forty observations cannot supply the missing ten. Entering 1,440 as the decision time for each open row would manufacture a median and hide the missed target."
+          },
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "The export has no actor, recipient or release-version columns. Reinterpreting a time cell as proof of the correct actor or exact revision loses the link to the event definition and exposure record. In a live review, check those source records independently before crediting automatic routing."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Microsoft Power Query’s Group By can count rows for each request identifier and summarize the open and decided groups from a typed CSV. Set the inclusion rule and handle empty cells explicitly before applying the half-cohort calculation. The tool supplies aggregation while the analyst owns the exposure definition and the Product Owner owns the decision."
+          }
+        ]
+      }
+    ],
+    "evidence": "Attach a web link to the cohort and calculation on CC-100. Include both milestones, the one-day cutoff, the target, the 40/60 split, the separate pilot and incident counts, and the reason the exact decision median remains unknown.",
+    "example": "EX-001 shows a correct assignment at four minutes and a decision at 143 minutes. It missed the two-minute routing window and still contributed a decision before the one-day cutoff.",
+    "failure": "If the population, exposure, observation time or event capture cannot be reconciled, flag the affected count and hold the product conclusion. The analyst preserves the extract and asks the event or service owner to resolve the discrepancy.",
+    "measure": "Have a second reader reproduce the counts and follow the result to CC-100. At the next review, retain the same event definitions, complete follow-up and inclusion rule so the Product Owner can compare the groups.",
+    "sources": [
+      {
+        "title": "GOV.UK Service Manual · How to set performance metrics for your service",
+        "url": "https://www.gov.uk/service-manual/measuring-success/how-to-set-performance-metrics-for-your-service"
+      },
+      {
+        "title": "NIST/SEMATECH e-Handbook · Empirical model fitting – distribution free (Kaplan-Meier) approach",
+        "url": "https://www.itl.nist.gov/div898/handbook/apr/section2/apr215.htm"
+      },
+      {
+        "title": "Python documentation · csv — CSV file reading and writing",
+        "url": "https://docs.python.org/3/library/csv.html"
+      },
+      {
+        "title": "Microsoft Learn · Grouping or summarizing rows",
+        "url": "https://learn.microsoft.com/en-us/power-query/group-by"
+      }
+    ]
+  },
+  {
+    "id": "feedback-to-backlog",
+    "kind": "deep-dive",
+    "phase": "Learn",
+    "parent": "feedback",
+    "activity": "Product review",
+    "audience": [
+      "Business Analyst",
+      "Product Owner",
+      "Service Owner"
+    ],
+    "title": "Turn a missed decision-time target into the next backlog item",
+    "summary": "Buyers can still wait for a decision after their purchase reaches the right approver. When that happens, the team needs to decide what to keep, what to investigate and what change is worth trying next. Those decisions belong with the original business objective so a later reader can see why the work was proposed.",
+    "owner": "The Product Owner owns the decision and the proposed follow-up. The business analyst checks user accounts against request history. The Service Owner owns the investigation of slow and missing correct assignments.",
+    "inputs": [
+      "The Jira epic CC-100, which groups work toward the business objective, the CC-123 delivery record, the export of later eligible submissions, its cutoff and counts, and the rollout and incident records. Obtain permission to read the relevant evidence and edit the product decision.",
+      "Requester and approver feedback, an agreed owner for the service investigation, and a safe way to examine restricted request histories. Keep names and purchase contents out of the general backlog."
+    ],
+    "steps": [
+      "Restate what the customer was supposed to experience and what the later data shows. Write the measurements and limitations on the parent objective.",
+      "Separate a problem in operating the released feature from an untested explanation for a business delay. Give each a decision owner and ask what evidence could change their mind.",
+      "Draft the proposed follow-up with a testable behavior, outcome measure and review point. Check the links from the backlog item back to the original objective, release and evidence."
+    ],
+    "detail": [
+      {
+        "id": "read-the-signal",
+        "title": "Start the discussion with a decision the evidence supports",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "After every purchase in the review group has had one day of follow-up, the analyst brings the export and the business feedback to a product review. In this exercise allow about half an hour for the Product Owner, analyst and Service Owner to check the evidence, assign work and record a decision in Jira. Time needed to inspect missing events or contact approvers is additional."
+          },
+          {
+            "type": "table",
+            "caption": "Inputs to the CC-100 decision",
+            "columns": [
+              "Observation",
+              "Who takes it forward and why"
+            ],
+            "rows": [
+              [
+                "The original median wait was two days. The goal was one day. Only 40 of 100 later purchases had a decision at the one-day cutoff.",
+                "The Product Owner records the missed target. With 60 open, the group had not reached its median (the time by which half received decisions). The exact change from baseline is unknown."
+              ],
+              [
+                "In the corrected prod-r42 pilot all 24 ordinary purchases were assigned correctly within two minutes. In the later 100, none met that window.",
+                "The Service Owner investigates changed exposure, workload, mapping and event capture. The eight later purchases without a correct assignment need individual tracking. They are separate from the eight earlier INC-7 cases already reconciled."
+              ],
+              [
+                "Approvers reported unclear supporting information. The later export has submission-to-assignment and submission-to-decision times.",
+                "The analyst asks where useful information was missing, when the approver noticed and when it arrived. The CSV cannot identify what delayed any one decision."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "A delayed decision is an observation. An explanation that can be tested is a hypothesis. Record both, and write down what evidence would cause the team to change its explanation."
+          }
+        ]
+      },
+      {
+        "id": "shape-follow-up",
+        "title": "Give the next experiment a clear boundary",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Invite both requesters and approvers. Select examples from decided requests and from work still open, including ones assigned quickly and ones assigned late. In private, trace first correct assignment, whether the approver could act, when missing information was requested and when it arrived. Record themes or elapsed times on the shared work item. An approver who never saw a request cannot say whether better supporting details would have helped it."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative Jira field settings for a proposed follow-up",
+            "value": "Work item: CC-140 (proposed story)\nParent objective: CC-100\nRelated delivery: CC-123 (relates to, if configured)\nOwner: Product Owner · evidence prepared by Business Analyst\nHypothesis: Complete supporting details at submission reduce the wait for a decision.\nProposed scope: eligible purchasing requests in the agreed comparison group."
+          },
+          {
+            "type": "table",
+            "caption": "Proposed acceptance and review contract for CC-140",
+            "columns": [
+              "Decision",
+              "What to write before scheduling the work"
+            ],
+            "rows": [
+              [
+                "Behavior that can be demonstrated",
+                "Given a synthetic eligible purchase with the agreed supporting detail, when the buyer submits it, the designated approver can see the detail on first opening the assigned request. An unrelated employee cannot read the protected detail or record a decision. Exercise missing-detail behavior with the purchasing representative before finalizing the story."
+              ],
+              [
+                "Outcome to measure",
+                "Compare similarly exposed eligible purchases using the same submission-based clock. Include all open requests, give each a full 24 hours, and report decisions, one-day open share and whether the median reaches the one-day objective. Check wrong recipients and the two-minute routing window alongside the outcome."
+              ],
+              [
+                "Next decision and owner",
+                "The Product Owner reviews with the analyst after the agreed comparison group has matured for a full day. If evidence points to another delay, investigate that explanation. If the agreed group or observation coverage cannot be reconstructed, postpone the outcome conclusion and name who will restore the missing evidence."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "The behavior check lets a tester verify a proposed change before it is offered to buyers. The product measure asks whether a comparable group actually waits less. A passing demonstration alone gives no estimate of the size of that effect. Agree the recruitment window, inclusion rules and comparison before observing the results."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "Keep routing and investigate delayed and missing correct assignments. Treat clearer supporting details as a separate product hypothesis. The Service Owner retains the operational cases while the Product Owner decides whether CC-140 is ready for refinement."
+          },
+          {
+            "type": "text",
+            "value": "An illustrative decision rule for the trial: agree the enrollment period and comparable purchasing units before rollout. Compare the exposed group with a similarly enrolled group using the prior submission form and the same eligibility rules. Give every submission 24 hours. Keep requests with no observed decision in the denominator as open, and pause the comparison if event capture or follow-up is incomplete. The Product Owner keeps the change for a wider trial only if at least half of the exposed submissions reach a decision within a day, its one-day open share is lower than the comparison group’s, and routing and access checks pass. Otherwise revise the hypothesis or gather more evidence. This is a proposed decision rule. The CC-140 experiment has no recorded results."
+          }
+        ]
+      },
+      {
+        "id": "record-the-decision",
+        "title": "Leave three links a reader can follow",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The analyst adds a web link on the epic to the cohort report with its definition, counts and limitations. Set CC-100 as the parent of the proposed CC-140 story. Add a configured “relates to” work-item link from the story to the delivered CC-123 for release context. Verify the child appears under the objective and that intended readers can open the evidence. Where evidence is restricted, provide the aggregate summary and a named contact."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "Jira Cloud provides a parent relationship and separate work item link types. A site administrator can configure the available link types. Check which relationship is shown from both ends. A note or web link supplies evidence and leaves the workflow status under the team’s control."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative decision entry on CC-100 from the fictional evidence",
+            "value": "Decision: keep automatic routing in use and pursue the remaining wait.\nEvidence: 40/100 decided by day one. Median unreached. 60 still open.\nService Owner: investigate 92 late correct assignments and the eight with none recorded.\nProduct Owner: take proposed child CC-140 into refinement to test supporting details.\nCC-123: Released. Retain its deployment and incident evidence.\nNext review: after the agreed comparison cohort has a complete day of follow-up."
+          },
+          {
+            "type": "text",
+            "value": "Record the review and its rationale on CC-100. The case supplies no subsequent delivery or achieved outcome for CC-140. The analyst can leave the proposal in the backlog for refinement under the local workflow. Keeping CC-123 Released preserves the delivery history. This review supplies no basis for marking the business objective achieved."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Worked failure · a feature proposal outruns the evidence",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Suppose an analyst looks only at the 40 decided purchases, hears that supporting details were unclear and asks engineering to change every submission form. Before committing, the Product Owner asks for a delayed example with a confirmed correct assignment. The export gives elapsed times but no field for missing information, review start or requests for clarification. A new form might add effort for every buyer while leaving an unserved queue untouched."
+          },
+          {
+            "type": "text",
+            "value": "The analyst brings an open and a decided example to the next conversation, checks whether differences in purchasing-unit mix or approver availability explain the pattern, and records what evidence is still missing. The team can trial clearer details on a bounded group if observations support that hypothesis. If the problem is instead lack of queue visibility, preserve the negative finding and refine a different proposal."
+          },
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "Closing the eight later cases under INC-7 would attach new work to an incident that already reconciled its own requests. Keep the later cases with the Service Owner, verify each outcome in the restricted service record, and link an aggregate disposition to the product review."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In any tracker, keep the objective, delivered change, evidence, service investigation and proposed experiment distinguishable. A parent record with linked work and a named review owner lets another team follow the same decision even when its work-item names and workflow differ."
+          }
+        ]
+      }
+    ],
+    "evidence": "A reader can start from proposed CC-140, recover its hypothesis, criterion, comparison group and review owner, then open CC-100 for the missed target and the decision. Restricted request details remain in the authorized service record.",
+    "example": "The Service Owner may establish why an individual purchase lacked a correct assignment. The Product Owner still needs separate evidence to decide whether clearer supporting details shorten the overall wait.",
+    "failure": "When feedback is anecdotal or comparable exposure is unknown, the Product Owner holds the proposed intervention for discovery. The analyst records a specific question and who can answer it. Operationally unresolved requests keep their assigned owner.",
+    "measure": "At the next product review, check whether the proposed behavior was delivered, whether comparable users encountered it and whether the full-cohort outcome and operational guardrails changed. Record the resulting keep, revise or stop decision on the epic.",
+    "sources": [
+      {
+        "title": "GOV.UK Service Manual · How the discovery phase works",
+        "url": "https://www.gov.uk/service-manual/agile-delivery/how-the-discovery-phase-works"
+      },
+      {
+        "title": "GOV.UK Service Manual · How to set performance metrics for your service",
+        "url": "https://www.gov.uk/service-manual/measuring-success/how-to-set-performance-metrics-for-your-service"
+      },
+      {
+        "title": "Atlassian Support · Link work items",
+        "url": "https://support.atlassian.com/jira-software-cloud/docs/link-issues/"
+      },
+      {
+        "title": "Atlassian Support · Edit the parent of a work item with your keyboard",
+        "url": "https://support.atlassian.com/jira-software-cloud/docs/edit-the-parent-of-an-issue-with-your-keyboard/"
+      }
+    ]
   }
 ]

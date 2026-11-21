@@ -214,7 +214,7 @@ def main(integration=False):
                 expected = [f"topics/{item['id']}.html" for item in lessons
                             if item.get("kind") == "deep-dive" and item["phase"] == "Define"]
                 assert define_links.evaluate_all("(links) => links.map(a => a.getAttribute('href'))") == expected
-                for section_phase, stop in (("Prove", "qualification"), ("Release", "release")):
+                for section_phase, stop in (("Prove", "qualification"), ("Release", "release"), ("Learn", "learning")):
                     order = [item["id"] for item in lessons
                              if item.get("kind") == "deep-dive" and item["phase"] == section_phase]
                     page.goto(base + f"tour.html#{stop}")
