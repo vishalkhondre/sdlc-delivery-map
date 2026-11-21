@@ -1,0 +1,318 @@
+{
+  "purpose": "Canonical fictional fixtures for the depth edition. Existing values are transcribed from the qualification record and cohort. New records below are proposed teaching fixtures pending Gate 1. No system or job was executed to produce them.",
+  "source_records": {
+    "qualification": "site/assets/examples/qualification-record.json",
+    "cohort": "site/assets/examples/one-day-cohort.csv",
+    "qualification_baseline": "Owner-reviewed correction candidate for edition 1.0.2"
+  },
+  "feature": {
+    "epic": "CC-100",
+    "issue": "CC-123",
+    "baseline_median_decision_days": 2,
+    "target_median_decision_days": 1,
+    "criteria": {
+      "AC-01": "The routing rule automatically assigns an eligible request to the designated approver at submission.",
+      "AC-02": "Only an authorized approver can record a decision."
+    },
+    "proposed_criterion": {
+      "id": "AC-03",
+      "window_minutes": 2,
+      "definition": "For each eligible request, measure elapsed time from submission to first correct automatic assignment. Passing AC-03 requires assignment within two minutes, inclusive. A missing correct assignment at the deadline misses the window.",
+      "status": "Proposed. The pilot reported this operational window. AC-03 was not part of the recorded qa-204 AC-01/AC-02 pass."
+    }
+  },
+  "accepted_source": {
+    "pull_request": "PR-42",
+    "commit": "3ab862bc3190549bff7df2e0c1a02c9cc11459e4",
+    "build": "build-418",
+    "published_digest": "sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c",
+    "platform": "linux/amd64"
+  },
+  "qualification": {
+    "qa": {
+      "revision": "qa-r17",
+      "config": "qa-routing-3",
+      "test_run": "qa-204",
+      "candidate_digest": "sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c",
+      "expected": "Purchasing approver",
+      "observed": "Purchasing approver",
+      "assignment_actor": "routing-rule",
+      "requester_attempt": "denied; request still pending",
+      "authorized_approval": "recorded",
+      "outcome": "passed",
+      "request_id": "R-17",
+      "criteria": [
+        "AC-01",
+        "AC-02"
+      ],
+      "tested_at": "2026-03-10T10:00:00Z",
+      "retest": "qa-209: purchasing mapping and permissions rechecked following the UAT hold."
+    },
+    "uat": {
+      "revision": "uat-r9",
+      "config": "uat-routing-6",
+      "candidate_digest": "sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c",
+      "scenario": "Submit eligible request, verify recipient, record final decision.",
+      "signatory_role": "Designated business representative",
+      "outcome": "accepted",
+      "record": "uat-82",
+      "decided_at": "2026-03-12T11:00:00Z",
+      "prior_decision": {
+        "record": "uat-80",
+        "decided_at": "2026-03-11T10:00:00Z",
+        "revision": "uat-r8",
+        "config": "uat-routing-5",
+        "signatory_role": "Designated business representative",
+        "outcome": "rejected",
+        "reason": "Purchasing unit B reached unit A’s approver.",
+        "candidate_digest": "sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c"
+      },
+      "requalification": "Corrected the UAT mapping, reran qa-209 for the affected rule and authorization, then repeated the scenario in uat-r9."
+    }
+  },
+  "release": {
+    "version": "1.3.0",
+    "approval_policy": "Standard change; allowed after recorded QA and business acceptance and configuration review.",
+    "authorized_digest": "sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c",
+    "tag": "v1.3.0",
+    "tagged_commit": "3ab862bc3190549bff7df2e0c1a02c9cc11459e4",
+    "authorized_at": "2026-03-12T12:00:00Z"
+  },
+  "production": {
+    "rollout": "prod-rollout-87",
+    "runtime_revision": "prod-r42",
+    "actual_digest": "sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c",
+    "config": "prod-routing-11",
+    "mapping_review": "Mapped the QA purchasing role to the production purchasing group and verified membership.",
+    "smoke": "Test request automatically reached the designated test approver.",
+    "observation": "Illustrative corrected rollout: between 11:00 and 13:00 UTC on 13 March, 24 of 24 distinct eligible pilot requests received a correct assignment inside the agreed two-minute routing window. Two additional controlled smoke submissions also passed and were excluded from that denominator. No increase in serving errors was observed during that window; the service owner then expanded exposure.",
+    "attempts": [
+      {
+        "time": "2026-03-13T09:00:00Z",
+        "revision": "prod-r41",
+        "config": "prod-routing-10",
+        "digest": "sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c",
+        "exposure": "limited pilot",
+        "result": "halted after a controlled purchase request reached the wrong approver",
+        "incident": "INC-7; eight eligible requests required reconciliation; seven reassigned and one authorized decision retained."
+      },
+      {
+        "time": "2026-03-13T11:00:00Z",
+        "revision": "prod-r42",
+        "config": "prod-routing-11",
+        "digest": "sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c",
+        "result": "rechecked the corrected mapping, passed smoke, observed routing before expanding exposure"
+      }
+    ]
+  },
+  "populations": {
+    "corrected_pilot": {
+      "revision": "prod-r42",
+      "eligible": 24,
+      "inside_routing_window": 24,
+      "excluded_smokes": 2,
+      "elapsed_window_minutes": 2,
+      "observation_start": "2026-03-13T11:00:00Z",
+      "observation_end": "2026-03-13T13:00:00Z"
+    },
+    "production_incident": {
+      "id": "INC-7",
+      "affected_revision": "prod-r41",
+      "affected": 8,
+      "reassigned": 7,
+      "prior_authorized_decision_retained": 1,
+      "owner": "Service Owner",
+      "cohort_relation": "Precedes and is excluded from the later one-day cohort."
+    },
+    "later_outcome": {
+      "revision": "prod-r42",
+      "submitted": 100,
+      "followup_minutes": 1440,
+      "correctly_assigned_by_horizon": 92,
+      "minimum_correct_assignment_minutes": 3,
+      "maximum_correct_assignment_minutes": 19,
+      "assigned_within_two_minutes": 0,
+      "no_correct_assignment_by_horizon": [
+        "EX-093",
+        "EX-094",
+        "EX-095",
+        "EX-096",
+        "EX-097",
+        "EX-098",
+        "EX-099",
+        "EX-100"
+      ],
+      "unassigned_owner": "Service Owner",
+      "decided": 40,
+      "still_open": 60,
+      "decision_median": "Not reached by 24 hours. Exact median and change from baseline unknown.",
+      "product_owner_decision": "Keep routing, investigate delayed and missing correct assignments, and test whether better supporting details reduce the decision wait."
+    }
+  },
+  "proposed_records": {
+    "numbering": "PR numbers reflect opening order, and may merge in a different order. PR-42 is already open when PR-47 is created. The maintenance workflow and main release-build workflow use separate run sequences. build-423 is a repair candidate that predates the integrated build-418. It never becomes the accepted build.",
+    "earlier_code_failure": {
+      "bug": "CC-131",
+      "related_feature": "CC-123",
+      "criterion": "AC-02",
+      "case": "TC-04",
+      "reported_at": "2026-03-05T10:00:00Z",
+      "environment": "QA",
+      "expected": "Unrelated employee's attempt is denied and the request stays pending.",
+      "actual": "The early candidate records the unrelated employee's decision.",
+      "severity": "High",
+      "priority": "Fix before qualification",
+      "owner": "Developer",
+      "triage": "QA Lead and Product Owner agree release impact; promotion is held.",
+      "fix": {
+        "pull_request": "PR-47",
+        "workflow": "maintenance-verification",
+        "build": "build-423",
+        "built_at": "2026-03-06T10:00:00Z",
+        "result": "QA verifies the negative case and exercises the authorized path. The repair is included in the subsequent integrated release build.",
+        "image_digest": "sha256:653039af804cc7ec40d01b3cc83d64dd1d4eee1c1aa9bc2cd0aee9c83a4d365d",
+        "qa_run": "qa-198"
+      },
+      "accepted_integration": {
+        "pull_request": "PR-42",
+        "workflow": "main-release-build",
+        "build": "build-418",
+        "built_at": "2026-03-09T10:00:00Z",
+        "result": "Requalify the integrated image on its own digest in qa-204."
+      },
+      "failing_candidate": {
+        "workflow": "maintenance-verification",
+        "build": "build-422",
+        "image_digest": "sha256:ad1985a0d6e0fe53eab9a6fdcd1d8acb4823434ae8e9ec257936d912fe95b78e",
+        "qa_run": "qa-196"
+      }
+    },
+    "configuration_follow_up": {
+      "id": "prod-routing-12",
+      "prior": "prod-routing-11",
+      "state": "Proposed future mapping change; requires approval and qualification. No recorded deployment."
+    },
+    "product_follow_up": {
+      "id": "CC-140",
+      "parent": "CC-100",
+      "owner": "Product Owner",
+      "hypothesis": "Giving the approver complete supporting details on submission reduces the wait to decision.",
+      "measure": "Compare time to decision and share open at one day using the same eligible-submission definition."
+    },
+    "cases": [
+      {
+        "id": "TC-01",
+        "criterion": "AC-01",
+        "scenario": "Eligible request; rule chooses the unit's approver without manual input.",
+        "observe": "First assignment actor and actual recipient."
+      },
+      {
+        "id": "TC-02",
+        "criterion": "AC-01",
+        "scenario": "Purchasing unit B with a different mapping.",
+        "observe": "Actual recipient is the designated unit B group."
+      },
+      {
+        "id": "TC-03",
+        "criterion": "AC-02",
+        "scenario": "The designated approver decides a pending request.",
+        "observe": "Authorized decision is recorded once."
+      },
+      {
+        "id": "TC-04",
+        "criterion": "AC-02",
+        "scenario": "An unrelated employee attempts a decision.",
+        "observe": "Denied and still pending. Recheck the request state."
+      },
+      {
+        "id": "TC-05",
+        "criterion": "AC-03",
+        "scenario": "First correct automatic assignment at exactly 120 seconds.",
+        "observe": "Passes the proposed inclusive two-minute threshold."
+      },
+      {
+        "id": "TC-06",
+        "criterion": "AC-03",
+        "scenario": "No correct assignment by 120 seconds; first correct event at 121 seconds.",
+        "observe": "Misses the proposed threshold; the later event remains recorded."
+      }
+    ],
+    "sample_values": {
+      "coverage": {
+        "new_code_lines_covered": 31,
+        "new_code_lines_total": 50,
+        "percent": 62,
+        "example_policy_minimum_percent": 80,
+        "effect": "The proposed team policy blocks the required check. Product defaults remain a research question."
+      },
+      "ci_story": "A test sets the assignee directly, reaches the tested lines, and can pass without demonstrating AC-01. The corrected test starts with an unassigned submission and observes the assignment actor and recipient."
+    },
+    "workflow_policy": {
+      "status": "Illustrative workflow choices for Gate 1, independent of Jira defaults. A linked bug has its own status and resolution. Production deployment does not close the product experiment.",
+      "feature_issue": "CC-123",
+      "target_fix_version": "1.3.0",
+      "status_by_map_step": [
+        {
+          "step": 1,
+          "name": "Commit a change",
+          "status": "In development",
+          "owner": "Developer",
+          "evidence": "Feature branch linked to CC-123."
+        },
+        {
+          "step": 2,
+          "name": "Check the feature PR",
+          "status": "In review",
+          "owner": "Developer",
+          "evidence": "PR-42 and its check runs."
+        },
+        {
+          "step": 3,
+          "name": "Merge and build",
+          "status": "Ready for QA",
+          "owner": "Developer",
+          "evidence": "Integrated commit and build-418 digest."
+        },
+        {
+          "step": 4,
+          "name": "Verify in QA",
+          "status": "In QA",
+          "owner": "QA Lead",
+          "evidence": "qa-204 and linked AC-01/AC-02 results."
+        },
+        {
+          "step": 5,
+          "name": "Business acceptance",
+          "status": "In UAT",
+          "owner": "Business Analyst",
+          "evidence": "uat-80 rejects the mapping; hold, recheck qa-209, then record uat-82."
+        },
+        {
+          "step": 6,
+          "name": "Publish GitHub release",
+          "status": "Ready for release",
+          "owner": "Release Manager",
+          "evidence": "Accepted digest, fix version, v1.3.0 tag and production authorization."
+        },
+        {
+          "step": 7,
+          "name": "Deploy to Prod",
+          "status": "Released",
+          "owner": "Release Manager",
+          "evidence": "Record after prod-r42 observation and smoke. The failed prod-r41 attempt remains in the deployment history."
+        }
+      ],
+      "bug_statuses": [
+        "New",
+        "Triaged",
+        "In progress",
+        "Ready for retest",
+        "Closed",
+        "Reopened",
+        "Deferred"
+      ],
+      "bug_resolution_on_successful_retest": "Fixed",
+      "deferred_resolution": "Leave unset while tracked as outstanding work."
+    }
+  }
+}
