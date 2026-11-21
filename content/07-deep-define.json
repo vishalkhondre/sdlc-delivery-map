@@ -206,7 +206,7 @@
         "blocks": [
           {
             "type": "text",
-            "value": "Suppose CC-131 initially shares the automatic-routing label with CC-123. The release reviewer sees several matching items and cannot tell which one holds promotion. The QA Lead first opens the failed test execution. In the fictional maintenance run qa-196 on build-422, test case TC-04 attempts a decision as an unrelated employee. The expected result is a denial with the request still pending. The early software records the decision."
+            "value": "Suppose CC-131 initially shares the automatic-routing label with CC-123. The release reviewer sees several matching items and cannot tell which one holds promotion. The QA Lead first opens the failed test execution. In qa-196 on build-412 from PR-40, test case TC-04 attempts a decision as an unrelated employee. The expected result is a denial with the request still pending. The early software records the decision."
           },
           {
             "type": "text",
@@ -215,12 +215,12 @@
           {
             "type": "code",
             "language": "text",
-            "caption": "Illustrative record after the separate maintenance retest",
-            "value": "CC-131 · Bug · Closed · Resolution: Fixed\nAC-02 / TC-04 · failure qa-196 on build-422 retained\nRepair PR-47 · retest qa-198 on build-423\nCC-131 blocks CC-123 · original hold and retest recorded\nCC-123 · Parent: CC-100 · integrated PR-42 / build-418\nIntegrated qualification: qa-204, AC-01 and AC-02"
+            "caption": "Illustrative record after the repair retest on build-415",
+            "value": "CC-131 · Bug · Closed · Resolution: Fixed\nAC-02 / TC-04 · failure qa-196 on build-412 retained\nRepair PR-41 · retest qa-198 on build-415\nCC-131 blocks CC-123 · original hold and retest recorded\nCC-123 · Parent: CC-100 · integrated PR-42 / build-418\nIntegrated qualification: qa-204, AC-01 and AC-02"
           },
           {
             "type": "text",
-            "value": "The maintenance retest checks both the denial and the authorized path. The triage owner can now close the defect with resolution Fixed, the recorded reason for closure. The story still needs evidence for its integrated release build. A link back to the original hold explains the sequence to a reader who finds both records months later."
+            "value": "The qa-198 retest checks both the denial and the authorized path. The triage owner can now close the defect with resolution Fixed, the recorded reason for closure. The story still needs evidence for its integrated release build. A link back to the original hold explains the sequence to a reader who finds both records months later."
           }
         ]
       },
@@ -293,7 +293,7 @@
       "Make the move in Jira, then reread the status, resolution and linked item. Tell the next owner what remains to be checked."
     ],
     "evidence": "The story history connects each handoff to its supporting record. The bug keeps the failing execution, repair, fresh retest, closure or reopening decision and its link to the affected story.",
-    "example": "The team closes CC-131 after it verifies the repair on the maintenance build. CC-123 still needs its own integrated test and business acceptance before the release decision.",
+    "example": "The team closes CC-131 after it verifies the repair on build-415. CC-123 still needs its own integrated test and business acceptance before the release decision.",
     "failure": "A reopened bug with a populated Resolution field can disappear from an unresolved-work report. The QA Lead flags the discrepancy and the workflow owner corrects the reopen action and the affected record.",
     "measure": "Sample recent moves and count how many have evidence for the named candidate. Look separately for reopened or deferred bugs with a populated resolution and ask the triage owner to reconcile them.",
     "detail": [
@@ -426,17 +426,17 @@
               [
                 "Triaged → In progress",
                 "Developer",
-                "Accept the repair and refer to the failure in the work for PR-47."
+                "Accept the repair and refer to the failure in the work for PR-41."
               ],
               [
                 "In progress → Ready for retest",
                 "Developer",
-                "Provide PR-47 and maintenance build-423 to QA."
+                "Provide PR-41 and build-415 to QA."
               ],
               [
                 "Ready for retest → Closed",
                 "QA Lead as triage owner",
-                "Review qa-198 on build-423. TC-04 denies the unrelated employee and leaves the request pending. The authorized path works. Set resolution Fixed."
+                "Review qa-198 on build-415. TC-04 denies the unrelated employee and leaves the request pending. The authorized path works. Set resolution Fixed."
               ],
               [
                 "Ready for retest or Closed → Reopened",
@@ -458,7 +458,7 @@
           {
             "type": "callout",
             "label": "Team policy",
-            "value": "The named person chooses each transition. The configured close action sets Fixed, and the reopen action clears it. A linked run or a passing maintenance repair does not move the story, authorize production or close the product experiment."
+            "value": "The named person chooses each transition. The configured close action sets Fixed, and the reopen action clears it. A linked run or a passing repair retest does not move the story, authorize production or close the product experiment."
           },
           {
             "type": "code",
@@ -474,7 +474,7 @@
         "blocks": [
           {
             "type": "text",
-            "value": "Start from the fictional failure trail. On March 5, TC-04 in qa-196 on maintenance build-422 records an unrelated employee's decision. PR-47 repairs it. QA retests on build-423 in qa-198 on the maintenance path, giving the triage owner evidence to close CC-131. The later integrated build-418 comes from PR-42 on the main release path. It has its own digest and qualifies in qa-204. The two build numbers come from separate run sequences."
+            "value": "Follow the three increments through one pipeline. PR-40 produces build-412. On March 5, TC-04 fails in qa-196 when an unrelated employee can record a decision, so QA raises CC-131. PR-41 produces build-415 with the fix. TC-04 passes in qa-198, and the triage owner closes CC-131 as Fixed. PR-42 then produces build-418, which qualifies on its own digest in qa-204."
           },
           {
             "type": "text",
@@ -494,7 +494,7 @@
             "type": "list",
             "ordered": false,
             "items": [
-              "Closing CC-131 when a developer delivers PR-47 skips the retest. The team could release a fix that denies everyone, including the designated approver. Ready for retest gives QA a candidate and a clear next action.",
+              "Closing CC-131 when a developer delivers PR-41 skips the retest. The team could release a fix that denies everyone, including the designated approver. Ready for retest gives QA a candidate and a clear next action.",
               "Moving CC-123 to Released when the first production deployment starts hides a failed rollout. The wrong recipient in prod-r41 triggered incident INC-7. The accepted record follows the corrected prod-r42 checks and observation."
             ]
           }
@@ -1270,7 +1270,7 @@
           },
           {
             "type": "text",
-            "value": "There is also an earlier, separate worked failure. In the maintenance example, TC-04 in qa-196 on build-422 let the unrelated employee record a decision. QA preserves that failed execution and attaches a defect reference to Jira bug CC-131. Triage records in Jira that CC-131 blocks CC-123. This work-item link records the delivery impact separately from the defect link on the failed test. The repair went into build-423. In qa-198, QA checked the denial and the authorized path. Neither maintenance candidate supplies the missing unrelated-employee execution for build-418."
+            "value": "There is also an earlier, separate worked failure. In the first increment from PR-40, TC-04 in qa-196 on build-412 let the unrelated employee record a decision. QA preserves that failed execution and attaches a defect reference to Jira bug CC-131. Triage records in Jira that CC-131 blocks CC-123. This work-item link records the delivery impact separately from the defect link on the failed test. PR-41 produced the repaired build-415. In qa-198, QA checked the denial and the authorized path. Neither earlier candidate supplies the missing unrelated-employee execution for build-418."
           },
           {
             "type": "callout",

@@ -6,7 +6,7 @@ parts = ['''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 545" role="
 <title id="title">Feature and defect status in Jira</title>
 <desc id="desc">Two independent workflows. The feature waits for business acceptance and the bug closes after retesting. Reopening the bug clears the resolution.</desc>
 <defs><marker id="arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7z" fill="#17666e"/></marker></defs>
-<rect width="680" height="545" rx="12" fill="#f5f7fa"/><path d="M311 24v494" stroke="#b7c8d7"/>''']
+<rect width="680" height="545" rx="12" fill="#f5f7fa"/><path d="M311 24v465" stroke="#b7c8d7"/>''']
 
 
 def label(x, y, text, size=16, bold=False):
@@ -55,6 +55,6 @@ label(401, 377, "Retest passed", 14)
 label(508, 442, "Clear resolution", 14)
 label(508, 459, "when reopening", 14)
 label(333, 458, "Resolution: Fixed", 14)
-label(22, 521, "A separate issue link records that the bug blocks the feature.", 16)
+label(22, 528, "A separate issue link records that the bug blocks the feature.", 16)
 parts.append("</svg>")
 Path(__file__).with_suffix(".svg").write_text("\n".join(parts) + "\n")

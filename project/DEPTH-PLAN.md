@@ -289,7 +289,7 @@ All samples must agree with each other and with the two existing downloads. Main
 | PR-42, commit `3ab862b…`, build-418, digest `sha256:041f…` | Existing | The accepted candidate. |
 | qa-204, qa-209, uat-80 (rejected), uat-82 (accepted) | Existing | The UAT rejection was a configuration fault with the same image. |
 | TC-01 to TC-06 | New | Map each to AC-01, AC-02 or AC-03. |
-| BUG CC-131, PR-47, build-423 | New | A QA-found code defect on an earlier candidate, so the code-fix path has its own worked example. It must predate build-418 and must not alter the existing accepted chain. |
+| BUG CC-131, PR-40/build-412 and PR-41/build-415 | New | A QA-found code defect on an earlier candidate, so the code-fix path has its own worked example. It must predate build-418 and must not alter the existing accepted chain. |
 | v1.3.0, prod-r41 (halted), prod-r42, INC-7 | Existing | Eight requests reconciled: seven reassigned, one decision retained. |
 | `one-day-cohort.csv` | Existing | 100 rows, 40 decided, 60 open, 92 assigned. |
 

@@ -2,7 +2,7 @@
 <title id="title">Feature and defect status in Jira</title>
 <desc id="desc">Two independent workflows. The feature waits for business acceptance and the bug closes after retesting. Reopening the bug clears the resolution.</desc>
 <defs><marker id="arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7z" fill="#17666e"/></marker></defs>
-<rect width="680" height="545" rx="12" fill="#f5f7fa"/><path d="M311 24v494" stroke="#b7c8d7"/>
+<rect width="680" height="545" rx="12" fill="#f5f7fa"/><path d="M311 24v465" stroke="#b7c8d7"/>
 <text x="22" y="35" fill="#183456" font-family="Arial, sans-serif" font-size="21" font-weight="bold">Feature · CC-123</text>
 <text x="329" y="35" fill="#183456" font-family="Arial, sans-serif" font-size="21" font-weight="bold">Bug · CC-131</text>
 <text x="22" y="60" fill="#183456" font-family="Arial, sans-serif" font-size="16" font-weight="normal">Tracks delivery of automatic routing</text>
@@ -57,5 +57,5 @@
 <text x="508" y="442" fill="#183456" font-family="Arial, sans-serif" font-size="14" font-weight="normal">Clear resolution</text>
 <text x="508" y="459" fill="#183456" font-family="Arial, sans-serif" font-size="14" font-weight="normal">when reopening</text>
 <text x="333" y="458" fill="#183456" font-family="Arial, sans-serif" font-size="14" font-weight="normal">Resolution: Fixed</text>
-<text x="22" y="521" fill="#183456" font-family="Arial, sans-serif" font-size="16" font-weight="normal">A separate issue link records that the bug blocks the feature.</text>
+<text x="22" y="528" fill="#183456" font-family="Arial, sans-serif" font-size="16" font-weight="normal">A separate issue link records that the bug blocks the feature.</text>
 </svg>
