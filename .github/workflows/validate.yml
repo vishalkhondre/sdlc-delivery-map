@@ -21,15 +21,18 @@ jobs:
         run: |
           python -m pip install -r scripts/requirements.txt
           python -m playwright install --with-deps chromium
-      - name: Check lesson structure, sources, hotspots and review
+      - name: Check lesson structure, sources and hotspots
+        run: python scripts/validate.py source
+      - name: Check reviewed edition
+        if: github.event_name != 'pull_request' || github.base_ref == 'main'
         env:
           BASE: ${{ github.event.pull_request.base.sha }}
         run: |
-          python scripts/validate.py source
           ARGS=()
           if [[ -n "$BASE" ]]; then ARGS+=(--base "$BASE"); fi
           python scripts/check_release.py check "${ARGS[@]}"
-          python -m unittest discover -s scripts/tests -v
+      - name: Run unit tests
+        run: python -m unittest discover -s scripts/tests -v
       - name: Build and check all navigation
         run: |
           python site/generate.py
