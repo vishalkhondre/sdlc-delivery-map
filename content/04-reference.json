@@ -178,8 +178,8 @@
         "url": "https://learn.microsoft.com/en-us/azure/devops/test/create-test-suites?view=azure-devops"
       },
       {
-        "title": "ISTQB · Acceptance testing",
-        "url": "https://istqb.org/certifications/certified-tester-acceptance-testing/"
+        "title": "ISTQB · Certified Tester Foundation Level Syllabus – Acceptance Testing (Version 2019)",
+        "url": "https://istqb.org/wp-content/uploads/2024/11/ISTQB-CT-AcT_Syllabus_v1.0_2019.pdf"
       }
     ]
   },
@@ -268,8 +268,8 @@
         "url": "https://www.gov.uk/service-manual/the-team/what-each-role-does-in-service-team"
       },
       {
-        "title": "ISTQB · Acceptance testing",
-        "url": "https://istqb.org/certifications/certified-tester-acceptance-testing/"
+        "title": "ISTQB · Certified Tester Foundation Level Syllabus – Acceptance Testing (Version 2019)",
+        "url": "https://istqb.org/wp-content/uploads/2024/11/ISTQB-CT-AcT_Syllabus_v1.0_2019.pdf"
       }
     ]
   },
@@ -324,8 +324,8 @@
     "measure": "Report which high-impact scenarios have current evidence, which remain untested and which failures still block the candidate.",
     "sources": [
       {
-        "title": "ISTQB · Acceptance testing",
-        "url": "https://istqb.org/certifications/certified-tester-acceptance-testing/"
+        "title": "ISTQB · Certified Tester Foundation Level Syllabus – Acceptance Testing (Version 2019)",
+        "url": "https://istqb.org/wp-content/uploads/2024/11/ISTQB-CT-AcT_Syllabus_v1.0_2019.pdf"
       },
       {
         "title": "Microsoft Learn · Create and manage test suites",
@@ -354,8 +354,8 @@
     "measure": "Trace a sample signed decision to what the users exercised. Check whether rejected scenarios returned to the acceptance session after correction.",
     "sources": [
       {
-        "title": "ISTQB · Acceptance testing",
-        "url": "https://istqb.org/certifications/certified-tester-acceptance-testing/"
+        "title": "ISTQB · Certified Tester Foundation Level Syllabus – Acceptance Testing (Version 2019)",
+        "url": "https://istqb.org/wp-content/uploads/2024/11/ISTQB-CT-AcT_Syllabus_v1.0_2019.pdf"
       }
     ]
   },

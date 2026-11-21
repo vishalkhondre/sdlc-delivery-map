@@ -103,7 +103,7 @@
     "title": "Verify AC-01 and AC-02",
     "activity": "QA",
     "phase": "Prove",
-    "summary": "Test the two promises separately. AC-01 says submission automatically assigns the approver specified by the rule. AC-02 says only authorized approvers can record a decision. Seeing the expected name on screen is insufficient to distinguish automatic routing from a manual fix.",
+    "summary": "Test the two promises separately. AC-01 says submission automatically assigns the approver specified by the rule. AC-02 is a security check: only authorized approvers can record a decision. Seeing the expected name on screen is insufficient to distinguish automatic routing from a manual fix.",
     "owner": "QA engineer designs and executes the checks with the business analyst",
     "inputs": [
       "AC-01 and AC-02, the effective routing rule and expected approver",
@@ -121,8 +121,8 @@
     "measure": "Report required criteria passed, failed and untested separately. Retain the first failure when recording a successful retest.",
     "sources": [
       {
-        "title": "ISTQB · Acceptance testing and business rules",
-        "url": "https://istqb.org/certifications/certified-tester-acceptance-testing/"
+        "title": "ISTQB · Certified Tester Foundation Level Syllabus – Acceptance Testing (Version 2019)",
+        "url": "https://istqb.org/wp-content/uploads/2024/11/ISTQB-CT-AcT_Syllabus_v1.0_2019.pdf"
       },
       {
         "title": "Microsoft Learn · Track test status",
@@ -189,8 +189,8 @@
     "measure": "Review how much scheduled UAT time is lost to missing accounts, unavailable dependencies or stale data. Use the recurring causes to improve preparation.",
     "sources": [
       {
-        "title": "ISTQB · Acceptance testing and business rules",
-        "url": "https://istqb.org/certifications/certified-tester-acceptance-testing/"
+        "title": "ISTQB · Certified Tester Foundation Level Syllabus – Acceptance Testing (Version 2019)",
+        "url": "https://istqb.org/wp-content/uploads/2024/11/ISTQB-CT-AcT_Syllabus_v1.0_2019.pdf"
       },
       {
         "title": "Microsoft Learn · Azure Container Apps revisions",
@@ -225,8 +225,8 @@
     "measure": "Track acceptance decisions reopened because the changed scenario, candidate or operating assumption was unclear. Use those cases to improve the decision record.",
     "sources": [
       {
-        "title": "ISTQB · Acceptance testing and business rules",
-        "url": "https://istqb.org/certifications/certified-tester-acceptance-testing/"
+        "title": "ISTQB · Certified Tester Foundation Level Syllabus – Acceptance Testing (Version 2019)",
+        "url": "https://istqb.org/wp-content/uploads/2024/11/ISTQB-CT-AcT_Syllabus_v1.0_2019.pdf"
       },
       {
         "title": "Azure Well-Architected Framework · Safe deployment practices",
@@ -256,8 +256,8 @@
     "measure": "Measure time from a failed gate to an evidence-backed decision. Keep separate the time spent diagnosing, fixing and waiting for requalification.",
     "sources": [
       {
-        "title": "ISTQB · Acceptance testing and business rules",
-        "url": "https://istqb.org/certifications/certified-tester-acceptance-testing/"
+        "title": "ISTQB · Certified Tester Foundation Level Syllabus – Acceptance Testing (Version 2019)",
+        "url": "https://istqb.org/wp-content/uploads/2024/11/ISTQB-CT-AcT_Syllabus_v1.0_2019.pdf"
       },
       {
         "title": "Azure Well-Architected Framework · Safe deployment practices",
@@ -295,8 +295,8 @@
         "url": "https://learn.microsoft.com/en-us/azure/devops/test/track-test-status?view=azure-devops"
       },
       {
-        "title": "ISTQB · Acceptance testing and business rules",
-        "url": "https://istqb.org/certifications/certified-tester-acceptance-testing/"
+        "title": "ISTQB · Certified Tester Foundation Level Syllabus – Acceptance Testing (Version 2019)",
+        "url": "https://istqb.org/wp-content/uploads/2024/11/ISTQB-CT-AcT_Syllabus_v1.0_2019.pdf"
       },
       {
         "title": "DORA · Deployment automation",

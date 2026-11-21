@@ -97,6 +97,6 @@
     "conclusion": "Median time to decision not reached by one day.",
     "follow_up": "Learn why approvers still wait after assignment and link the next change to CC-100.",
     "population": "Separate post-recovery cohort exposed to prod-r42 after the pilot; excludes the pilot incident and synthetic tests. The CSV uses elapsed minutes from each submission.",
-    "limits": "No baseline assignment durations are supplied. The observed one-day decision data establish a missed target, not the exact median or change from the two-day baseline."
+    "limits": "The two-minute window was met for 24 of 24 eligible requests in the corrected pilot. In the later cohort, 92 correct assignments took 3 to 19 minutes and eight requests had no correct assignment by 24 hours. The Service Owner investigates these later eight separately from INC-7. No baseline assignment durations are supplied. The observed one-day decision data establish a missed target, not the exact median or change from the two-day baseline."
   }
 }

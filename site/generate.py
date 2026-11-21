@@ -9,6 +9,8 @@ import html
 import json
 import re
 import shutil
+import subprocess
+from functools import lru_cache
 from collections import defaultdict
 from pathlib import Path
 
@@ -76,7 +78,7 @@ BRANCHES = {
     "incident": [("recover", "Restore and verify the service")],
     "recover": [("smoke", "Verify restored routing"), ("incident", "Reconcile affected requests")],
     "measure": [("feedback", "Review the outcome")],
-    "feedback": [("define", "Shape the next change")],
+    "feedback": [("define", "Shape the next change"), ("service-retirement", "When the service is ready to retire")],
 }
 ICONS = {
     "search": '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/>',
@@ -116,6 +118,18 @@ def source_url(url):
 def topic_link(topics, key, prefix="", label=None):
     return f'<a href="{prefix}topics/{e(key)}.html">{e(label or topics[key]["title"])}</a>'
 
+@lru_cache(maxsize=1)
+def edition_stamp():
+    version = (CONTENT / "VERSION").read_text().strip()
+    try:
+        sha = subprocess.check_output(
+            ["git", "rev-parse", "--short=8", "HEAD"], cwd=ROOT, text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+    except (OSError, subprocess.CalledProcessError):
+        sha = "unavailable"
+    return f"Edition {e(version)} · Commit {e(sha)}"
+
 def shell(title, summary, body, *, active, prefix=""):
     tabs = "".join(f'<a href="{prefix}{path}"' + (' aria-current="true"' if name == active else '') + f'>{name}</a>' for name, path in NAV)
     mark = '<svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M2 2h20v4H2zm0 8h13v4H2zm0 8h20v4H2z"/></svg>'
@@ -130,6 +144,7 @@ def shell(title, summary, body, *, active, prefix=""):
 <div class="tools"><a class="iconbtn" aria-label="Search topics" title="Search topics" href="{prefix}topics.html#topic-search">{icon("search")}</a>
 <button id="theme-toggle" class="iconbtn js-only" type="button" aria-label="Switch colour theme" title="Switch colour theme">{icon("theme")}</button></div></div></header>
 {body}<footer class="site-footer"><div><a class="brand footbrand" href="{prefix}index.html">{mark}SDLC Delivery Map</a>
+<small>{edition_stamp()}</small>
 <nav aria-label="Footer navigation"><a href="{prefix}topics.html">All topics</a><a href="{prefix}references.html">Sources and credits</a><a href="https://github.com/vishalkhondre/sdlc-delivery-map">Source repository</a><a href="{prefix}assets/delivery-map.png" download>Download diagram</a></nav></div></footer></body></html>'''
 
 def write(path, text):
@@ -163,8 +178,8 @@ def interactive_map(hotspots, topics):
 
 def home(topics, hotspots):
     body = f'''<main class="home frame" id="content" tabindex="-1">
-<section class="intro"><div><h1>From Feature Commit to Production</h1>
-<p>Explore how a team defines, builds, tests and releases a change, then uses production evidence to decide what to do next.</p></div>
+<section class="intro"><div><h1>From business problem to production outcome</h1>
+<p>Follow an approval-routing feature from the business problem that justified it to the production evidence that shapes the next product decision.</p></div>
 <div class="start-card"><strong>New to software delivery?</strong><p>Follow one approval-routing feature through seven decisions.</p><a class="primary" href="tour.html">Start the guided tour</a></div></section>
 {interactive_map(hotspots, topics)}
 <section class="route-section"><h2>Explore by phase</h2><div class="phase-grid">'''
@@ -180,7 +195,7 @@ def home(topics, hotspots):
     if lookup:
         body += '<nav class="lookup-links" aria-label="Learning resources">'+ " · ".join(lookup) + '</nav>'
     body += '</main>' 
-    return shell("From Feature Commit to Production","Explore the SDLC with a clickable software delivery diagram and guided walkthrough.",body,active="Map")
+    return shell("From business problem to production outcome","Explore the SDLC with a clickable software delivery diagram and guided walkthrough.",body,active="Map")
 
 def tour_page(topics):
     parts=['<main id="content" class="reading frame" tabindex="-1"><div class="page-intro"><h1>Follow one feature</h1><p>Work through seven decisions in the approval-routing example. At each stop, trace the evidence and test what happens when a check fails.</p></div><ol class="tour-list" id="tour-stops">']
@@ -198,21 +213,22 @@ def topic_index(topics, hotspots):
         if h["label"] not in aliases[h["id"]]:
             aliases[h["id"]].append(h["label"])
     total=len(topics)
-    out = ['<main class="frame index-page" id="content" tabindex="-1"><div class="page-intro"><h1>Topic index</h1><p>Open a lesson by activity, tool, role or output. The phase groups provide a text view of the map.</p></div>']
-    out.append('<div class="filterbar js-only"><label for="topic-search">Search topics<input type="search" id="topic-search" placeholder="Try UAT, acceptance criteria or image digest" autocomplete="off"></label><label for="phase-select">Phase<select id="phase-select"><option value="">All phases</option>' + ''.join(f'<option value="{p}">{p}</option>' for p in PHASES) + '</select></label><button id="clear-search" type="button">Reset</button></div>')
+    out = ['<main class="frame index-page" id="content" tabindex="-1"><div class="page-intro"><h1>Topic index</h1><p>Open a lesson by activity, tool, role or output. The sections provide a text view of the map.</p></div>']
+    out.append('<div class="filterbar js-only"><label for="topic-search">Search topics<input type="search" id="topic-search" placeholder="Try UAT, acceptance criteria or image digest" autocomplete="off"></label><label for="phase-select"><span id="section-label">Section</span><select id="phase-select" aria-labelledby="section-label"><option value="">All sections</option>' + ''.join(f'<option value="{p}">{p}</option>' for p in PHASES) + '</select></label><button id="clear-search" type="button">Reset</button></div>')
     out.append(f'<p id="result-count" aria-live="polite">{total} topics</p>')
     for phase in PHASES:
         rows = []
         for key, t in topics.items():
             if t["phase"] != phase:
                 continue
-            keywords = " ".join([*aliases[key],t["owner"],t["title"], t["summary"], t["evidence"]])
+            keywords = " ".join([*aliases[key], t["owner"], t["title"], t["summary"], *t["inputs"],
+                                 *t["steps"], t["example"], t["evidence"], t["failure"], t["measure"]])
             alt_names = [name for name in aliases[key] if name.lower() != t["title"].lower()]
             note = f'<p class="aliases">On the map · {e(" · ".join(alt_names))}</p>' if alt_names else ""
             rows.append(f'<article class="topic-row" data-phase="{phase}" data-text="{e(keywords)}"><h3>{topic_link(topics,key)}</h3><p>{e(t["summary"])}</p>{note}</article>')
         if rows:
             out.append(f'<section class="index-section phase-{PHASE_BANDS[phase][0]}" id="phase-{phase.lower()}" data-index-phase="{phase}"><h2>{phase}</h2><div class="topic-grid">{"".join(rows)}</div></section>')
-    out.append('<p id="no-results" hidden>There are no matching topics. Try a different word or choose another phase.</p></main>')
+    out.append('<p id="no-results" hidden>There are no matching topics. Try a different word or choose another section.</p></main>')
     return shell("Topic index","Browse or search every topic in the SDLC Delivery Map.",''.join(out),active="Topics")
 
 def refs_page(topics):
@@ -299,7 +315,10 @@ def generate():
     write("references.html",refs_page(topics))
     by_id={}
     for i,spot in enumerate(spots):
-        by_id.setdefault(spot["id"],i)
+        key = spot["id"]
+        by_id.setdefault(key, i)
+        if spot.get("return_target"):
+            by_id[key] = i
     for key in topics:
         write(f"topics/{key}.html",topic_page(key,topics,by_id))
     write(".nojekyll","")
