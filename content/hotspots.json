@@ -338,6 +338,7 @@
   {
     "id": "release-plan",
     "label": "Plan the release",
+    "return_target": true,
     "x": 1553,
     "y": 271,
     "w": 190,
@@ -372,6 +373,7 @@
   {
     "id": "branch",
     "label": "Feature branch",
+    "return_target": true,
     "x": 441,
     "y": 392,
     "w": 190,
@@ -389,6 +391,7 @@
   {
     "id": "pull-request",
     "label": "Open pull request",
+    "return_target": true,
     "x": 663,
     "y": 392,
     "w": 190,
@@ -423,6 +426,7 @@
   {
     "id": "release",
     "label": "Publish GitHub release",
+    "return_target": true,
     "x": 1553,
     "y": 392,
     "w": 190,
@@ -457,6 +461,7 @@
   {
     "id": "build",
     "label": "Build candidate once",
+    "return_target": true,
     "x": 886,
     "y": 515,
     "w": 190,
@@ -525,6 +530,7 @@
   {
     "id": "rollout",
     "label": "Start Prod rollout",
+    "return_target": true,
     "x": 1775,
     "y": 515,
     "w": 190,
@@ -661,6 +667,7 @@
   {
     "id": "qa-tests",
     "label": "Verify AC-01 and AC-02",
+    "return_target": true,
     "x": 1108,
     "y": 1008,
     "w": 190,
@@ -678,6 +685,7 @@
   {
     "id": "uat-decision",
     "label": "Record UAT decision",
+    "return_target": true,
     "x": 1331,
     "y": 1008,
     "w": 190,
@@ -850,6 +858,7 @@
   {
     "id": "measure",
     "label": "Measure the outcome",
+    "return_target": true,
     "x": 435,
     "y": 1401,
     "w": 485,
