@@ -260,12 +260,27 @@
         "url": "https://istqb.org/wp-content/uploads/2024/11/ISTQB-CT-AcT_Syllabus_v1.0_2019.pdf"
       },
       {
-        "title": "Azure Well-Architected Framework · Safe deployment practices",
+        "title": "Azure Well-Architected Framework · Architecture strategies for safe deployment practices",
         "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
       },
       {
         "title": "Microsoft Learn · Track test status",
         "url": "https://learn.microsoft.com/en-us/azure/devops/test/track-test-status?view=azure-devops"
+      }
+    ],
+    "detail": [
+      {
+        "id": "requalification-routes",
+        "title": "Choose the requalification route",
+        "blocks": [
+          {
+            "type": "figure",
+            "src": "assets/figures/regression-scope.svg",
+            "alt": "Separate retest routes for an application repair and a routing-mapping correction.",
+            "caption": "Follow what changed to the evidence needed for re-entry.",
+            "text_equivalent": "A finding holds promotion or sign-off and preserves earlier evidence. On the code route, qa-196 fails on build-412. The repair produces build-415 with a new digest, qa-198 confirms the fix and checks adjacent behavior, and the triage owner closes CC-131. Later build-418 qualifies separately in qa-204. On the mapping route, retain the rejected uat-80 and the build-418 image digest, correct the configuration and link the affected rechecks in qa-209. Repeating the business scenario on uat-r9 with uat-routing-6 produces the new uat-82 decision on this route. On either route, missing identity or required evidence keeps the hold open. When re-entry conditions are met, the business representative can test and decide on the identified candidate."
+          }
+        ]
       }
     ]
   },

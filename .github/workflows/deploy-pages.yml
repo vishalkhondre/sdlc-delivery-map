@@ -49,6 +49,10 @@ jobs:
           if gh release view "$tag" >/dev/null 2>&1; then exit 0; fi
           python scripts/release_snapshot.py notes "$tag" > "$RUNNER_TEMP/notes.md"
           pdf="$RUNNER_TEMP/sdlc-delivery-map-$tag.pdf"
+          if ! command -v inkscape >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends inkscape
+          fi
           python scripts/field_guide_pdf.py "$tag" "$pdf"
           gh release create "$tag" "$pdf" --target "$GITHUB_SHA" \
             --title "The SDLC Delivery Map $tag" --notes-file "$RUNNER_TEMP/notes.md"

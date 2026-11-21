@@ -482,8 +482,52 @@
         "url": "https://dora.dev/capabilities/deployment-automation/"
       },
       {
-        "title": "Microsoft Azure Well-Architected Framework · Safe deployment practices",
+        "title": "Microsoft Azure Well-Architected Framework · Architecture strategies for safe deployment practices",
         "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
+      }
+    ],
+    "detail": [
+      {
+        "id": "environment-decisions",
+        "title": "What does each environment establish?",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "Contexts used by the approval-routing team",
+            "columns": [
+              "Context",
+              "Purpose",
+              "Decision",
+              "Evidence"
+            ],
+            "rows": [
+              [
+                "Dev",
+                "Implement the change locally and check it in continuous integration.",
+                "May the reviewed change merge, and which integrated build can enter QA?",
+                "PR-42 review and checks, integrated commit, build-418 and its published image digest."
+              ],
+              [
+                "QA",
+                "Verify technical behavior on the identified candidate.",
+                "Did automatic assignment and decision permissions pass for this digest and configuration?",
+                "qa-r17, qa-routing-3 and qa-204. The later mapping correction has its own affected recheck in qa-209."
+              ],
+              [
+                "UAT",
+                "Exercise the purchase from submission to decision with a business representative.",
+                "Does the representative accept this scenario and configuration?",
+                "uat-80 rejects the wrong recipient. uat-82 accepts the repeat on uat-r9 with uat-routing-6."
+              ],
+              [
+                "Prod",
+                "Observe who receives a real or controlled assignment on the serving revision.",
+                "Should the Service Owner hold, recover or widen exposure?",
+                "prod-rollout-87 retains the failed prod-r41 attempt and INC-7, then prod-r42, prod-routing-11, the controlled check and the two-hour pilot observation."
+              ]
+            ]
+          }
+        ]
       }
     ]
   }

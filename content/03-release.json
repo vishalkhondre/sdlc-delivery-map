@@ -93,7 +93,7 @@
     "measure": "Inspect a held decision as well as a successful one. Both records should explain which condition determined the result.",
     "sources": [
       {
-        "title": "GitHub Docs · Deployment protection rules",
+        "title": "GitHub Docs · Deployments and environments",
         "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments"
       },
       {
@@ -101,8 +101,46 @@
         "url": "https://docs.docker.com/dhi/explore/security-concepts/digests/"
       },
       {
-        "title": "Microsoft Azure Well-Architected Framework · Safe deployment practices",
+        "title": "Microsoft Azure Well-Architected Framework · Architecture strategies for safe deployment practices",
         "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
+      }
+    ],
+    "detail": [
+      {
+        "id": "three-decisions",
+        "title": "Who decides whether the candidate can advance?",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "Decisions recorded for the same build-418 image",
+            "columns": [
+              "Decision",
+              "Question",
+              "Owner in this example",
+              "Record"
+            ],
+            "rows": [
+              [
+                "QA result",
+                "Does this candidate route the request automatically and enforce decision permissions?",
+                "The QA tester records the observations. The QA lead checks their scope.",
+                "qa-204 identifies the tested digest, configuration and results. qa-209 records the affected recheck after the UAT mapping change."
+              ],
+              [
+                "Business acceptance",
+                "Can the purchasing user complete the intended workflow with the correct approver?",
+                "The designated business representative accepts or rejects the scenario.",
+                "uat-80 records the rejection. uat-82 records acceptance on the same digest with the corrected UAT mapping."
+              ],
+              [
+                "Production authorization",
+                "May this digest be deployed to production with the reviewed settings?",
+                "The Release Manager verifies eligibility under the standard-change policy.",
+                "The 12 March authorization at 12:00 UTC records the policy and allowed digest. The supplied record does not identify an individual approver."
+              ]
+            ]
+          }
+        ]
       }
     ]
   },
@@ -414,8 +452,23 @@
         "url": "https://www.gov.uk/service-manual/measuring-success/how-to-set-performance-metrics-for-your-service"
       },
       {
-        "title": "NIST Engineering Statistics Handbook · Estimating event times with incomplete follow-up",
+        "title": "NIST Engineering Statistics Handbook · Empirical model fitting - distribution free (Kaplan-Meier) approach",
         "url": "https://www.itl.nist.gov/div898/handbook/apr/section2/apr215.htm"
+      }
+    ],
+    "detail": [
+      {
+        "id": "measure-figure",
+        "title": "Outcomes at the one-day cutoff",
+        "blocks": [
+          {
+            "type": "figure",
+            "src": "assets/figures/cohort-at-one-day.svg",
+            "alt": "Four bars for the same 100 submissions show 92 correctly assigned, 40 decided and 60 open at day one. The decision bar ends before the 50% line.",
+            "caption": "The one-day decision target, measured across all eligible submissions",
+            "text_equivalent": "Each of the 100 submissions had a full day of follow-up. By day one, 92 had reached the correct approver. Those assignments took 3–19 minutes, so zero of 100 met the two-minute assignment window. Forty of 100 had a decision and 60 remained open. Because the decision bar ends below the 50% line, the cohort had not reached its median decision time within one day. Assignment and decision refer to the same requests. Only the decided and open counts add up to the cohort."
+          }
+        ]
       }
     ]
   },

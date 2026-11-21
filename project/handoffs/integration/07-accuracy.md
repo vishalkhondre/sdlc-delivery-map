@@ -1,0 +1,40 @@
+# Independent accuracy review of the overview figures and integration
+
+**Scope.** I reviewed the six generated overview pages, their four rendered SVGs and two tables. I traced their records into the related deep dives and compared the links with the generated index and tour. This review applies to section 6.7 and Phase 5. It does not bind an edition or certify a live tool installation.
+
+## Recomputed results and decisions
+
+| Surface | Evidence checked | Result |
+| --- | --- | --- |
+| Measure | Read the downloadable CSV with a CSV parser and counted distinct request IDs, follow-up, decision field, open flag and correct-assignment times. | 100 distinct eligible submissions had 1,440 minutes each. Every open flag agreed with the decision field. Correct assignments numbered 92, took 3–19 minutes, first reached half the cohort at 11 minutes, and satisfied the two-minute window for 0/100. Forty decisions and 60 open requests leave the decision median unreached by day one. The bar lengths and half-cohort reference show those counts. |
+| Handoffs | Inspected the original 2,048 × 1,735 map and rendered the four-style SVG. | The navy branch-to-PR arrow stays in the repository lane. The teal arrow goes from PR to Actions checks. Failed QA leads to Hold release via the red dashed path. The gray dashed path goes from UAT decision to Confluence validation summary. Both direction and meaning agree. |
+| Hold | Matched both branches of the rendered figure and the text equivalent to the earlier code failure in the dataset and to the two UAT records. | TC-04 in qa-196 exposed the unauthorized decision on build-412. PR-41 produced build-415 with a different digest and qa-198 checked both the fix and the authorized path. The triage owner closed CC-131. Build-418 then required qa-204. The mapping route preserves the rejected uat-80 on the unchanged image, rechecks routing and permissions in qa-209, and obtains a new business decision in uat-82 on uat-r9/uat-routing-6. |
+| Evidence record | Compared the complete source, QA, UAT, release and production objects in the dataset and downloadable JSON. Inspected the reused flow SVG and its reverse reading route. | PR-42, integrated commit 3ab862bc…, build-418 and the linux/amd64 digest sha256:041f649d… lead to the tested and authorized image. Two actual attempts are retained. prod-r41/prod-routing-10 reached the wrong recipient and triggered INC-7. prod-r42/prod-routing-11 passed smoke, then the corrected two-hour pilot observed 24/24 eligible requests, excluding the two controlled checks. Neither pilot contributes to the later 100. The incident involved eight earlier requests, seven reassigned and one authorized decision retained. |
+| Policy | Compared the three rows with the JSON timestamps and the change-approval page. | QA records technical observations and the QA lead checks scope. A designated business representative decides UAT. On the example standard route, the Release Manager checks the candidate against the preauthorized procedure. The 12 March 12:00 UTC authorization follows the 11:00 UTC uat-82 acceptance. No individual signer is supplied. GitHub’s configured environment gate allows manual approval as one possible control. |
+| Environments | Compared the context, purpose, question and evidence in each row with the map and actual records. | Dev covers local work and CI. QA checks the tested digest, technical behavior and configuration. UAT adds the designated representative's workflow decision. Prod supplies actual serving and exposure evidence, including both attempts. The Service Owner decides whether to widen exposure following observation. |
+
+## Integration and reader cross-checks
+
+The built index contains 53 overviews, 40 deep dives and six flows. All 40 declared parents link to their deep dive from Go deeper, all 40 breadcrumbs link back, and the tour links to every deep dive. The eight index groups are Define, Build, Prove, Release, Learn, Reference, Deep dive and Flow. The delivered map, JSON and CSV each match their source asset byte for byte.
+
+I cross-checked the requalification answers to Q11–13, the standard authority and configured environment gate for Q16, the distinction between the actual controlled observation and the proposed alert for Q18, and the cohort-to-CC-100 decision for Q20. The latter retains CC-123 as Released, assigns the later operational investigation to the Service Owner and sends proposed CC-140 to refinement under the Product Owner. The data do not establish an exact decision median or the effect of CC-140. The separate editorial review covers all twenty questions.
+
+## Primary references opened 21 November 2026
+
+| Publisher and title | Claim checked |
+| --- | --- |
+| GitHub, [Deployments and environments](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments) | An environment-referencing job waits for its configured protections. Approval, optional self-review prevention and plan restrictions are separate settings. |
+| GitHub, [Deployment environments](https://docs.github.com/en/actions/concepts/workflows-and-actions/deployment-environments) | An environment represents a deployment target. Its configured rules precede runner allocation and access to environment secrets. |
+| GitHub, [Pull requests](https://docs.github.com/en/pull-requests/reference/pull-requests) and [Events that trigger workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request) | A pull request proposes a merge. Configured pull-request activity can trigger the checks shown on this map. |
+| Docker, [Image digests](https://docs.docker.com/dhi/explore/security-concepts/digests/) | A digest identifies image content. A separate configuration record and production observation establish what happened to a request. |
+| Microsoft, [Architecture strategies for safe deployment practices](https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments) | Health checks support progressive exposure and a detected problem should halt rollout. |
+| DORA, [Deployment automation](https://dora.dev/capabilities/deployment-automation/) | The package, target-specific configuration and deployment test have distinct roles. |
+| ISTQB, [Certified Tester Foundation Level Syllabus – Acceptance Testing, Version 2019](https://istqb.org/wp-content/uploads/2024/11/ISTQB-CT-AcT_Syllabus_v1.0_2019.pdf) and Microsoft, [Track test status](https://learn.microsoft.com/en-us/azure/devops/test/track-test-status?view=azure-devops) | Acceptance testing has a business scope. Recorded results can be tracked across test runs. Neither source supplies the fictional team's approval policy. |
+| GOV.UK Service Manual, [How to set performance metrics for your service](https://www.gov.uk/service-manual/measuring-success/how-to-set-performance-metrics-for-your-service) | Outcome measures should answer the service objective and be considered with user research. |
+| NIST, [Empirical model fitting - distribution free (Kaplan-Meier) approach](https://www.itl.nist.gov/div898/handbook/apr/section2/apr215.htm) | An unreached event contributes time at risk up to censoring. The worked CSV has equal complete observation to a common cutoff. |
+
+## Findings and recheck
+
+I raised two findings. The six overview pages used some descriptive source aliases, and the evidence-record instructions interpreted a blank as proof the event never happened. I reopened the rebuilt pages and checked the corrected GitHub, Microsoft, GOV.UK and NIST link labels against the primary headings. The CSV instructions now identify a blank as an event absent from the export at the cutoff. The eight rows are described as lacking a *recorded* correct assignment, and the Service Owner retains the investigation.
+
+**Verdict — accept the overview figures and integration for accuracy.** Both findings are resolved in the generated site. The worked records are fictional. The live enforcement, running application and individual signatory were outside this review.

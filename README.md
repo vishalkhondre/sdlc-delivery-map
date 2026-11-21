@@ -24,7 +24,7 @@ Open `http://localhost:8000/`. On a machine with Chromium already installed, set
 
 ## Maintain a lesson
 
-- `content/0*.json` holds the canonical lesson records, including their owners, inputs, steps, evidence, examples, failure paths, measures and references.
+- The numbered lesson files matching `content/[0-9][0-9]-*.json` hold the canonical lesson records, including their owners, inputs, steps, evidence, examples, failure paths, measures and references.
 - `content/hotspots.json` connects rectangles on the 2048 × 1735 illustration to lesson IDs. Several regions may teach different uses of one lesson.
 - `site/` contains the generator, styles, interactions and original map illustration. `dist/` is the generated, self-contained static site.
 - `project/`, `templates/`, `.claude/` and `.github/prompts/` preserve the authoring and review handoff.
@@ -45,7 +45,13 @@ python scripts/release_snapshot.py notes v1.0.0
 python scripts/release_snapshot.py pdf v1.0.0 build/sdlc-delivery-map-v1.0.0.pdf
 ```
 
-A second PDF layout can be generated on machines without a browser. Run `python scripts/field_guide_pdf.py v1.0.0 build/sdlc-delivery-field-guide.pdf` to produce a printable guide from the same lesson inventory, with a linked index, bookmarks and the full-size map scaled to the page.
+The printable field guide uses ReportLab and the Inkscape command-line renderer. It includes the lesson index, bookmarks, figures and their text descriptions. Install Inkscape on your PATH and the Python dependencies in `scripts/requirements.txt`. To build a local integration preview:
+
+```sh
+python scripts/field_guide_pdf.py --preview build/sdlc-field-guide-preview.pdf
+```
+
+For a reviewed edition, pass its matching release tag in place of `--preview`. To label a local HTML build as an unbound preview as well, run `SDLC_INTEGRATION_PREVIEW=1 python site/generate.py`.
 
 ## Credits and license
 

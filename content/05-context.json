@@ -125,6 +125,21 @@
         "title": "GitHub Docs · Pull requests",
         "url": "https://docs.github.com/en/pull-requests/reference/pull-requests"
       }
+    ],
+    "detail": [
+      {
+        "id": "handoffs-figure",
+        "title": "Read the four arrow styles",
+        "blocks": [
+          {
+            "type": "figure",
+            "src": "assets/figures/map-arrow-legend.svg",
+            "alt": "Four labeled arrow samples illustrate a next step, a handoff, a failure or recovery, and an evidence link.",
+            "caption": "One route from the delivery map for each arrow style",
+            "text_equivalent": "Solid navy means next step in the same lane, from Feature branch to Open pull request. Solid teal means handoff between lanes, from Open pull request in the repository to Run CI checks in GitHub Actions. Dashed red means failure or recovery path, from failed QA verification to Hold release. Dashed gray means linked record or evidence, from Record UAT decision to Validation summary in Confluence."
+          }
+        ]
+      }
     ]
   },
   {

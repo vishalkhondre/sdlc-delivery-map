@@ -4,6 +4,7 @@ import functools
 import http.server
 import json
 import os
+import subprocess
 import threading
 from pathlib import Path
 from playwright.sync_api import sync_playwright
@@ -73,6 +74,67 @@ def check_detail_routes(page, base, lessons):
         parent_link.focus()
         page.keyboard.press("Enter")
         page.wait_for_url(base + f"topics/{parent}.html")
+
+
+def check_integration_catalog(page, base, lessons):
+    page.goto(base + "tour.html")
+    dives = {f"topics/{item['id']}.html" for item in lessons if item.get("kind") == "deep-dive"}
+    tour = page.locator("#tour-stops .tour-deeper a")
+    assert set(tour.evaluate_all("links => links.map(a => a.getAttribute('href'))")) == dives
+
+    page.goto(base + "topics.html")
+    page.locator("#clear-search").click()
+    for kind, label in (("deep-dive", "Deep dive"), ("flow", "Flow")):
+        expected = [f"topics/{item['id']}.html" for item in lessons if item.get("kind") == kind]
+        group = page.locator(f'section[data-index-phase="{label}"]')
+        page.get_by_label("Section", exact=True).select_option(label)
+        assert group.get_by_role("heading", level=2, name=label, exact=True).is_visible()
+        visible = page.locator(".topic-row:visible a")
+        actual = visible.evaluate_all("links => links.map(a => a.getAttribute('href'))")
+        assert sorted(actual) == sorted(expected), label
+    page.locator("#clear-search").click()
+
+
+def check_overview_routes_at_phone_width(page, base, lessons):
+    routes = ["index.html", "tour.html", "topics.html", "references.html"]
+    routes.extend(f"topics/{item['id']}.html" for item in lessons if item.get("kind", "overview") == "overview")
+    for route in routes:
+        page.goto(base + route)
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1"), route
+
+    # The six reference additions must work for someone following the page by keyboard.
+    references = {"evidence-record": "figure", "hold": "figure", "measure": "figure",
+                  "handoffs": "figure", "policy": "table", "environments": "table"}
+    topics = {item["id"]: item for item in lessons}
+    for key, kind in references.items():
+        page.goto(base + f"topics/{key}.html")
+        section, block = next((section, block) for section in topics[key].get("detail", [])
+                              for block in section["blocks"] if block["type"] == kind)
+        contents = page.locator(".mobile-contents")
+        contents.locator("summary").press("Enter")
+        contents.get_by_role("link", name=section["title"], exact=True).press("Enter")
+        page.wait_for_url(base + f"topics/{key}.html#{section['id']}")
+        reference = page.locator(f"#{section['id']}")
+        page.keyboard.press("Tab")
+        if kind == "figure":
+            summary = reference.locator(".figure-description summary")
+            assert summary.evaluate("el => el === document.activeElement"), key
+            page.keyboard.press("Enter")
+            description = reference.locator(".figure-description[open]")
+            expected = block["text_equivalent"]
+            entries = expected if isinstance(expected, list) else [expected]
+            for entry in entries:
+                assert entry in description.inner_text(), key
+            assert reference.get_by_role("img", name=block["alt"], exact=True).is_visible(), key
+        else:
+            region = reference.get_by_role("region", name=block["caption"], exact=True)
+            assert region.evaluate("el => el === document.activeElement"), key
+            assert region.locator("thead th[scope=col]").count() == len(block["columns"]), key
+            assert region.locator("tbody tr").count() == len(block["rows"]), key
+            if region.evaluate("el => el.scrollWidth > el.clientWidth + 1"):
+                page.keyboard.press("ArrowRight")
+                page.wait_for_function("el => el.scrollLeft > 0", arg=region.element_handle())
+    print(f"Checked {len(routes)} overview and navigation pages at 390px and six keyboard reference routes")
 
 
 def check_flow_routes(page, base, lessons):
@@ -185,7 +247,11 @@ def main(integration=False):
                 return_link.click()
                 assert page.locator(f"#{card_target}").get_attribute("aria-label") == "Record UAT decision"
                 page.go_back()
-                assert "Edition " in page.locator("footer small").inner_text()
+                footer = page.locator("footer small").inner_text()
+                label = "Integration preview · Unbound" if os.getenv("SDLC_INTEGRATION_PREVIEW") == "1" else "Edition "
+                assert footer.startswith(label), footer
+                commit = subprocess.check_output(["git", "rev-parse", "--short=8", "HEAD"], cwd=ROOT, text=True).strip()
+                assert footer.endswith(f" · Commit {commit}"), footer
                 page.emulate_media(color_scheme="light")
                 badge = page.locator(".activity-tag")
                 light_ink = badge.evaluate("el => getComputedStyle(el).color")
@@ -195,6 +261,8 @@ def main(integration=False):
                 page.goto(base + "topics.html")
                 search = page.locator("#topic-search")
                 assert page.get_by_label("Section", exact=True).count() == 1
+                if integration:
+                    check_integration_catalog(page, base, lessons)
                 check_search(page, base, {item["id"]: item for item in lessons}, integration)
                 page.goto(base + "topics.html")
                 search.fill("unfindable-test-phrase")
@@ -235,6 +303,8 @@ def main(integration=False):
                     page.goto(base + route)
                     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1"), f"Viewport overflow: {route}"
                 page.set_viewport_size({"width": 390, "height": 844})
+                if integration:
+                    check_overview_routes_at_phone_width(page, base, lessons)
                 check_detail_routes(page, base, lessons)
                 check_build_reading_order(page, base)
                 check_flow_routes(page, base, lessons)
