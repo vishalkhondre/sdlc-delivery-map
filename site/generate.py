@@ -49,6 +49,7 @@ TOUR = [
     ("learning", "Release & Learn", "Decide what to do next", "The Product Owner reviews the time to assignment, the time to decision and the requests still open after one day. Requesters and approvers explain what they experienced.",
      ("measure", "feedback"), "Forty of 100 requests reached a decision by one day. Did the cohort reach its one-day median target?", "With a full day of follow-up, 60% remained open at one day. Fewer than half had received a decision, so the median was not reached by that milestone."),
 ]
+TOUR_DEPTH_PHASES = {"intent": "Define", "qualification": "Prove", "release": "Release"}
 BUILD_READING_ORDER = ("local-dev-loop", "branch-commit-conventions", "code-review-practice",
                        "ci-integration-tests", "merge-rules", "image-build")
 BRANCHES = {
@@ -66,6 +67,13 @@ BRANCHES = {
     "uat-promotion": [("uat-runtime", "Start the UAT revision")],
     "uat-runtime": [("uat-decision", "Exercise the business workflow")],
     "validation-summary": [("release-plan", "Plan the accepted change for release"), ("evidence-record", "Inspect linked evidence")],
+    "versioning-and-fix-version": [("flow-traceability", "Follow the tag to the running image")],
+    "change-approval": [("evidence-record", "Inspect the recorded authorization"), ("hold", "Hold a candidate with missing evidence")],
+    "deploy-workflow-anatomy": [("deployment-record", "Compare the serving target with the authorization"), ("smoke", "Verify the first assignment")],
+    "rollout-strategies": [("rollback-rollforward", "Contain a failed pilot")],
+    "rollback-rollforward": [("flow-bug-prod", "Reconcile the requests affected by INC-7")],
+    "data-change-coordination": [("rollback-rollforward", "Check compatibility before restoring a revision")],
+    "release-notes-practice": [("evidence-record", "Verify the availability claim"), ("flow-bug-prod", "Read the rollout and recovery history")],
     "release-plan": [("release", "Publish the accepted version")],
     "release": [("policy", "Check production eligibility")],
     "rollout": [("observe", "Observe the running revision")],
@@ -267,8 +275,8 @@ def tour_page(topics):
             items.append(topic_link(topics,"hold",label="Failure path: hold and requalify"))
             keys = (*keys, "hold")
         # These stops also teach lessons whose map parents are tools or policies.
-        if slug in {"intent", "qualification"}:
-            section_phase = "Define" if slug == "intent" else "Prove"
+        if slug in TOUR_DEPTH_PHASES:
+            section_phase = TOUR_DEPTH_PHASES[slug]
             children = [topic_link(topics, key) for key, item in topics.items()
                         if item.get("kind") == "deep-dive" and item["phase"] == section_phase]
         else:
@@ -347,7 +355,7 @@ def topic_page(key, topics, area_by_id):
     elif kind == "flow":
         nav_name = "Flows"
         same_phase = [topics[k] for k in keys]
-    if kind == "deep-dive" and phase == "Prove":
+    if kind == "deep-dive" and phase in {"Prove", "Release"}:
         keys = [k for k, item in topics.items() if item.get("kind") == kind and item["phase"] == phase]
     elif key in BUILD_READING_ORDER:
         keys = [topic_id for topic_id in BUILD_READING_ORDER if topic_id in topics]
@@ -396,10 +404,9 @@ def topic_page(key, topics, area_by_id):
             branches=[(keys[ordinal+1],"Continue reading")]
     choices=''.join(f'<li><span>{e(label)}</span>{topic_link(topics,other,prefix)}</li>' for other,label in branches if other in topics)
     tour_id = next((s[0] for s in TOUR if map_key in s[4]), None)
-    if t.get("kind") == "deep-dive" and phase == "Define":
-        tour_id = "intent"
-    elif kind == "deep-dive" and phase == "Prove":
-        tour_id = "qualification"
+    if kind == "deep-dive":
+        tour_id = next((slug for slug, section_phase in TOUR_DEPTH_PHASES.items()
+                        if section_phase == phase), tour_id)
     if kind == "flow":
         tour_id = "flows"
     result.append(section("next-decision","Follow the workflow",

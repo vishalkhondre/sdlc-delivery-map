@@ -1,0 +1,1277 @@
+[
+  {
+    "id": "versioning-and-fix-version",
+    "kind": "deep-dive",
+    "phase": "Release",
+    "sources": [
+      {
+        "title": "Atlassian Support · Manage versions",
+        "url": "https://support.atlassian.com/jira-cloud-administration/docs/manage-versions/"
+      },
+      {
+        "title": "Pro Git · Git Basics — Tagging",
+        "url": "https://git-scm.com/book/en/v2/Git-Basics-Tagging"
+      },
+      {
+        "title": "Git · git-rev-parse",
+        "url": "https://git-scm.com/docs/git-rev-parse"
+      },
+      {
+        "title": "GitHub Docs · About releases",
+        "url": "https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases"
+      },
+      {
+        "title": "Semantic Versioning 2.0.0",
+        "url": "https://semver.org/spec/v2.0.0.html"
+      }
+    ],
+    "parent": "release-plan",
+    "activity": "Release preparation",
+    "audience": [
+      "Business Analyst",
+      "Developer",
+      "Release Coordinator"
+    ],
+    "title": "Match the planned version to the code the business accepted",
+    "summary": "A version on a work item tells the team which delivery should include it. Before announcing the change, check that the version leads to the code the business accepted. A separate production record tells you when people could use it.",
+    "owner": "The release coordinator matches the work and source records. The repository maintainer checks the tag, and the Release Manager decides whether the evidence is sufficient to move the feature.",
+    "inputs": [
+      "Read access to the Jira story, release scope, results of user acceptance testing (UAT), build receipt and source repository. A commit is a saved version of the source. A build produces a deployable package from that source.",
+      "Permission to set the Jira Fix versions field and an authorized maintainer to create the release tag. Managing a GitHub release needs repository write permission, subject to the repository’s access rules."
+    ],
+    "steps": [
+      "Read the scope of Jira version 1.3.0. Open CC-123 and its linked accepted candidate. Record the integrated commit as well as the image digest, the content identifier for the published package.",
+      "Compare the commit named by tag v1.3.0 with the commit on the build-418 receipt. Verify the accepted tests and the candidate digest. Ask the maintainer to resolve any discrepancy before publication.",
+      "Publish the release entry against the verified tag with references to scope, image and business acceptance. Link it back to CC-123. Leave actual user exposure to the deployment and observation records."
+    ],
+    "evidence": "A second reader can follow CC-123 from its target version to the release tag, recover the integrated commit, and use the receipt to find the package accepted in testing.",
+    "example": "PR-42, the pull request integrating the feature, leads to build-418. The receipt and v1.3.0 both identify the same source commit. The qa-204 technical run and uat-82 business decision refer to its published image.",
+    "failure": "If the published tag or proposed target resolves to another commit, the coordinator holds publication or promotion, records the discrepancy on CC-123 and asks the maintainer to identify the verified source.",
+    "measure": "Sample published versions. Count how many let a reviewer recover the expected commit and the tested package, and identify any issue whose availability claim lacks a production record.",
+    "detail": [
+      {
+        "id": "release-records",
+        "title": "Read the three records side by side",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The business analyst starts with the work item in Jira. The maintainer works in the source repository. The release coordinator brings the records together once business acceptance is available and before publishing the version. Allow several minutes for a straightforward check with the records already linked. A disagreement about scope or identity reopens the decision and can take longer."
+          },
+          {
+            "type": "table",
+            "caption": "Worked mapping for automatic purchase routing",
+            "columns": [
+              "Record and owner in this team",
+              "What to inspect for version 1.3.0",
+              "What the record establishes"
+            ],
+            "rows": [
+              [
+                "Jira fix version · release coordinator",
+                "CC-123 carries Fix versions = 1.3.0. Read the feature scope, selected issues and links to the acceptance records.",
+                "Planned inclusion of the work. The field contains no source commit or deployment observation."
+              ],
+              [
+                "Git tag · repository maintainer",
+                "Resolve v1.3.0 to the integrated commit on the build-418 receipt. Keep the full identifier when comparing.",
+                "A named point in source history. The receipt connects it to the published image."
+              ],
+              [
+                "GitHub release · release coordinator",
+                "Inspect the release’s selected tag v1.3.0, the accepted digest, the business decision and the audience note.",
+                "Publication of the version and its description. The entry can exist before the first production attempt."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "Setting Fix versions adds a work item to that Jira version. Affects versions records where a problem was observed. GitHub releases are based on Git tags and can carry release notes and assets. Neither action measures production exposure."
+          }
+        ]
+      },
+      {
+        "id": "version-choice",
+        "title": "Decide what the number promises",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "If a team adopts Semantic Versioning, it first declares the public interface on which its consumers depend. Once that interface is stable, an incompatible change increases the major number, a compatible addition increases the minor number, and a compatible fix increases the patch number. For this feature, a minor release could be justified if automatic routing adds an option while preserving the contract consumers already rely on. A change that breaks a supported integration needs a different compatibility decision."
+          },
+          {
+            "type": "text",
+            "value": "The fictional record supplies 1.3.0 and its corresponding tag. It supplies neither the previous version nor a published interface contract. Record the team’s choice without claiming this example proves Semantic Versioning compliance. The leading v is the repository’s tag convention."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative release preparation settings",
+            "value": "Work item: CC-123\nFix versions: 1.3.0\nTag selected for publication: v1.3.0\nExpected source: integrated PR-42 commit from the build-418 receipt"
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "A human-readable version lets people talk about a release. An exact source identifier and a package receipt let a second person check which software that name refers to."
+          }
+        ]
+      },
+      {
+        "id": "verify-the-tag",
+        "title": "Check the actual target",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In a read-only checkout with a freshly fetched tag from the authoritative repository, this Git command resolves the tag to its commit. It works for either an annotated tag, which has its own tag object, or a lightweight tag pointing at the commit. Comparing the object identifier of an annotated tag itself to a commit would give a misleading mismatch."
+          },
+          {
+            "type": "code",
+            "language": "sh",
+            "caption": "Illustrative Git command to inspect the tag",
+            "value": "git rev-parse --verify 'refs/tags/v1.3.0^{commit}'"
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Expected output using the fictional accepted source",
+            "value": "3ab862bc3190549bff7df2e0c1a02c9cc11459e4"
+          },
+          {
+            "type": "text",
+            "value": "Look up that full value on the publication receipt. Confirm build-418 produced the expected image for linux/amd64 and that uat-82 names the same digest. The tag command reads source history only. It does not look in the registry or query the business decision."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The Release Manager moves CC-123 from In UAT to Ready for release only when the version mapping, acceptance, reviewed configuration and production authorization are present. Add web links to the release entry and authorization. Keep the status during a production hold."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "The tag leads to the repair rather than the accepted integration",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Suppose a draft uses the source behind build-415. This is a comparison exercise. The recorded v1.3.0 actually identifies build-418’s source. PR-40/build-412 exposed the authorization defect CC-131 in qa-196. PR-41/build-415 repaired it and qa-198 verified that repair. PR-42/build-418 integrated the feature, received its own qa-204 checks and later uat-82 acceptance. A green repair run cannot authorize publication of a different integrated candidate."
+          },
+          {
+            "type": "text",
+            "value": "Keep the draft unpublished, attach the expected and observed identifiers to CC-123, and return the selection to the maintainer. For an unpublished draft, select the correctly verified source under the team’s tag policy. If people already consumed a wrong published tag, preserve its history, issue a traceable correction under a new version as appropriate, and review any dependent deployment. Silently moving the tag makes old downloads and later checkouts disagree. Marking the feature Released when the draft is corrected would also conceal the later prod-r41 hold."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "With another tracker, source host or package registry, keep one path from scope to named source to accepted package. Give the rollout team that path and a separate place to record what actually reached users."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "change-approval",
+    "kind": "deep-dive",
+    "phase": "Release",
+    "sources": [
+      {
+        "title": "GitHub Docs · Deployments and environments",
+        "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments"
+      },
+      {
+        "title": "Microsoft Learn · Architecture strategies for safe deployment practices",
+        "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
+      },
+      {
+        "title": "Atlassian · Change management types",
+        "url": "https://www.atlassian.com/itsm/change-management/types"
+      }
+    ],
+    "parent": "policy",
+    "activity": "Release preparation",
+    "audience": [
+      "Release Manager",
+      "Business Analyst",
+      "Deployment Operator"
+    ],
+    "title": "Decide who may authorize a production change",
+    "summary": "A business representative can accept the way a purchase request moves through the service. Someone still has to decide whether this particular version may run in production under the planned settings. Follow that second decision from the evidence to the job that can deploy it.",
+    "owner": "The Release Manager checks the standard-change conditions and owns production authorization under the example policy. The designated change authority decides exceptional cases. The deployment operator executes an authorized job.",
+    "inputs": [
+      "The accepted image digest, a content identifier for the tested package, plus the target production environment. Obtain the quality assurance (QA) result, user acceptance testing (UAT) decision and review of environment-specific routing settings.",
+      "Permission to read the change and qualification records. An eligible reviewer needs the appropriate repository access and membership in the configured reviewer list. The operator needs separate permission to request a deployment."
+    ],
+    "steps": [
+      "Establish which change policy covers the requested action. Match the proposed digest and target to the evidence, including the review of the production group mapping. Identify the actual deployment initiator.",
+      "At the production environment gate, check whether the person giving approval is eligible and independent as required by policy. Record the outcome, evidence links, scope and time.",
+      "Pass only the authorized candidate to the production job. If any required evidence is stale or absent, retain the hold, name the missing decision and tell its owner what to supply."
+    ],
+    "evidence": "The change record should identify the policy, accountable role, actual decision actor, target, allowed digest, configuration review, conditions and time. The fictional record contains only part of a real audit trail.",
+    "example": "uat-82 accepted the business scenario at 11:00 UTC on 12 March. The example authorizes build-418’s digest at 12:00 UTC that day. The later prod-rollout-87 record captures what happened when the service actually ran.",
+    "failure": "A person starting the job cannot approve their own deployment under the illustrated settings. The job waits for an eligible reviewer. A candidate that fails the policy check returns to the evidence owner.",
+    "measure": "For a sample of production attempts, recover the authorization for the actual target and digest. Check that exception decisions name an accountable person, a reason and any outstanding follow-up.",
+    "detail": [
+      {
+        "id": "choose-policy",
+        "title": "Choose the authority before asking for a signature",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Start when the release coordinator requests production use of an accepted candidate. Inspect the change record and the pending production job. Allow several minutes to compare identities and evidence for a routine change. The wait for the business representative or reviewer is separate. A time estimate for a desk check does not grant permission when that wait expires."
+          },
+          {
+            "type": "table",
+            "caption": "Illustrative change routes used by this team",
+            "columns": [
+              "Route",
+              "Who decides and on what basis",
+              "Handoff"
+            ],
+            "rows": [
+              [
+                "Standard · repeatable, assessed change",
+                "The change authority preauthorizes the procedure. The Release Manager verifies that this instance fits its limits and that the required evidence is present.",
+                "Record the authorized digest and target. An out-of-scope case needs another route."
+              ],
+              [
+                "Normal · change needing individual assessment",
+                "The designated change authority reviews the impact, verification plan, recovery options and affected owners. An unfamiliar routing change outside the standard policy is a candidate.",
+                "Record an individual decision and its conditions before the production job proceeds."
+              ],
+              [
+                "Emergency · delay creates unacceptable active harm",
+                "The incident lead states the user impact and why the ordinary timetable is unsafe. The designated emergency authority assesses the proposed repair, retained tests, residual risk and deferred checks.",
+                "Use the approved expedited path, identify who authorized it, retain evidence and schedule follow-up. Urgency alone grants no permission."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "Business acceptance answers whether the feature meets the agreed scenario. Production authorization binds a particular change and target to a decision authority. Keep the evidence for both."
+          }
+        ]
+      },
+      {
+        "id": "environment-gate",
+        "title": "Find the control that can stop the job",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In GitHub Actions an environment is a named deployment target with its own settings. A job must reference the protected environment for its rules to apply. Configure the target in the repository and inspect the workflow for other jobs or credentials that could deploy outside it. A reviewer checking a Jira comment alone cannot tell whether the workflow enforces the decision."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative production environment settings, entered in repository settings",
+            "value": "Environment: production\nRequired reviewer: designated release-reviewer team\nPrevent self-review: enabled\nAdministrator bypass: disallowed\nWorkflow job references: environment: production"
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "On supported repositories, a GitHub environment can list up to six people or teams with at least read access as required reviewers. Approval by one eligible reviewer satisfies that reviewer rule. Prevent self-review excludes the person who initiated the deployment. Environment secrets are available to the job only after the applicable protection rules pass."
+          },
+          {
+            "type": "text",
+            "value": "These controls require configuration and their availability depends on the plan and repository visibility. A list of several reviewers is not a quorum. If policy requires the author and approver to differ, check the change authorship too. Prevent self-review checks who initiated deployment, which can be a different person from the code author. If the team requires two independent decisions, implement and test both."
+          }
+        ]
+      },
+      {
+        "id": "decision-record",
+        "title": "Read the recorded approval and identify what else to collect",
+        "blocks": [
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Authorization output from the fictional record with its evidence limits",
+            "value": "Target: production\nPolicy: standard change\nDecision: this package authorized at 2026-03-12T12:00:00Z\nDigest: sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c\nEvidence: qa-204, affected recheck qa-209, accepted uat-82\nReview condition: production role mapping and membership checked\nAccountable role under team policy: Release Manager\nIndividual decision actor and provider approval log: not supplied"
+          },
+          {
+            "type": "text",
+            "value": "The public record summarizes the review of the production mapping. It supplies neither a signed copy of a particular configuration by that individual nor a GitHub job approval event. In a real change, retain the reviewer identity, reviewed configuration version, decision time, actor independence and link to the job’s approval event. Give an auditor a way to open the original records under the correct permissions."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "A standard-change check passes when QA evidence, business acceptance and configuration review apply to the selected candidate and the production policy conditions are satisfied. The Release Manager moves CC-123 to Ready for release and adds web links to the authorization and release record. Released waits for observed production evidence."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "A passing technical check accompanies a rejected business decision",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Consider the case immediately after uat-80. The image had passed qa-204, but unit B’s request reached unit A’s approver in business testing. The image digest still matched build-418. The QA lead and business analyst preserve the rejection. The Release Manager withholds production authorization and leaves the feature In UAT. Link the rejected decision on CC-123 and name the configuration owner and required repeat checks."
+          },
+          {
+            "type": "text",
+            "value": "The owner corrects the UAT mapping, QA records the affected recheck in qa-209 and the designated business representative accepts the repeated scenario in uat-82. The reviewer can then inspect all conditions for the noon decision. Selecting the most recent green QA run alone would have admitted the rejected business configuration. Treating the noon authorization as proof of correct operation would hide the later wrong recipient on prod-r41. Keep the failed production attempt even though its digest matched the authorization."
+          },
+          {
+            "type": "text",
+            "value": "If a new build replaces the accepted digest during the wait, hold the replacement and establish qualification for it. If the task is urgent, record which authorized exception applies and who accepts the residual risk. A repository administrator’s ability to bypass a technical rule does not establish the team’s permission to use an exception."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Any protected deployment system can separate the party proposing a change, the authority permitting it and the operator applying it. Trace the decision to the exact package and reviewed target settings, and retain the evidence of enforcement for that particular job."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "deploy-workflow-anatomy",
+    "parent": "rollout",
+    "kind": "deep-dive",
+    "activity": "Prod",
+    "phase": "Release",
+    "audience": [
+      "Platform Engineer",
+      "Release Manager",
+      "Business Analyst"
+    ],
+    "title": "Read a production deployment job from approval to the running application",
+    "summary": "The team has agreed which version of approval routing may go live. The operator still needs to show which version started, which routing table it used and whether a purchase reached the intended person. A deployment record should let a second reader check all three.",
+    "owner": "The platform engineer maintains the deployment job. The Release Manager checks the authorization, the operator investigates discrepancies, and the Service Owner decides whether to widen exposure.",
+    "inputs": [
+      "The approved image digest, a fingerprint of the published package, the registry repository, the production destination and a reviewed version of the routing configuration. Match them with the quality assurance (QA) run and business acceptance.",
+      "Permission for the production job to update this container app and inspect its revisions. A revision is a deployed snapshot of the application template. The app also needs permission to pull the packaged image from its registry.",
+      "A known serving revision, a controlled purchase request with an independently agreed recipient, and access to the first assignment event and to rollout history."
+    ],
+    "steps": [
+      "Read the selected change and its authorization. Stop before the cloud update if the approval, digest, destination or material settings disagree.",
+      "Start a job that references the protected production environment. Authenticate its workload identity, preserve the current traffic route and stage the accepted package by digest.",
+      "Inspect the specific new revision, wait for readiness, and match the image and mapping to the selection. Send a controlled request to that target and inspect its first assignment.",
+      "Attach each attempt to the feature. Give the actual serving target and smoke evidence to the Service Owner for the exposure decision."
+    ],
+    "evidence": "A deployment attempt links the approved selection, run, timestamp, observed revision, image, effective configuration, traffic destination and smoke observation. A failed attempt remains accessible after the correction.",
+    "example": "Both production attempts in prod-rollout-87 used the authorized build-418 image. The first controlled purchase reached the wrong approver on prod-r41. The second attempt used prod-r42 and the corrected mapping.",
+    "failure": "The operator holds the release on a missing or expired authorization, readiness timeout, mismatched target or failed controlled check. Inspect the named revision and preserve the observed failure before deciding on recovery.",
+    "measure": "Sample a held attempt and a completed attempt. Can another operator determine what was authorized, what handled a request, and which observation permitted the next step?",
+    "sources": [
+      {
+        "title": "GitHub Docs · Configuring OpenID Connect in Azure",
+        "url": "https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-azure"
+      },
+      {
+        "title": "GitHub Docs · Deployments and environments",
+        "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments"
+      },
+      {
+        "title": "GitHub Docs · Workflow syntax for GitHub Actions",
+        "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax"
+      },
+      {
+        "title": "Azure Login Action v2.3.0",
+        "url": "https://github.com/Azure/login/releases/tag/v2.3.0"
+      },
+      {
+        "title": "Microsoft Learn · Update and deploy changes in Azure Container Apps",
+        "url": "https://learn.microsoft.com/en-us/azure/container-apps/revisions"
+      },
+      {
+        "title": "Microsoft Learn · Traffic splitting in Azure Container Apps",
+        "url": "https://learn.microsoft.com/en-us/azure/container-apps/traffic-splitting"
+      },
+      {
+        "title": "Microsoft Learn · az containerapp",
+        "url": "https://learn.microsoft.com/en-us/cli/azure/containerapp?view=azure-cli-latest"
+      },
+      {
+        "title": "Microsoft Learn · az containerapp revision",
+        "url": "https://learn.microsoft.com/en-us/cli/azure/containerapp/revision?view=azure-cli-latest"
+      },
+      {
+        "title": "Microsoft Learn · Health probes in Azure Container Apps",
+        "url": "https://learn.microsoft.com/en-us/azure/container-apps/health-probes"
+      },
+      {
+        "title": "Microsoft Learn · Container Apps Revisions - List Revisions",
+        "url": "https://learn.microsoft.com/en-us/rest/api/resource-manager/containerapps/container-apps-revisions/list-revisions?view=rest-resource-manager-containerapps-2026-07-01"
+      },
+      {
+        "title": "Azure · Container Apps Deploy Action",
+        "url": "https://github.com/Azure/container-apps-deploy-action"
+      },
+      {
+        "title": "jq 1.7 Manual",
+        "url": "https://jqlang.org/manual/v1.7/"
+      }
+    ],
+    "detail": [
+      {
+        "id": "release-input",
+        "title": "Start with the decision authorizing this job",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In the illustrated design a release operator starts the workflow manually on a permitted branch. A separate job called verify_release reads the current, access-controlled change record. It checks the intended environment, QA and business decisions, reviewed configuration, authorized digest and whether authorization is still valid. A failed or missing decision prevents it from producing a deployable selection. The job below consumes its outputs. The public qualification download is a fictional record for analysis and grants no cloud access."
+          },
+          {
+            "type": "text",
+            "value": "The example allows minutes for the cloud update and readiness check once the gate opens. The twenty-minute job timeout is an illustrative limit. Approval waiting time and the later two-hour business observation are separate. A second operator should be able to follow the change record to a specific job attempt even when the job ends early."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "Keep three records with different owners: the authorized selection, the platform’s observed state and the application’s routing result. Their shared identifiers let a reviewer compare the decisions."
+          }
+        ]
+      },
+      {
+        "id": "job-shape",
+        "title": "Read the protected job and its cloud identity",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "These excerpts show parts of an illustrative GitHub Actions workflow. The prior verification job, production settings and separate smoke and evidence steps are described here so you can evaluate their responsibilities. The manual dispatch accepts no caller-supplied image or shell command."
+          },
+          {
+            "type": "code",
+            "language": "yaml",
+            "caption": "Illustrative workflow excerpt · selected production job and login",
+            "value": "on: workflow_dispatch\nconcurrency:\n  group: purchase-routing-production\n  cancel-in-progress: false\njobs:\n  # The separate verify_release job supplies the selection described above.\n  stage:\n    needs: verify_release\n    runs-on: ubuntu-latest\n    environment: production\n    timeout-minutes: 20\n    permissions:\n      id-token: write\n    env:\n      DIGEST: ${{ needs.verify_release.outputs.digest }}\n      CONFIG: ${{ needs.verify_release.outputs.routing_config }}\n      REPOSITORY: ${{ vars.ROUTING_IMAGE_REPOSITORY }}\n      STABLE: ${{ needs.verify_release.outputs.serving_revision }}\n      APP: ${{ vars.CONTAINER_APP }}\n      RG: ${{ vars.RESOURCE_GROUP }}\n    steps:\n      - name: Sign in with the production job identity\n        uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # v2.3.0\n        with:\n          client-id: ${{ vars.AZURE_CLIENT_ID }}\n          tenant-id: ${{ vars.AZURE_TENANT_ID }}\n          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}"
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "The production environment must already have its branch and reviewer rules configured. GitHub evaluates applicable rules before the job starts. OpenID Connect lets the job obtain a short-lived identity token for exchange with Azure. Configure Azure to trust the intended repository and environment, and grant its identity only the needed cloud permissions. The id-token permission alone grants no rights to update an Azure resource."
+          },
+          {
+            "type": "text",
+            "value": "The environment variables identify the registered workload and target. Keep any secrets in protected storage and exclude credentials and request contents from logs. The GitHub concurrency group coordinates participating runs in this repository. Coordinate other operators and other deployment systems through the same change control, so a concurrent edit cannot replace the reviewed state during staging."
+          }
+        ]
+      },
+      {
+        "id": "apply-and-read",
+        "title": "Stage a revision and read back what Azure created",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "This example assumes one application container, multiple active revisions, an HTTP readiness probe, at least one replica for verification, and normal ingress pinned to a previously verified revision by name. Before updating, inspect the current app and routing rules: require the expected subscription and app, the reviewed baseline and named serving revision receiving all normal traffic. Hold if a rule points at “latest,” the app is in single-revision mode, or another change has moved the baseline. In those cases creating a revision could immediately expose it. The release maintainer records the preflight result. In the example, verify_release also supplies STABLE, the expected complete revision name from that baseline."
+          },
+          {
+            "type": "code",
+            "language": "bash",
+            "caption": "Illustrative preflight · verify that default traffic stays on the named baseline",
+            "value": "set -euo pipefail\n: \"${STABLE:?}\" \"${APP:?}\" \"${RG:?}\"\nbaseline=$(az containerapp show -g \"$RG\" -n \"$APP\" -o json)\n[[ -n \"${baseline//[[:space:]]/}\" ]]\njq -e --arg stable \"$STABLE\" '\n    .properties.configuration as $cfg |\n    [$cfg.ingress.traffic[]? | select((.weight // 0) > 0)] as $live |\n    ($cfg.activeRevisionsMode | ascii_downcase) == \"multiple\"\n    and ($live | length) == 1\n    and $live[0].revisionName == $stable\n    and $live[0].weight == 100\n    and ($live[0].latestRevision // false) == false' <<<\"$baseline\" >/dev/null"
+          },
+          {
+            "type": "text",
+            "value": "After the environment approval wait and immediately before changing Azure, the protected job must read the authoritative approval again. Match the target, digest and configuration with the earlier selection. Require a current, unrevoked decision covering this attempt. If it expired, changed, was withdrawn or cannot be read, stop and request a fresh decision. The excerpts omit this change-system-specific call. Outputs from verify_release alone cannot establish that the authorization still applies."
+          },
+          {
+            "type": "code",
+            "language": "bash",
+            "caption": "Illustrative staging step after verified preflight · use the existing image",
+            "value": "set -euo pipefail\n[[ \"$DIGEST\" =~ ^sha256:[0-9a-f]{64}$ ]]\n: \"${REPOSITORY:?}\" \"${CONFIG:?}\" \"${APP:?}\" \"${RG:?}\"\nsuffix=\"r${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}\"\naz containerapp update --resource-group \"$RG\" --name \"$APP\" \\\n  --image \"$REPOSITORY@$DIGEST\" --set-env-vars \"ROUTING_CONFIG=$CONFIG\" \\\n  --revision-suffix \"$suffix\" --output none\nrevision=$(az containerapp revision list -g \"$RG\" -n \"$APP\" \\\n  --query \"[?properties.template.revisionSuffix=='$suffix'].name | [0]\" -o tsv)\ntest -n \"$revision\""
+          },
+          {
+            "type": "text",
+            "value": "Continue in the same Bash step with the revision name just returned. The runner has the Azure CLI and jq, a tool for reading JSON. The loop makes at most 24 reads and waits ten seconds between attempts. Azure CLI calls take additional time. The twenty-minute job timeout covers the whole job. A failed read or an unexpected image or setting stops the job. A successful result gives the operator a revision to target for a controlled test."
+          },
+          {
+            "type": "code",
+            "language": "bash",
+            "caption": "Illustrative readback · check the exact staged revision before a smoke test",
+            "value": "for attempt in {1..24}; do\n  state=$(az containerapp revision show -g \"$RG\" -n \"$APP\" \\\n    --revision \"$revision\" --output json)\n  [[ -n \"${state//[[:space:]]/}\" ]] || { echo \"HOLD: empty revision response\" >&2; exit 1; }\n  if ! jq -e --arg image \"$REPOSITORY@$DIGEST\" --arg config \"$CONFIG\" '\n    .properties.template.containers as $cs |\n    ($cs | length) == 1 and $cs[0].image == $image and\n    ([$cs[0].env[]? | select(.name == \"ROUTING_CONFIG\") | .value] == [$config])\n  ' <<<\"$state\" >/dev/null; then\n    echo \"HOLD: observed revision image or mapping reference differs\" >&2\n    exit 1\n  fi\n  if jq -e '.properties | .provisioningState == \"Provisioned\" and\n    .healthState == \"Healthy\" and .runningState == \"Running\" and\n    .active == true and (.replicas | type) == \"number\" and .replicas >= 1\n  ' <<<\"$state\" >/dev/null; then\n    echo \"Ready for controlled smoke: $revision $DIGEST $CONFIG\"\n    break\n  fi\n  if jq -e '.properties | .provisioningState == \"Failed\" or\n    .runningState == \"Failed\" or .runningState == \"Degraded\"\n  ' <<<\"$state\" >/dev/null || [[ \"$attempt\" == 24 ]]; then\n    echo \"HOLD: revision failed or readiness deadline reached\" >&2\n    exit 1\n  fi\n  sleep 10\ndone"
+          },
+          {
+            "type": "text",
+            "value": "Readiness is the platform’s assessment that a replica can handle traffic. The template reports the image and mapping reference selected for the container. Verify the effective mapping version and actual recipient independently in the service: correlate a controlled submission at the revision-specific endpoint with the revision that served it and its first assignment event. Capture the observed image, configuration, traffic target and routing observation in the rollout record, including failures. A useful hold record includes the actual values and reason, with sensitive values removed."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The release team blocks expansion on a missing, stale or mismatched observation. A named environment, a successful sign-in and a successful update command each answer only one part of the question. A retry must first inspect the target and record the previous attempt."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Worked failure · the approved package reaches the wrong approver",
+        "blocks": [
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Fictional production evidence from the qualification record",
+            "value": "Change CC-123 · rollout prod-rollout-87 · authorized build-418\nImage for both attempts: sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c\n13 March, 09:00 UTC · prod-r41 · prod-routing-10 · pilot held, INC-7\n13 March, 11:00 UTC · prod-r42 · prod-routing-11 · corrected smoke passed\n11:00–13:00 UTC · 24/24 eligible pilot submissions routed inside two minutes"
+          },
+          {
+            "type": "text",
+            "value": "The first controlled purchase reached the wrong approver. The operator holds expansion and records the actual revision, mapping and observation in prod-rollout-87. With the corrected mapping the Service Owner checks the new attempt, the pilot observations and the disposition of the eight affected requests. Seven were reassigned and one authorized decision was retained. The Release Manager adds a web link from CC-123 to the deployment record. It stays Ready for release during the hold and moves to Released after verified exposure. The fixture supplies no cloud login logs, exact provider revision names or probe timing."
+          },
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "Rebuilding from tag v1.3.0 during deployment can produce a different package. Select the accepted digest from its publication record."
+          },
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "Polling the newest revision can read another operator’s rollout. Retrieve the particular revision created for this attempt and tie the controlled request to that revision."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The Azure Container Apps Deploy Action can take an already published image through its imageToDeploy input in place of the explicit CLI update. A team using that action still supplies its own approval comparison, traffic controls, runtime readback and business smoke evidence."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "rollout-strategies",
+    "parent": "rollout",
+    "kind": "deep-dive",
+    "phase": "Release",
+    "activity": "Prod",
+    "audience": [
+      "Product Owner",
+      "Service Owner",
+      "Platform Engineer"
+    ],
+    "title": "Choose who receives the new behavior first",
+    "summary": "Installing a new version and letting buyers use it can happen at different times. For approval routing, decide whose requests will enter the new path, how you will recognize a wrong assignment, and who can stop the rollout.",
+    "owner": "The Service Owner owns the decision to widen or stop exposure. The platform operator applies the change and records who or what actually received it. The Product Owner helps select a representative group.",
+    "inputs": [
+      "The authorized package, approved production settings and a known working route for requests outside the pilot. Confirm that each active version can read and write the records the other version may touch.",
+      "An independently approved list of expected approvers, a way to recover the first assignment event for each eligible request, and service error measurements for a comparable period or population.",
+      "Permission to change routing or feature settings and an operator available throughout the observation window. Agree how to contain new submissions and reconcile those already received."
+    ],
+    "steps": [
+      "Define the eligible requests, the treatment they will receive and the unaffected comparison group or baseline. Choose a mechanism that can actually select that population.",
+      "Take a controlled purchase through the new path. Capture the serving revision, configuration, first assignment and expected recipient. Verify a request outside the pilot still follows its intended path.",
+      "Count distinct eligible requests over the agreed window and compare the first correct assignments and service health with the decision rule. Keep synthetic checks separate.",
+      "Have the Service Owner record expand, hold or recover. Update the exposure control only after the decision and verify the resulting state."
+    ],
+    "evidence": "An exposure record identifies the target group or traffic rule, actual revision and configuration, observation interval, eligible count, wrong or late recipients, service health and the person accountable for the next decision.",
+    "example": "In prod-rollout-87 the team halted the first pilot after a controlled purchase went to the wrong person. After correction, 24 of 24 distinct eligible pilot submissions received a correct assignment within two minutes over two hours. The Service Owner widened exposure.",
+    "failure": "On a wrong recipient, the operator immediately stops widening access, preserves the first assignment event and captures the affected population. The Service Owner decides containment and owns unresolved cases.",
+    "measure": "For each expansion decision, check whether a second reader can reproduce the eligible count, identify exclusions, and explain what would have made the team hold.",
+    "sources": [
+      {
+        "title": "Microsoft Learn · Update and deploy changes in Azure Container Apps",
+        "url": "https://learn.microsoft.com/en-us/azure/container-apps/revisions"
+      },
+      {
+        "title": "Microsoft Learn · Traffic splitting in Azure Container Apps",
+        "url": "https://learn.microsoft.com/en-us/azure/container-apps/traffic-splitting"
+      },
+      {
+        "title": "Microsoft Learn · Understand feature management using Azure App Configuration",
+        "url": "https://learn.microsoft.com/en-us/azure/azure-app-configuration/concept-feature-management"
+      },
+      {
+        "title": "Google SRE Workbook · Canarying Releases",
+        "url": "https://sre.google/workbook/canarying-releases/"
+      }
+    ],
+    "detail": [
+      {
+        "id": "which-lever",
+        "title": "Choose an exposure mechanism that matches the risk",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "A revision is a deployed snapshot of the application. Exposure describes the people or requests that can use the changed behavior. A pilot, sometimes called a canary, limits that exposure for an observation period so the team can decide whether to continue. A pilot must include purchasing traffic that actually invokes the routing rule. Otherwise an all-green chart can describe people who never saw the feature."
+          },
+          {
+            "type": "table",
+            "caption": "Three rollout choices for the approval service",
+            "columns": [
+              "Method and deployment",
+              "Who receives the change?",
+              "Observation and reversal",
+              "Operational cost"
+            ],
+            "rows": [
+              [
+                "Single active revision. Azure moves app traffic when the new revision is ready.",
+                "Requests using the app’s normal endpoint reach the serving revision. Without an application-level control, all eligible submissions can enter the new path.",
+                "Watch the first assignments and service health as soon as it serves. To recover, deploy a compatible known-good state or repair forward.",
+                "Fewest moving parts, largest immediate exposure. Verify recovery compatibility before switching."
+              ],
+              [
+                "Weighted traffic across active revisions. Run the old and new revisions together.",
+                "The configured share of traffic at the application endpoint goes to each revision. It does not identify a particular purchasing team.",
+                "Group observations by the revision that handled the request. Return traffic to a compatible known-good revision and verify the resulting weights.",
+                "Needs capacity and compatibility for two revisions. At low volume a small share can produce too few eligible requests."
+              ],
+              [
+                "Targeted feature flag. Deploy code for both paths and have the app evaluate a managed switch.",
+                "The app uses trusted group or user context to choose the pilot. Other eligible requests continue on the previous path while the flag is off for them.",
+                "Record the evaluated variation and mapping on each request. Disable it for the pilot and verify the change has taken effect.",
+                "Requires both paths to work, an owner to monitor configuration refresh, and a planned date to retire the switch."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "In Azure Container Apps, weighted traffic uses multiple-revision mode. The configured weights total 100 percent. A revision label has its own URL and can point directly to a selected revision. Possession of a label URL alone is insufficient as business authorization. Azure App Configuration can supply a flag and targeting filters, while application code must evaluate the flag and select the behavior."
+          }
+        ]
+      },
+      {
+        "id": "choose-for-this-service",
+        "title": "Design a pilot for a small purchasing service",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "If every buyer can safely receive a readily reversible change, a single revision with an operator watching representative traffic can be enough. Here, a wrong assignment can put an unrelated employee in the approval chain. A small service with few submissions could wait hours for a low traffic percentage to exercise the relevant business unit. For this design exercise choose a named purchasing pilot through a targeted flag, provided the application already has a verified fallback and the team can maintain both paths. If those conditions are absent, arrange controlled access to a specific revision and explicitly check who can reach it."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative feature setting and pilot agreement · a design choice",
+            "value": "Feature: automatic purchasing assignment\nPilot selection: authenticated purchasing pilot group\nOutside group: retain the existing assignment path\nInitial observation: controlled checks, followed by eligible pilot submissions\nStop condition: a wrong recipient, unverified routing, or lost evidence\nExpansion authority: Service Owner"
+          },
+          {
+            "type": "text",
+            "value": "Agree the gate before the first submission. Compare the automatic assignment actor and recipient with the unit’s approved group, count assignments outside two minutes and look for a rise in serving errors. Check the number of distinct submissions and whether the relevant units are represented. If the window ends with no meaningful traffic or incomplete records, continue observation or arrange a representative controlled exercise. A controlled check can isolate a fault immediately, while ordinary submissions answer how the pilot behaved in use. The supplied case records a limited pilot, its interval and its result. It leaves the exposure mechanism, traffic percentages and membership list unspecified."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "Decide what the pilot can establish before interpreting the percentage. A successful two-hour window supports a decision for that rollout. Its duration and sample size limit any claim about future requests."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Worked failure · a healthy service routes to the wrong person",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "Read the two attempts separately",
+            "columns": [
+              "Attempt and actual state",
+              "Observation",
+              "Action and evidence"
+            ],
+            "rows": [
+              [
+                "13 March, 09:00 UTC. prod-r41, prod-routing-10, authorized build-418 image.",
+                "A controlled purchase reached the wrong approver during limited exposure. A request can already be assigned while still having the wrong recipient.",
+                "Stop expansion. The on-call responder declares INC-7. Record affected requests and who owns the correction."
+              ],
+              [
+                "13 March, 11:00 UTC. prod-r42, prod-routing-11, same image.",
+                "The corrected mapping and controlled smoke check passed. From 11:00 to 13:00 UTC all 24 distinct eligible pilot submissions received a correct assignment within two minutes. Two additional controlled submissions passed and were excluded from 24.",
+                "With no observed increase in serving errors during the window, the Service Owner expanded exposure. Keep both attempt records."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "Halting new exposure cannot undo an assignment already saved. In INC-7 the team reconciled eight affected requests. Seven were reassigned and one authorized decision was retained. Link the incident and both attempts in the deployment record prod-rollout-87. On Jira add a web link from feature CC-123 to that record and keep the story Ready for release during the hold. After verified rollout the Release Manager records Released. Neither the first passing smoke nor a change in traffic weight performs that transition."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "A wrong recipient stops expansion immediately. In the corrected pilot the Service Owner reviewed delivery and service evidence before widening exposure. Record missing evidence and its owner when the handoff remains on hold."
+          }
+        ]
+      },
+      {
+        "id": "read-the-population",
+        "title": "Keep later results attached to the people observed",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The later product review studied another 100 eligible submissions for a full day each. Ninety-two correct assignments took 3–19 minutes. Eight had no correct assignment by 24 hours and belonged with the Service Owner for investigation. These later eight were separate from the eight reconciled during INC-7. A reader who combines cohorts would obscure both the successful limited pilot and the later missed routing window."
+          },
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "Selecting ten percent of incoming traffic and calling it ten percent of buyers can expose a different mix of people and request types. Inspect the serving revision and the eligible population directly."
+          },
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "Disabling a flag and declaring recovery leaves previously misrouted work with the wrong recipient. Confirm the fallback on new submissions and reconcile the affected request IDs."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "A rollout needs a way to select exposure, reliable observations from that population, and a person empowered to stop it. A load balancer can divide requests while an application rule can select a named group. Choose the control that matches the business promise and verify what it actually selected."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "rollback-rollforward",
+    "kind": "deep-dive",
+    "parent": "recover",
+    "audience": [
+      "Service Owner",
+      "On-call Operator",
+      "Release Manager",
+      "Business Analyst"
+    ],
+    "title": "Choose a recovery that protects the requests already submitted",
+    "phase": "Release",
+    "activity": "Prod",
+    "summary": "A buyer’s request has reached the wrong approver. The team must stop more buyers being affected and decide what to do about requests already in somebody’s queue. An older version is a useful way back only if it can still handle today’s work.",
+    "owner": "The on-call responder declares the incident and stops expansion. The Service Owner coordinates recovery and decides when exposure can widen. The operator changes the serving state under the authorized procedure. The business owner verifies who should receive or decide each affected request.",
+    "inputs": [
+      "The first observed failure, current exposure, actual software revision and image digest (the package’s content fingerprint), effective routing settings and independently approved recipients.",
+      "The last verified working combination, current stored data and work in flight, plus permission to inspect assignments, control exposure and apply the approved change."
+    ],
+    "steps": [
+      "Keep the failed observation and the list of exposed requests. Contain further harm and identify which part of the running service caused it.",
+      "Compare recovery options against current data, permissions and expected routing. Record the decision and verify the repaired target with a controlled purchase.",
+      "Check ordinary requests in the agreed observation window. Account for each affected request, hand open exceptions to their owners and retain both deployment attempts."
+    ],
+    "evidence": "The recovery entry links INC-7 and prod-rollout-87 to the observed targets, configuration review, controlled test, observation and request dispositions. An incident reviewer can explain why expanding exposure was justified.",
+    "example": "On 13 March the fictional service kept build-418 while repairing a production mapping. The corrected pilot supplied evidence for expanding exposure. The separate incident ledger accounted for the requests that had already gone astray.",
+    "failure": "If the older version cannot process a pending request or the controlled check still chooses the wrong approver, keep expansion on hold. The operator contains remaining exposure and asks the Service Owner to choose another compatible recovery.",
+    "measure": "Measure elapsed time to verified restoration separately from time to account for affected work. Record their start and finish events explicitly. The case supplies attempt and observation times, and no incident closure timestamp.",
+    "sources": [
+      {
+        "title": "Microsoft Learn · Update and deploy changes in Azure Container Apps",
+        "url": "https://learn.microsoft.com/en-us/azure/container-apps/revisions"
+      },
+      {
+        "title": "Microsoft Azure Well-Architected Framework · Architecture strategies for safe deployment practices",
+        "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
+      },
+      {
+        "title": "Google SRE Workbook · Incident Response",
+        "url": "https://sre.google/workbook/incident-response/"
+      },
+      {
+        "title": "AWS Builders’ Library · Ensuring rollback safety during deployments",
+        "url": "https://aws.amazon.com/builders-library/ensuring-rollback-safety-during-deployments/"
+      }
+    ],
+    "detail": [
+      {
+        "id": "contain",
+        "title": "What needs to stop immediately?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Start at the first incorrect assignment in production. Hold expansion as soon as the mismatch is known. If buyers already in the pilot could still be harmed, restrict their access to this path or use the rehearsed safe fallback. An exposure hold by itself tells you only that additional buyers have not been admitted. Capture the revision, mapping version, time, request reference, actual first recipient and expected recipient before another action changes the visible queue."
+          },
+          {
+            "type": "text",
+            "value": "For an exercise, allow ten minutes for the responder to identify the serving target, contain exposure and agree a verification plan with the Service Owner. Reserve two hours to observe a corrected pilot after its controlled check passes. Actual recovery time depends on the harm and what changed. Investigating and repairing requests already sent can continue after new requests route correctly. Keep a named owner for that work."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative recovery setting for approval routing",
+            "value": "Trigger: first automated recipient differs from approved purchasing mapping\nImmediate action: hold expansion and assess active pilot exposure\nRecovery owner: Service Owner\nVerification: fresh controlled purchase, affected-request review and pilot observation"
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "Separate stopping new harm from repairing work already affected. Switching traffic can help the next buyer immediately while an earlier request remains in the wrong queue."
+          }
+        ]
+      },
+      {
+        "id": "choose",
+        "title": "Which change would remove the cause?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "A rollback restores a previously verified version or setting. A rollforward introduces a corrected one. Start from the observed fault and ask whether the proposed target can process the requests, queue messages and stored values present now. Try a representative pending request with the proposed combination in a safe environment. Check the intended approver can act and that a buyer outside the approval role cannot record a decision."
+          },
+          {
+            "type": "table",
+            "caption": "Recovery choices under the example team’s policy",
+            "columns": [
+              "Choice",
+              "Use it when",
+              "Evidence required before wider exposure"
+            ],
+            "rows": [
+              [
+                "Restore a previous revision",
+                "The regression comes from code and the previous revision can still read and write current data. Verify it can use the current dependencies and group mappings.",
+                "Identify its package and compatible settings, check readiness, direct controlled traffic there and confirm the intended version served the request."
+              ],
+              [
+                "Restore a previous setting",
+                "The program is sound and a known earlier mapping is still authorized. Have the business owner verify recipients and current membership.",
+                "Inspect the effective setting in the running service and test a fresh submission. Check separately which existing assignments require repair."
+              ],
+              [
+                "Disable the routing feature",
+                "A tested feature flag, a switch controlling this behavior, leads to a staffed and authorized fallback.",
+                "Validate who receives fallback work, how pending purchases are found, and that decisions remain restricted. Record which users and workers actually saw the switch."
+              ],
+              [
+                "Roll forward with a correction",
+                "An earlier program cannot read the new data, or restoring an old setting would select an obsolete group.",
+                "Qualify the corrected mapping or software, obtain the applicable authorization and verify the actual target. A code repair requires a newly built and identified image."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "Azure Container Apps can keep several revisions active and direct traffic between them in multiple-revision mode. Some settings apply to the whole app. Check which settings actually changed and inspect the effective mapping in its own store as well as the serving revision."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Why did INC-7 keep the same image?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "At 09:00 UTC on 13 March, a controlled purchase on prod-r41 reached the wrong approver. Use the first assignment event and an independently agreed purchasing mapping to identify the discrepancy. A later screenshot of the correct queue could reflect a manual correction. The recorded repair verified the production group mapping and membership, applied prod-routing-11 and ran the same software on prod-r42. The record supplies neither a traffic weight nor an exact incident-declaration time."
+          },
+          {
+            "type": "table",
+            "caption": "Fictional recovery entry from the qualification record",
+            "columns": [
+              "Record",
+              "Observed result"
+            ],
+            "rows": [
+              [
+                "Incident and failed target",
+                "INC-7 · prod-rollout-87 · prod-r41 with prod-routing-10. Limited pilot halted after the wrong recipient."
+              ],
+              [
+                "Package shared by the two attempts",
+                "PR-42 → build-418, linux/amd64, sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c"
+              ],
+              [
+                "Corrected target and controlled check",
+                "At 11:00 UTC, prod-r42 with prod-routing-11. A fresh eligible test request automatically reached the designated test approver."
+              ],
+              [
+                "Decision on exposure",
+                "From 11:00 to 13:00 UTC, all 24 eligible pilot requests received the correct assignment within two minutes. Two additional controlled submissions passed and were excluded from the 24. Serving errors did not increase. The Service Owner expanded exposure."
+              ],
+              [
+                "Previously affected work",
+                "Eight eligible requests required reconciliation. Seven were reassigned and one prior authorized decision was retained. The Service Owner owned their disposition."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "Relate INC-7 to CC-123 in Jira and add web links to the rollout and recovery evidence. Link the corrective change if it has its own work item. Under the example workflow CC-123 stays Ready for release during the hold. The Release Manager moves the feature to Released on the evidence from the corrected rollout. No separate production defect key or individual approval log is supplied."
+          }
+        ]
+      },
+      {
+        "id": "verify",
+        "title": "When can the response hand off to incident review?",
+        "blocks": [
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The operator reports the actual running identity, effective configuration and controlled routing result. The Service Owner keeps exposure limited on any mismatch or unresolved exposure risk. Widen after the agreed observation passes. Assign an owner and disposition to every outstanding request before closing the reconciliation."
+          },
+          {
+            "type": "text",
+            "value": "For each affected request, establish the first recipient and current state. Before reassigning an open purchase, verify the intended group and check the change did not produce a duplicate task. For a decided purchase, verify who held decision authority when it was decided. Preserve a valid decision and its history. Escalate any ambiguous decision to the business owner with the original event intact."
+          },
+          {
+            "type": "text",
+            "value": "Two errors particularly matter here. An image rollback that leaves a shared routing table untouched can reproduce the wrong assignment on the old version. Restoring a database snapshot after buyers have submitted more requests could erase their work. Establish compatibility and a plan for subsequent writes before selecting a data recovery path. The eight later requests without a correct assignment in the one-day cohort belong to a separate investigation."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "On another platform, find the controls for exposure, the running software identity and the effective settings. Ask the same business questions of the restored service and of each affected request, then leave the evidence with the people authorized to widen exposure and close the incident."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "data-change-coordination",
+    "kind": "deep-dive",
+    "parent": "release-plan",
+    "audience": [
+      "Developer",
+      "Data Owner",
+      "Release Manager",
+      "Business Analyst"
+    ],
+    "title": "Change how an approver is stored without losing open requests",
+    "phase": "Release",
+    "activity": "Release preparation",
+    "summary": "A purchase already waiting for approval must still reach the same people when the application changes. During a gradual release, an older copy of the app may save a request that a newer copy opens a minute later. The migration owner plans and tests that handoff before retiring the old way of storing assignments.",
+    "owner": "The migration owner coordinates database and application changes. The data owner verifies stored assignments and history, the purchasing owner examines unresolved cases, and the Release Manager uses that evidence to authorize the next stage.",
+    "inputs": [
+      "The existing table definition, all readers and writers (including background jobs and reporting), the versions allowed for rollback, and the business meaning of an empty or assigned field.",
+      "A representative copy with synthetic pending, unassigned and decided purchases. Read access is enough to verify the data. Separate approved permissions are needed to change the table, deploy code and run repair batches."
+    ],
+    "steps": [
+      "Expand the table by adding the new field. Deploy code that keeps the old field readable and writes both fields in one operation.",
+      "Copy existing assignments, drain older writers, catch up with intervening changes and compare both values. Exercise existing open requests and decision permissions before switching reads.",
+      "Retain a safe rollback path while observing the new reads. Retire old consumers, move all writers to the new field and demonstrate recovery on the new format before removing the old field."
+    ],
+    "evidence": "Give rollout and recovery owners the tested version-by-schema matrix, active reader and writer inventory, comparison output, open-request checks, retained recovery targets, observation and decision to proceed or hold.",
+    "example": "The fictional CC-123 record shows why saved assignments and decisions matter. INC-7 required seven reassignments and preservation of one authorized decision. The field migration below is a separate hypothetical change to the same service. No database migration is recorded in the qualification file.",
+    "failure": "A late old writer can change an existing assignment after the backfill. Keep reads on the old field, remove the old writer from service, reconcile from the current authoritative value and recheck before switching.",
+    "measure": "Count unequal assignments, open requests that cannot be found by their intended group, and consumers still depending on the old format. Track each separately. Equal fields can both contain the wrong recipient.",
+    "sources": [
+      {
+        "title": "AWS Builders’ Library · Ensuring rollback safety during deployments",
+        "url": "https://aws.amazon.com/builders-library/ensuring-rollback-safety-during-deployments/"
+      },
+      {
+        "title": "PostgreSQL · 5.8. Modifying Tables",
+        "url": "https://www.postgresql.org/docs/current/ddl-alter.html"
+      },
+      {
+        "title": "PostgreSQL · ALTER TABLE",
+        "url": "https://www.postgresql.org/docs/current/sql-altertable.html"
+      },
+      {
+        "title": "PostgreSQL · 9.2. Comparison Functions and Operators",
+        "url": "https://www.postgresql.org/docs/current/functions-comparison.html"
+      }
+    ],
+    "detail": [
+      {
+        "id": "expand",
+        "title": "What changes for a purchase that already exists?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Suppose the routing service wants to rename its stored approver-group field. Both fields will hold the same stable group key. A missing value means the request currently has no assignment. This design keeps the existing assignment and decision history intact. A business request to change a recipient requires its own authorization. Reading today’s group mapping again during the move could silently redirect an older request."
+          },
+          {
+            "type": "code",
+            "language": "sql",
+            "caption": "Illustrative PostgreSQL expansion using invented table and field names",
+            "value": "ALTER TABLE purchase_request\n    ADD COLUMN routing_group_key text;"
+          },
+          {
+            "type": "text",
+            "value": "This adds space for the new value while the original assigned_group_key remains available. Rehearse the migration and compatibility checks in a representative test database. Allow about an hour for a small training rehearsal. Estimate production batch duration from measured rows per batch, lock waits and available capacity. Schedule the schema change under the approved release procedure and agree when to pause if live traffic slows."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "In PostgreSQL, adding a nullable column without a default leaves its initial value null. ALTER TABLE generally requires an exclusive lock unless its subcommand specifies otherwise. A short statement can still wait behind other work. Have the database owner monitor blocking and stop or reschedule if the agreed budget is exceeded."
+          }
+        ]
+      },
+      {
+        "id": "matrix",
+        "title": "Which application can safely run at each stage?",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "Illustrative compatibility matrix for the routing field",
+            "columns": [
+              "Database and application stage",
+              "Safe reads and writes",
+              "Evidence for the next decision"
+            ],
+            "rows": [
+              [
+                "Old field only",
+                "The legacy application reads and writes assigned_group_key. Code that refers to the new column cannot serve here.",
+                "Inventory web processes, workers, scheduled jobs, exports and eligible rollback versions. Test old-format reads and writes as a baseline."
+              ],
+              [
+                "Both fields, mixed application versions",
+                "Legacy processes still write only the old field. Bridge code reads the old value and writes each change to both fields in one database transaction.",
+                "Confirm old queries tolerate the added column and use named fields where needed. Keep reads on the old field throughout overlap."
+              ],
+              [
+                "Both fields, old-only writers drained",
+                "Only bridge writers serve. Finish copying assignments and catch up with changes since the first pass. Recheck all rows against the old value.",
+                "Compare both fields and exercise synthetic pending, unassigned and decided requests. Allow new-field reads only after the checks pass."
+              ],
+              [
+                "Both fields, reads switched",
+                "Current code reads the new value and continues writing both. The tested bridge version can resume old-field reads during the rollback window.",
+                "Observe fresh submissions, existing queues, permission checks and scheduled jobs. Returning an old-only writer would require reverting reads and repeating reconciliation."
+              ],
+              [
+                "Both fields, transition to new-only code",
+                "After the rollback window, retire old-field readers and rollback paths. Deploy new-only code; bridge versions that write both must drain before column removal.",
+                "Capture the final equality check before allowing new-only writes. Then verify current business state independently and confirm no active or recovery version references the old column."
+              ],
+              [
+                "Old field removed",
+                "Only new-only readers and writers can operate. A version that still selects or updates the dropped column fails.",
+                "Exercise the compatible recovery target on the contracted schema and repeat open-request, assignment and authorization checks."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "Backfill means copying values into records already stored. Page through the table by its stable request key in bounded batches. In each transaction copy from the current authoritative old value on the protected row, including a legitimate null. Read and update consistently so a concurrent assignment cannot be overwritten by a stale value from an earlier scan. Record batch progress, retry an interrupted batch safely and perform a final whole-table comparison after old-only writers have drained."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "Each release step needs a compatible current version and a compatible recovery version. Test both against data the latest writer can create. An idle older worker may still wake up and write during a later stage."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "A late writer changes an open purchase",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Consider a test purchase awaiting approval. The bridge has copied its group to the new field. An older worker now makes a legitimate reassignment and updates only the old field. Both fields are filled, but a reader of the new field would show the previous group. This is a hypothetical rehearsal for CC-123. The recorded prod-r41 incident involved a routing mapping and gives no evidence that this migration happened."
+          },
+          {
+            "type": "code",
+            "language": "sql",
+            "caption": "Illustrative comparison while the old value is authoritative",
+            "value": "SELECT request_id, assigned_group_key, routing_group_key\nFROM purchase_request\nWHERE assigned_group_key IS DISTINCT FROM routing_group_key\nORDER BY request_id;"
+          },
+          {
+            "type": "text",
+            "value": "The query compares every row, including a difference between a missing value and a saved group. Here is the proposed rehearsal result using invented labels. The returned row blocks the read switch."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative rehearsal output for the late-writer example",
+            "value": "request_id      | assigned_group_key | routing_group_key\ntraining-open   | successor-group    | prior-group"
+          },
+          {
+            "type": "text",
+            "value": "The migration owner keeps the old read path active, finds and drains the old writer, then repeats catch-up from the latest saved value. The data owner reruns the full comparison and inspects the assignment event for the test purchase. Confirm the current authorized group can find and decide it and the former group cannot. Verify an originally unassigned purchase remains visible to the exception owner and that the historical decision on a decided purchase still appears once. An empty comparison alone could hide records copied consistently to the wrong group."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "At cutover the team requires a drained old-writer inventory, zero unexplained differences, passing business and permission checks, and a demonstrated compatible rollback path. Record the release decision with the migration owner and release reviewer. A mismatch blocks the read switch and subsequent contraction."
+          }
+        ]
+      },
+      {
+        "id": "contract",
+        "title": "When can the old field go?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "During the rollback window both fields continue to receive every assignment. Read the rehearsal output beside the pending-request list and the worker inventory. At the end of the window, complete the last equality comparison under dual writes. Retire recovery versions that require the old field and deploy new-only code. Once new-only writes start, an old value is allowed to become stale. Verify the new field directly against current assignment events and the approved business rule. Confirm all processes still writing both have drained before authorizing the drop."
+          },
+          {
+            "type": "figure",
+            "src": "assets/figures/data-change-coordination.svg",
+            "caption": "When can the old routing field be retired?",
+            "alt": "A hypothetical routing-field migration branches at the final check: remove the old field or keep it and recheck.",
+            "text_equivalent": "Add the new field alongside the old field. During overlap read the old field and write both together in bridge code. Backfill stored requests, drain old-only writers, then catch up and reconcile open requests, their owners and decision history. Once that passes, switch reads and keep both writes during the rollback window. Before moving to new-only writes, compare both fields again. Retire all old-field consumers and recovery targets. After the switch, verify current business state and all-new consumers. If the final checks pass, remove the old field. Otherwise retain both fields and resolve the discrepancy before proceeding."
+          },
+          {
+            "type": "text",
+            "value": "Open a separate Jira change and relate it to CC-123. Attach web links to the schema proposal, migration and compatibility checks, batch results, current rollback target and release decision. In this exercise a failed rehearsal leaves the change On hold. CC-123 remains Released. Removing the old column after only checking web traffic can break a nightly export. Copying assignments by firing the original routing workflow can send fresh notifications and alter decision history. Verify side effects and include background consumers in the rehearsal."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Use your database’s supported schema-change and comparison operations with the application versions you actually deploy. The portable evidence is a rehearsed read/write compatibility matrix, a reconciliation against business records, and an explicit decision on which version can still recover the service."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "release-notes-practice",
+    "kind": "deep-dive",
+    "phase": "Release",
+    "sources": [
+      {
+        "title": "GitHub Docs · Automatically generated release notes",
+        "url": "https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes"
+      },
+      {
+        "title": "GitHub Docs · About releases",
+        "url": "https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases"
+      },
+      {
+        "title": "Atlassian Support · Manage versions",
+        "url": "https://support.atlassian.com/jira-cloud-administration/docs/manage-versions/"
+      }
+    ],
+    "parent": "notes",
+    "activity": "Prod",
+    "audience": [
+      "Business Analyst",
+      "Release Writer",
+      "Release Manager",
+      "Support"
+    ],
+    "title": "Write release notes that tell users what they can do today",
+    "summary": "A requester reading a release note wants to know whether their next purchase will go to the right person automatically. An approver wants to know what they can decide, and support needs a way to investigate a missing assignment. Write for those readers using the evidence available when the note is published.",
+    "owner": "The release writer drafts the note with the business analyst. The Service Owner confirms current exposure, the support representative checks the reporting route, and the Release Manager owns publication and corrections.",
+    "inputs": [
+      "Access to the merged pull requests (reviewed proposals for changes), Jira scope for CC-123, accepted user acceptance testing (UAT) scenario, release tag v1.3.0 and deployment and incident records. Read the smoke check, a short controlled test of the deployed feature, to see what the team actually observed.",
+      "Permission to read the affected team records and publish in the intended documentation space. A repository publisher needs write permission to manage a GitHub release. Check what the audience can open."
+    ],
+    "steps": [
+      "Start at the release entry and identify the changes included since the preceding release. Match the feature to CC-123 and its accepted behavior. Ask the Service Owner who can use it at the intended publication time.",
+      "Draft the change in the vocabulary of requesters and approvers. State the eligible request type, available audience, observable behavior, limits and support route. Attach the technical references at the level the intended reader can access.",
+      "Read the note against both production attempts. Correct the availability line as the rollout changes. Put the note’s stable web link on CC-123 and retain the old deployment evidence."
+    ],
+    "evidence": "A reader can identify an eligible purchase request, its expected automatic assignment, who can record a decision and where to report a mismatch. A support colleague can trace the publication and its availability line to the release, feature and observed rollout.",
+    "example": "The fictional v1.3.0 announcement can describe the accepted routing behavior before rollout. After the corrected pilot the writer can say exposure expanded. The case does not specify that every requester or every category was enabled.",
+    "failure": "If the change list is correct but the availability line says everyone can use routing during a pilot hold, the writer stops publication or corrects the published copy and directs support to the current operational record.",
+    "measure": "Give the note to a requester and a support colleague. Can the requester tell whether to expect routing, and can the colleague identify the correct rollout record before promising availability?",
+    "detail": [
+      {
+        "id": "select-inputs",
+        "title": "Work from the release scope, then check exposure",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Prepare a first draft when the release candidate is known, in the repository’s release editor or in the documentation space. Revisit it when the first pilot begins, when an incident pauses expansion, and when the Service Owner authorizes wider exposure. A writer who already has the linked records might spend ten to twenty minutes drafting and checking a short note. Confirming an unknown audience can take longer."
+          },
+          {
+            "type": "table",
+            "caption": "Source-to-sentence worksheet for v1.3.0",
+            "columns": [
+              "Input",
+              "What the writer checks",
+              "How it changes the note"
+            ],
+            "rows": [
+              [
+                "CC-123 and PR-42",
+                "The integrated change routes eligible purchase requests at submission. Its two accepted criteria cover assignment and permission to record decisions.",
+                "Describe what requesters and authorized approvers can do. A title about changing routing code gives neither role a useful instruction."
+              ],
+              [
+                "CC-131 and PR-41",
+                "The earlier permission defect was fixed on build-415. Its inclusion in build-418 is backed by the later qualification.",
+                "Explain the authorization boundary without implying every employee can decide or that the earlier failed package was shipped."
+              ],
+              [
+                "uat-82 and build-418",
+                "The designated business representative accepted the corrected business scenario on this package.",
+                "Use the tested behavior for scope. Business acceptance alone provides no availability date or enabled-user list."
+              ],
+              [
+                "prod-rollout-87 and INC-7",
+                "Read which attempt is serving, which requests were observed and who decided to expand.",
+                "Write the availability line for its time. Give support access to the evidence behind it."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "GitHub can draft a change list from merged pull requests, contributors and a link to the full changelog for the selected release interval. Labels can group or exclude entries. Generated notes cannot establish who is in a production pilot or whether a particular purchase reached its intended approver."
+          }
+        ]
+      },
+      {
+        "id": "draft-and-check",
+        "title": "Use an editorial setting that protects availability wording",
+        "blocks": [
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative publication settings for the release writer",
+            "value": "Version: v1.3.0\nPrimary readers: purchasing requesters and authorized approvers\nAudience confirmation: Service Owner\nPublish availability line only after checking: prod-rollout-87\nSupport evidence: link the deployment record and incident summary for permitted readers"
+          },
+          {
+            "type": "text",
+            "value": "The writer can use GitHub’s Generate release notes action in the release editor, review the chosen previous tag and compare the generated change list with the intended scope. The dataset supplies no previous tag, generated output or publication timestamp. In a real release, verify the interval, check for unlabeled or excluded changes and confirm the target tag before editing the draft. A merge title describes engineering work, so ask what the reader can now do differently."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "Write each claim so a second person can name the evidence that supports it. Accepted behavior, audience exposure and sustained product outcomes answer three different reader questions."
+          }
+        ]
+      },
+      {
+        "id": "example-note",
+        "title": "Draft for requesters, approvers and support",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "This example is ready for review after the corrected pilot observation. It uses the degree of availability the record supports. The team would insert the actual support contact and audience-appropriate links before publishing it outside the exercise."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative reader-facing draft for v1.3.0",
+            "value": "Automatic routing for eligible purchase requests\n\nWhen your purchasing group is enabled, submit an eligible purchase request as usual. The service assigns it to your group’s designated approver. Only an authorized approver can record a decision.\n\nAvailability: routing has expanded beyond the corrected pilot. Other request categories are outside this change. Ask purchasing support whether your group is enabled.\n\nIf an eligible request stays unassigned or reaches the wrong person, use your private purchasing-support channel. Give the request reference, purchasing unit, submission time and the observed group or role when that identifies the problem. Keep personal details and purchase contents out of public reports."
+          },
+          {
+            "type": "text",
+            "value": "For the support copy, link the feature issue CC-123, the v1.3.0 release entry, the prod-rollout-87 record with the prod-r42 controlled test, and the permitted INC-7 incident summary. The map’s downloadable qualification record carries the fictional evidence. The case supplies no public tracker ticket URL or live support mailbox. An end-user note should stand on its own even when a reader cannot open the engineering records."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The Release Manager authorizes availability wording using the Service Owner’s rollout decision. Publication alone leaves the Jira story at its current status. Add a web link to the versioned note on CC-123. The Release Manager records Released after the corrected deployment, smoke check and observation."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "“Available to everyone” during a halted pilot",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Suppose an early draft announces routing for all purchase requests as soon as the GitHub release appears. At publication the evidence supports only the accepted feature and planned rollout. Say that production availability will be confirmed after pilot verification. At 09:00 UTC on 13 March, a controlled request on prod-r41 reached the wrong recipient. Expansion stopped. If that earlier draft went public, correct it in place, tell support the pilot is paused and keep the incident linked on the operational record. CC-123 remains Ready for release."
+          },
+          {
+            "type": "text",
+            "value": "At 11:00 UTC prod-r42 ran with the corrected mapping. The Service Owner expanded exposure after the two-hour observation ended at 13:00 UTC. Update the availability line at that decision. The observed 24 eligible pilot requests and two excluded controlled submissions cannot establish universal availability or a promise that every future request will route within two minutes. Nor does assignment mean the purchasing decision is complete. A promise of shorter decision time needs separate evidence from the outcome review."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "On another publishing platform, start with the changes included in a named version and turn each visible change into a reader action. Validate availability with the people controlling exposure, then link the release note back to evidence that support can inspect."
+          }
+        ]
+      }
+    ]
+  }
+]

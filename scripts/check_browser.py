@@ -214,18 +214,22 @@ def main(integration=False):
                 expected = [f"topics/{item['id']}.html" for item in lessons
                             if item.get("kind") == "deep-dive" and item["phase"] == "Define"]
                 assert define_links.evaluate_all("(links) => links.map(a => a.getAttribute('href'))") == expected
-                prove = [item["id"] for item in lessons
-                         if item.get("kind") == "deep-dive" and item["phase"] == "Prove"]
-                prove_links = page.locator("#qualification .tour-deeper a")
-                assert prove_links.evaluate_all("(links) => links.map(a => a.getAttribute('href'))") == [
-                    f"topics/{key}.html" for key in prove
-                ]
-                prove_links.first.click()
-                for previous, current in zip(prove, prove[1:]):
-                    pager = page.get_by_role("navigation", name="Reading order")
-                    pager.get_by_role("link", name="Next topic").click()
-                    page.wait_for_url(base + f"topics/{current}.html")
-                    assert pager.get_by_role("link", name="Previous topic").get_attribute("href") == f"{previous}.html"
+                for section_phase, stop in (("Prove", "qualification"), ("Release", "release")):
+                    order = [item["id"] for item in lessons
+                             if item.get("kind") == "deep-dive" and item["phase"] == section_phase]
+                    page.goto(base + f"tour.html#{stop}")
+                    links = page.locator(f"#{stop} .tour-deeper a")
+                    assert links.evaluate_all("(links) => links.map(a => a.getAttribute('href'))") == [
+                        f"topics/{key}.html" for key in order
+                    ]
+                    links.first.focus()
+                    page.keyboard.press("Enter")
+                    page.wait_for_url(base + f"topics/{order[0]}.html")
+                    for previous, current in zip(order, order[1:]):
+                        pager = page.get_by_role("navigation", name="Reading order")
+                        pager.get_by_role("link", name="Next topic").click()
+                        page.wait_for_url(base + f"topics/{current}.html")
+                        assert pager.get_by_role("link", name="Previous topic").get_attribute("href") == f"{previous}.html"
                 page.set_viewport_size({"width": 375, "height": 812})
                 for route in ("index.html", "topics.html", "tour.html", target, "topics/uat-decision.html"):
                     page.goto(base + route)

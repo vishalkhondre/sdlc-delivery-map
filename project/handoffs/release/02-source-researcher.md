@@ -1,0 +1,5 @@
+# Evidence supplied to the authors
+
+Use the shared fictional dataset and downloadable qualification record. PR-40/build-412 failed in qa-196. PR-41/build-415 was retested in qa-198. The integrated PR-42/build-418 at 3ab862bc3190549bff7df2e0c1a02c9cc11459e4 was qualified separately in qa-204. The mapping rejection uat-80 preceded qa-209 and acceptance uat-82. The standard-change record identifies the policy, scope, digest and time. The fixture supplies a signatory role for UAT and no named production approver or enforcement log.
+
+Both prod-rollout-87 attempts used the authorized image. The March 13 attempt at 09:00 UTC used prod-r41 / prod-routing-10. A controlled routing check failed. INC-7 accounts for eight affected requests. The 11:00 UTC attempt used prod-r42 / prod-routing-11. Two controlled checks were excluded from the 24 eligible pilot requests observed over two hours. The Service Owner then expanded exposure. There is no recorded rollout percentage, precise expansion time, proof of universal availability or recorded schema migration. Separate any teaching configuration, compatibility example and alternative recovery path from that history.

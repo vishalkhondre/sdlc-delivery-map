@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 468 985" role="img" aria-labelledby="title desc">
+<title id="title">When can the old field go?</title><desc id="desc">Hypothetical routing-field migration. Add the new field and retain the old one. During overlap, preserve the old read path and keep both representations consistent. Drain old-only writers before the final catch-up and comparison. Backfill and reconcile stored requests, including open work. Preserve current ownership and earlier decisions. Read from the new field after verification and observe the cutover. Compare field values while both still receive all writes. After equality passes, retire old-dependent rollback versions and deploy new-only code. At the final gate, check current assignments against authoritative business records and the approved rule. Confirm every reader, writer and eligible rollback version can operate without the old field. Hold removal if any check fails.</desc>
+<defs><marker id="tip" viewBox="0 0 9 10" refX="8" refY="5" markerWidth="9" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 0 L9 5 L0 10 z" fill="#345765"/></marker></defs>
+<path fill="#f5f7f6" d="M0 0H468V985H0z"/>
+<text x="16" y="32" font-family="Arial, sans-serif" font-size="23" font-weight="700" text-anchor="start" fill="#162f40">When can the old field go?</text>
+<text x="16" y="60" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#162f40">Illustrative change to the approval-routing data.</text>
+<g data-label-box=""><rect x="16" y="83" width="436" height="65" rx="7" fill="#ffffff" stroke="#92a5ae" stroke-width="1.5"/>
+<text x="28" y="109" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Expand the schema</text>
+<text x="28" y="134" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Add the new field. Keep the existing field readable.</text>
+</g>
+<path d="M234 148V171" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="16" y="172" width="436" height="87" rx="7" fill="#ffffff" stroke="#92a5ae" stroke-width="1.5"/>
+<text x="28" y="198" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Run compatible readers and writers</text>
+<text x="28" y="223" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Read the old field. Write both fields together.</text>
+<text x="28" y="245" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Track any old writer that still updates only one.</text>
+</g>
+<path d="M234 259V282" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="16" y="283" width="436" height="87" rx="7" fill="#ffffff" stroke="#92a5ae" stroke-width="1.5"/>
+<text x="28" y="309" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Backfill and reconcile</text>
+<text x="28" y="334" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Fill older rows. Drain old writers and catch up.</text>
+<text x="28" y="356" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Recheck open work, owners and decision history.</text>
+</g>
+<path d="M234 370V393" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="16" y="394" width="436" height="87" rx="7" fill="#ffffff" stroke="#92a5ae" stroke-width="1.5"/>
+<text x="28" y="420" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Switch reads and observe</text>
+<text x="28" y="445" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Read the new field after reconciliation passes.</text>
+<text x="28" y="467" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Keep dual writes during the rollback window.</text>
+</g>
+<path d="M234 481V504" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="16" y="505" width="436" height="109" rx="7" fill="#ffffff" stroke="#92a5ae" stroke-width="1.5"/>
+<text x="28" y="531" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Before ending dual writes</text>
+<text x="28" y="556" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Compare both fields while both are still current.</text>
+<text x="28" y="578" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">If they agree, retire old-dependent rollback versions</text>
+<text x="28" y="600" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">and deploy new-only code. Otherwise hold here.</text>
+</g>
+<path d="M234 614V637" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="16" y="638" width="436" height="109" rx="7" fill="#e7eef7" stroke="#61809d" stroke-width="1.5"/>
+<text x="28" y="664" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Safe to retire the old field?</text>
+<text x="28" y="689" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Do current assignments match the business record</text>
+<text x="28" y="711" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">and approved rule? Can every reader, writer and</text>
+<text x="28" y="733" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">eligible rollback version run without the old field?</text>
+</g>
+<path d="M234 747V771" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round"/>
+<path d="M234 771H121V803" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<path d="M234 771H347V803" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="16" y="804" width="210" height="109" rx="7" fill="#e1f0e9" stroke="#4e816c" stroke-width="1.5"/>
+<text x="28" y="830" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Yes · contract</text>
+<text x="28" y="855" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Remove the old field.</text>
+<text x="28" y="877" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Verify the surviving</text>
+<text x="28" y="899" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">read and write paths.</text>
+</g>
+<g data-label-box=""><rect x="242" y="804" width="210" height="109" rx="7" fill="#fff0e1" stroke="#aa622a" stroke-width="1.5"/>
+<text x="254" y="830" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">No · hold</text>
+<text x="254" y="855" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Keep both fields.</text>
+<text x="254" y="877" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Resolve the gap and</text>
+<text x="254" y="899" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">repeat verification.</text>
+</g>
+<text x="16" y="944" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#162f40">Once writes update only the new field, the old value</text>
+<text x="16" y="966" font-family="Arial, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#162f40">can be stale. Use the assignment record to check owners.</text>
+</svg>
