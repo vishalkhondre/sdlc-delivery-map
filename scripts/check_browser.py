@@ -65,6 +65,12 @@ def main():
                 assert page.locator("h1").inner_text() == "Record UAT decision"
                 assert page.locator(".crumb .phase-name").inner_text() == "Build & Prove"
                 assert page.locator(".crumb .activity-tag").inner_text() == "UAT"
+                return_link = page.get_by_role("link", name="Return to the map", exact=True)
+                card_target = return_link.get_attribute("href").split("#")[1]
+                return_link.click()
+                assert page.locator(f"#{card_target}").get_attribute("aria-label") == "Record UAT decision"
+                page.go_back()
+                assert "Edition " in page.locator("footer small").inner_text()
                 page.emulate_media(color_scheme="light")
                 badge = page.locator(".activity-tag")
                 light_ink = badge.evaluate("el => getComputedStyle(el).color")
@@ -73,6 +79,11 @@ def main():
                 assert badge.evaluate("el => getComputedStyle(el).color") != light_ink
                 page.goto(base + "topics.html")
                 search = page.locator("#topic-search")
+                assert page.get_by_label("Section", exact=True).count() == 1
+                for query, lesson in (("rollback", "recover"), ("median", "measure"),
+                                      ("feature flag", "rollout"), ("security", "qa-tests")):
+                    search.fill(query)
+                    assert page.locator(f'.topic-row:visible a[href="topics/{lesson}.html"]').count() == 1
                 search.fill("unfindable-test-phrase")
                 assert page.locator(".topic-row:visible").count() == 0
                 search.fill(lessons[0]["title"])

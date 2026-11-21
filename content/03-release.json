@@ -438,7 +438,7 @@
       "Write the decision on the parent objective and link evidence and any follow-up work. Give a new improvement its own testable criterion and outcome measure so the next cycle can start on a clear question."
     ],
     "evidence": "A decision record names the observed outcome, its limitations, the selected action and the owner. Readers can navigate from follow-up work to the original objective and the release that supplied the evidence.",
-    "example": "Automatic assignment now happens promptly, yet many requests remain open after one day. Approvers report unclear supporting information. The Product Owner keeps routing and opens a separate improvement to test whether clearer request details reduce decision delay.",
+    "example": "In the later cohort, none of 100 requests met the two-minute correct-assignment window. Eight still lacked a correct assignment at 24 hours and 60 still awaited a decision. The Service Owner investigates delayed and missing assignments. Approvers report unclear supporting information. The Product Owner keeps routing and opens a separate improvement to test whether clearer request details reduce decision delay.",
     "failure": "A faster median after launch can reflect an easier mix of requests. Report the competing explanation and investigate before crediting the feature with the whole change.",
     "measure": "At the next review, verify that the agreed action occurred and that its evidence addresses the question recorded in the previous decision.",
     "sources": [
