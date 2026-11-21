@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 456 905" role="img" aria-labelledby="title desc">
+<title id="title">Respond to the wrong recipient</title><desc id="desc">The on-call responder finds wrong routing on prod-r41. The responder declares INC-7 and halts exposure. The Service Owner takes coordination and tracks eight requests. The Service Owner links the incident and change record, and the responder investigates. Actual route: correct mapping on the same image; smoke prod-r42 with prod-routing-11. A hypothetical code fault takes the hotfix route with a new digest. The Service Owner verifies seven reassignments and one retained authorized decision, owns any gaps, and reviews the incident. Expansion follows observation.</desc>
+<defs><marker id="tip" viewBox="0 0 9 10" refX="8" refY="5" markerWidth="9" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 0 L9 5 L0 10 z" fill="#345765"/></marker></defs>
+<path fill="#f5f7f6" d="M0 0H456V905H0z"/>
+<text x="16" y="32" font-family="Arial, sans-serif" font-size="23" font-weight="700" text-anchor="start" fill="#162f40">Respond to the wrong recipient</text>
+<text x="16" y="59" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#162f40">INC-7 during the limited pilot</text>
+<text x="114.0" y="99" font-family="Arial, sans-serif" font-size="16" font-weight="700" text-anchor="middle" fill="#425c69">On-call / operator</text>
+<path d="M228.0 80V854" stroke="#c9d3d5"/>
+<text x="342.0" y="99" font-family="Arial, sans-serif" font-size="16" font-weight="700" text-anchor="middle" fill="#425c69">Service Owner</text>
+<g data-label-box=""><rect x="14" y="116" width="202" height="131" rx="7" fill="#fff0e1" stroke="#aa622a" stroke-width="1.5"/>
+<text x="26" y="142" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">prod-r41 smoke</text>
+<text x="26" y="167" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Wrong recipient on</text>
+<text x="26" y="189" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">prod-routing-10.</text>
+<text x="26" y="211" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Declare INC-7 and</text>
+<text x="26" y="233" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">halt expansion.</text>
+</g>
+<path d="M216 167H238" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="240" y="116" width="202" height="131" rx="7" fill="#fff0e1" stroke="#aa622a" stroke-width="1.5"/>
+<text x="252" y="142" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Coordinate INC-7</text>
+<text x="252" y="167" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Track eight affected</text>
+<text x="252" y="189" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">requests. Link the</text>
+<text x="252" y="211" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">incident to the repair</text>
+<text x="252" y="233" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">change or defect.</text>
+</g>
+<path d="M341 247V266H115V284" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="14" y="285" width="202" height="131" rx="7" fill="#e7eef7" stroke="#61809d" stroke-width="1.5"/>
+<text x="26" y="311" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Mapping or code?</text>
+<text x="26" y="336" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Compare the group</text>
+<text x="26" y="358" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">in the approved map</text>
+<text x="26" y="380" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">with the active map</text>
+<text x="26" y="402" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">and image identity.</text>
+</g>
+<path d="M216 340H238" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)" stroke-dasharray="5 4"/>
+<g data-label-box=""><rect x="240" y="285" width="202" height="153" rx="7" fill="#f6f5fa" stroke="#80758b" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="252" y="311" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Alternative · code</text>
+<text x="252" y="336" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Route a code fault to</text>
+<text x="252" y="358" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">emergency review.</text>
+<text x="252" y="380" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">A hotfix needs a new</text>
+<text x="252" y="402" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">digest, qualification</text>
+<text x="252" y="424" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">and authorization.</text>
+</g>
+<path d="M115 416V458" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="14" y="459" width="202" height="131" rx="7" fill="#e1f0e9" stroke="#4e816c" stroke-width="1.5"/>
+<text x="26" y="485" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Actual · mapping</text>
+<text x="26" y="510" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Correct the group.</text>
+<text x="26" y="532" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Keep the same image.</text>
+<text x="26" y="554" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Deploy prod-r42 with</text>
+<text x="26" y="576" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">prod-routing-11.</text>
+</g>
+<path d="M115 590V610" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="14" y="611" width="202" height="131" rx="7" fill="#e1f0e9" stroke="#4e816c" stroke-width="1.5"/>
+<text x="26" y="637" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Smoke prod-r42</text>
+<text x="26" y="662" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Verify the digest and</text>
+<text x="26" y="684" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">mapping. Submit and</text>
+<text x="26" y="706" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">observe the rule pick</text>
+<text x="26" y="728" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">the right approver.</text>
+</g>
+<path d="M216 667H238" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="240" y="611" width="202" height="131" rx="7" fill="#e1f0e9" stroke="#4e816c" stroke-width="1.5"/>
+<text x="252" y="637" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Reconcile all eight</text>
+<text x="252" y="662" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Seven reassigned.</text>
+<text x="252" y="684" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">One prior authorized</text>
+<text x="252" y="706" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">decision retained.</text>
+<text x="252" y="728" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Own any open gaps.</text>
+</g>
+<path d="M341 742V762" fill="none" stroke="#345765" stroke-width="2" stroke-linejoin="round" marker-end="url(#tip)"/>
+<g data-label-box=""><rect x="240" y="763" width="202" height="87" rx="7" fill="#e1f0e9" stroke="#4e816c" stroke-width="1.5"/>
+<text x="252" y="789" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#162f40">Review INC-7</text>
+<text x="252" y="814" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">Record repair, impact</text>
+<text x="252" y="836" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#425c69">and follow-up.</text>
+</g>
+<text x="16" y="885" font-family="Arial, sans-serif" font-size="18" font-weight="700" text-anchor="start" fill="#162f40">Expand only after observing the corrected pilot.</text>
+</svg>

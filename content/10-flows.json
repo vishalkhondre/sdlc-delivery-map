@@ -1,0 +1,1244 @@
+[
+  {
+    "id": "flow-jira-status",
+    "title": "Follow CC-123 through the seven Jira status handoffs",
+    "phase": "Reference",
+    "audience": [
+      "Business Analyst",
+      "Product Owner",
+      "Release Manager"
+    ],
+    "touches": [
+      "branch",
+      "pull-request",
+      "build",
+      "qa-tests",
+      "uat-decision",
+      "release",
+      "rollout",
+      "tool-jira"
+    ],
+    "summary": "When somebody asks where automatic approval routing stands, the story in Jira should lead them to the person who last moved it and the evidence behind that decision. Follow the same story through all seven steps, including the times the work continued while its status stayed put.",
+    "owner": "The business analyst keeps the story’s evidence links usable. The developer, quality assurance (QA) lead, business analyst and release manager move the story at different handoffs. The person entering a status may rely on a decision made by someone else.",
+    "inputs": [
+      "A ready feature, CC-123, under the objective CC-100. The team agreed to check automatic assignment at submission (AC-01) and permission to record decisions (AC-02).",
+      "Permission to read the linked records and to make the applicable Jira transition, the permitted move from one status to another. The person making a decision also needs the authority assigned in the team workflow.",
+      "A pull request (PR), the proposal to integrate a source change. A build receipt identifies the packaged software using an image digest, a content identifier. Each test, release and deployment decision names the candidate it concerns."
+    ],
+    "steps": [
+      "At each handoff, read the current status and the latest entry that changed it. Check the candidate and the actual observation in the linked record.",
+      "Identify who can authorize the decision, then ask the designated role to move the story and add the evidence. When a check fails, link the failure, its owner and the next required check while keeping the current status visible.",
+      "Finish by opening the deployment record from CC-123 and checking that the approved software really ran with the corrected production settings. Keep the outcome review under its parent objective."
+    ],
+    "evidence": "The story links the development work, QA results, business decision, production authorization and observed deployment. Someone following those links can explain why each transition happened and who last moved the story during a hold.",
+    "example": "Business acceptance was rejected in uat-80 and granted later in uat-82. CC-123 stayed In UAT throughout that interval. The business representative decided acceptance, while the business analyst remained the last person to move the story.",
+    "failure": "Missing evidence or a rejection holds the next transition. The current owner records which record failed and who can supply a replacement observation. A successful repair on an earlier candidate cannot qualify a later candidate.",
+    "measure": "Sample recent releases. For each of the seven handoffs, can a second reader recover the status before and after, the mover, the deciding authority and the linked evidence for that candidate?",
+    "sources": [
+      {
+        "title": "Atlassian · What are Jira workflows?",
+        "url": "https://support.atlassian.com/jira-software-cloud/docs/what-are-jira-workflows/"
+      },
+      {
+        "title": "Atlassian · What are the different types of activity on a work item?",
+        "url": "https://support.atlassian.com/jira-software-cloud/docs/what-are-the-different-types-of-activity-on-an-issue/"
+      },
+      {
+        "title": "Atlassian · What development data can I view in Jira?",
+        "url": "https://support.atlassian.com/jira-cloud-administration/docs/what-development-data-can-i-view-in-jira-software/"
+      },
+      {
+        "title": "GitHub Docs · About releases",
+        "url": "https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases"
+      }
+    ],
+    "detail": [
+      {
+        "id": "read-the-story",
+        "title": "Read a transition separately from a comment",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In Jira Cloud, open the story’s Activity section and look at History for status changes. Read the related comment or linked decision for the reason behind the move. A tester can add evidence without taking responsibility for the status. In this teaching policy allow a few minutes per handoff to inspect the record, verify the candidate and record the decision. Executing the test, waiting for the signatory and observing a rollout have their own durations."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative Jira transition setting",
+            "value": "Transition: In UAT → Ready for release\nPrerequisites: accepted UAT decision, matching digest, reviewed configuration and production authorization\nStatus mover: Release Manager"
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "A Jira workflow defines available statuses and transitions. Connected development tools can populate Jira’s Development panel with a matching key in a branch name, commit message, PR title or source branch, according to the object type. A GitHub release is tied to a source tag. Verify authorization and running state in their own records."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The seven statuses and named movers below are the fictional team’s manual workflow. The readiness note “Ready for selection” precedes the first move. The example does not supply a prior Jira status name. For a real story, take it from History."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "A person can authorize a business decision, record a status or operate a deployment. Look for the evidence attached to the particular responsibility you are checking."
+          }
+        ]
+      },
+      {
+        "id": "seven-map-steps",
+        "title": "Read the story at each numbered map step",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "CC-123 under the example team policy. The mover in each row is the last status mover after that step.",
+            "columns": [
+              "Numbered map step",
+              "Status before → after",
+              "Last mover and decision authority",
+              "Evidence and condition for the move"
+            ],
+            "rows": [
+              [
+                "1. Commit a change",
+                "Ready feature, prior status unspecified → In development",
+                "Developer starts selected work. The Product Owner owns its priority.",
+                "Developer links the feature branch to CC-123 and checks that it implements the agreed routing scope."
+              ],
+              [
+                "2. Check the feature PR",
+                "In development → In review",
+                "Developer requests review. The peer reviewer judges the proposal and maintainers own the required checks.",
+                "PR-42 and its check runs open from the story. Failed checks keep it In review with the developer as last mover."
+              ],
+              [
+                "3. Merge and build",
+                "In review → Ready for QA",
+                "Developer verifies the accepted source and build before handing the candidate to QA. Repository rules govern merge.",
+                "Integrated commit 3ab862bc3190549bff7df2e0c1a02c9cc11459e4 and build-418’s published digest identify what QA should receive."
+              ],
+              [
+                "4. Verify in QA",
+                "Ready for QA → In QA",
+                "QA lead takes the candidate and owns the technical qualification decision.",
+                "Match build-418 to qa-r17 and qa-routing-3. Attach qa-204’s AC-01 and AC-02 observations. Stay In QA if required evidence is missing."
+              ],
+              [
+                "5. Business acceptance",
+                "In QA → In UAT",
+                "Business analyst opens user acceptance testing (UAT) on the qualified candidate. The designated business representative owns the acceptance decision.",
+                "Keep qa-204, the uat-80 rejection, the affected QA recheck qa-209 and the uat-82 acceptance. The analyst remains the last mover throughout the hold."
+              ],
+              [
+                "6. Publish GitHub release",
+                "In UAT → Ready for release",
+                "Release manager verifies the evidence and production authorization under the standard-change policy.",
+                "Confirm fix version 1.3.0, tag v1.3.0, accepted digest, configuration review and authorization. Tag publication alone cannot advance the story."
+              ],
+              [
+                "7. Deploy to Prod",
+                "Ready for release → Released",
+                "Release manager records Released. The operator supplies observed runtime evidence and the service owner decides whether exposure may expand.",
+                "Link prod-rollout-87. Keep prod-r41’s halt. Confirm prod-r42, prod-routing-11, the actual digest, controlled smoke check and observation before the move."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "A smoke check is a short exercise of the running service. At step 7 the controlled purchase verifies routing in production. The later observation covers ordinary eligible requests. If the story still says Ready for release during that observation, the last mover is the release manager from step 6. An operator adding a rollout note does not change that answer."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Worked failure · two holds with different owners",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Purchasing unit B reached unit A’s approver in business run uat-80 on uat-r8 with uat-routing-5. The signatory rejected the scenario. The analyst linked the rejection and kept CC-123 In UAT. The team corrected the mapping for the same image and rechecked the affected routing and authorization in qa-209. The representative repeated the scenario on uat-r9 with uat-routing-6 and recorded uat-82. The QA recheck supplied evidence to the business decision without moving the story backward."
+          },
+          {
+            "type": "text",
+            "value": "Production exposed another mapping problem. The controlled request on prod-r41 reached the wrong approver, so exposure stopped and the team opened incident INC-7. The story stayed Ready for release. The corrected production revision prod-r42 used prod-routing-11 with the same image. The service owner reviewed the controlled check and a two-hour observation in which 24 of 24 eligible pilot requests received the correct assignment within the agreed window. The release manager then recorded the deployment on the feature."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Fictional deployment note to retain on CC-123",
+            "value": "Status: Released   Mover: Release Manager\nDeployment record: prod-rollout-87   Earlier halt: prod-r41 / INC-7\nObserved revision: prod-r42   Configuration: prod-routing-11\nObserved image: sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c\nSmoke: controlled purchase reached the designated test approver\nObservation: 11:00–13:00 UTC, 13 March 2026; 24 of 24 eligible pilot requests"
+          },
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "Treating the Jira bug CC-131’s Fixed resolution as feature acceptance skips qualification of the integrated build. The triage owner closed that bug after build-415 passed its retest in qa-198. QA separately checked build-418 in qa-204."
+          },
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "Moving the feature when the production rollout starts hides a failed pilot. Read the observed revision and configuration, follow the retained incident and wait for the named operating decision."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In another tracker, preserve the source decision, the person authorized to make it and the person who moved the work item. Evidence links and an explicit hold let the next owner reconstruct the handoff even when the status names differ."
+          }
+        ]
+      }
+    ],
+    "kind": "flow"
+  },
+  {
+    "id": "flow-bug-ci",
+    "title": "Follow a failed check from the pull request back to review",
+    "phase": "Build",
+    "audience": [
+      "Developer",
+      "Reviewer",
+      "Business Analyst"
+    ],
+    "touches": [
+      "branch",
+      "pull-request",
+      "ci",
+      "merge"
+    ],
+    "summary": "A proposed change can look right to its author and still fail a shared check. The developer uses the failure to repair the proposal in place, so a reviewer can see both what went wrong and what changed. The feature waits in review until its required checks pass.",
+    "owner": "The pull request (PR) author owns the repair. The reviewer checks the resulting behavior and the repository maintainer owns the merge policy. If the machine cannot start the test, the maintainer of the shared checks investigates.",
+    "inputs": [
+      "CC-123 and AC-01, its acceptance criterion for assigning an eligible request to the designated approver at submission. Pull request PR-42 proposes integrating the feature branch, a separate line of work, into the shared main branch.",
+      "Access to read GitHub Actions job logs, the step-by-step output from continuous integration (CI). The author also needs permission to update the source branch and attach evidence links to the Jira story.",
+      "A clean test setup, an unassigned purchasing request, the expected recipient and a way to observe who made the first assignment."
+    ],
+    "steps": [
+      "Open PR-42, choose Checks, select the failed unit tests job and expand the first failing test step. Copy its link and record the proposed and tested revisions.",
+      "Read the failed assertion, the test’s statement of expected behavior. Compare the actual value with the expected value, check the starting data and reproduce the failing case.",
+      "Repair the behavior or the test setup as the evidence requires. Push the repair to the same PR. Inspect the new run and keep the old failed run with its original logs.",
+      "Ask the reviewer to resume on the updated proposal. Keep the feature In review until the applicable checks and approvals allow merge."
+    ],
+    "evidence": "A reader can go from CC-123 to PR-42, open the original failed run, inspect the repair and open the new run on the updated proposal. The comparison names the check, the tested revision, the expected behavior and what actually passed.",
+    "example": "In the illustrative unit check, a newly submitted purchase has an empty assignment history. AC-01 requires the routing-rule actor to assign the Purchasing approver. The author repairs the submission path and repeats the check, leaving the failed observation available to the reviewer.",
+    "failure": "If the new run fails again, the author retains it, keeps merge blocked and reads its first failing step. A missing required result or a broken test machine belongs with the CI maintainer for diagnosis.",
+    "measure": "Ask a second reviewer to recover the original failure and the passing replacement for the current change from the Jira story. Count cases where the only evidence is a green badge from a different revision.",
+    "sources": [
+      {
+        "title": "GitHub Docs · Workflow syntax for GitHub Actions",
+        "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax"
+      },
+      {
+        "title": "GitHub Docs · Events that trigger workflows",
+        "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows"
+      },
+      {
+        "title": "GitHub Docs · Using workflow run logs",
+        "url": "https://docs.github.com/en/actions/how-tos/monitor-workflows/use-workflow-run-logs"
+      },
+      {
+        "title": "GitHub Docs · Re-running workflows and jobs",
+        "url": "https://docs.github.com/en/actions/how-tos/manage-workflow-runs/re-run-workflows-and-jobs"
+      },
+      {
+        "title": "GitHub Docs · Variables reference",
+        "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/variables"
+      },
+      {
+        "title": "GitHub Docs · About protected branches",
+        "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches"
+      },
+      {
+        "title": "pytest · How to invoke pytest",
+        "url": "https://docs.pytest.org/en/stable/how-to/usage.html"
+      },
+      {
+        "title": "pytest · How to write and report assertions in tests",
+        "url": "https://docs.pytest.org/en/stable/how-to/assert.html"
+      }
+    ],
+    "detail": [
+      {
+        "id": "read-the-failed-check",
+        "title": "Read the failure for the right version",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "CI runs the project’s checks on a separate machine called a runner. Start when a required check on the proposal turns red. Allow a few minutes in the example for a clean runner to install the project and run the tests. A focused local test takes seconds once the environment is ready. The duration of a repair depends on what failed. Read the job log to distinguish time waiting for a machine from time spent executing a test."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative repository setting for the shared branch",
+            "value": "Required status check: unit tests\nApply to: pull requests targeting main\nIf the required result is missing or failed: keep merge blocked"
+          },
+          {
+            "type": "figure",
+            "src": "assets/figures/flow-bug-ci.svg",
+            "alt": "A failed PR check leads through diagnosis, a repair on the same branch and a fresh run, with review resuming only after the required result passes.",
+            "caption": "Illustrative PR-42 check failure and recovery",
+            "text_equivalent": "In this hypothetical PR-42 failure, open the required check and inspect the output and tested revision. The author fixes its cause and pushes to the same PR. Open the new run and match the result to the updated revision. A red or missing required result keeps merge blocked and sends the author back to diagnosis. A passing result returns the proposal to review under the merge rules. CC-123 stays In review and links to PR-42 and both runs."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "In the example pull_request workflow, a push updating an open PR triggers new checks. For an open, mergeable PR the default checkout tests a temporary combination of the source branch and target branch. A job can explicitly choose a different revision. Read each job’s recorded checkout."
+          },
+          {
+            "type": "text",
+            "value": "A commit identifier, often called a SHA, names a saved source revision. The head is the tip of the proposed branch. Read the head from the PR event and the tested revision from the job, for example from its git rev-parse HEAD output. The shared record gives build-418’s final integrated commit. It does not supply PR-42’s historical head or its temporary test merge identifiers. Capture the values from a real run when following this procedure."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Worked failure · purchasing has no automatic assignment",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Suppose a reviewer spots a test which assigns the correct recipient by hand. The author replaces that setup with a fresh unassigned purchase and submits it through the application. The improved test reads the saved first assignment event. In the illustrative failing run of unit tests, the event list is empty. The output directs the developer to the submission path and its call to the routing rule. Returning a screen that happens to show the right name would leave this failure unresolved."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative excerpt from the unit tests job, using pytest, the Python test runner",
+            "value": "FAILED tests/unit/test_routing.py::test_submission_assigns_purchasing\nE   AssertionError: assert [] == [('routing-rule', 'Purchasing approver')]"
+          },
+          {
+            "type": "code",
+            "language": "bash",
+            "caption": "Illustrative local reproduction from the root of the routing repository",
+            "value": "python -m pytest -q tests/unit/test_routing.py::test_submission_assigns_purchasing"
+          },
+          {
+            "type": "text",
+            "value": "The empty list is the observed history. The pair on the right is the expected actor and recipient. First check that the request was eligible, unassigned and submitted in the test and that the history read belongs to that request. If these conditions hold, repair the missing rule invocation in the service. Run the focused case, then the full unit suite locally and push the tested change. The shared runner must exercise the updated proposal before its result can support review."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "A reviewer needs the failing observation, the change that explains it and a new observation on the changed source. The original failure helps the next person judge whether the repair addressed the business promise."
+          }
+        ]
+      },
+      {
+        "id": "retain-the-two-runs",
+        "title": "Keep both sides of the repair on CC-123",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "Illustrative Jira handoff showing the links to capture from GitHub. The shared record has no historical run URLs or commit identifiers for these attempts.",
+            "columns": [
+              "Evidence entry",
+              "Original failed run",
+              "New run after the repair push"
+            ],
+            "rows": [
+              [
+                "Location",
+                "PR-42 → Checks → original unit tests job → failed assertion. Save this job URL.",
+                "PR-42 → Checks → unit tests for the new push. Save its own job URL."
+              ],
+              [
+                "Revision and behavior",
+                "Record the event’s proposed head and the job’s tested revision. First assignment list was empty.",
+                "Record the updated head and tested revision. The corrected test observed routing-rule and Purchasing approver."
+              ],
+              [
+                "Decision",
+                "Hold merge. Author owns diagnosis. Keep CC-123 In review.",
+                "When the full unit job passes, reviewer can inspect the change again. Check all remaining requirements before merge."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "On CC-123 add web links to PR-42, both runs and the repair commit, with the criterion, cause and test name. Do this while the logs are available under the repository’s retention policy. This pre-merge repair stays on the existing PR and feature. The team does not open a separate Jira bug for it. By comparison, the defect CC-131 in the shared history was found in quality assurance (QA) on the earlier PR-40/build-412 candidate and had its own triage and retest."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "For main, repository maintainers require unit tests, lint, new-line coverage, quality gate and dependency review. The separate type check is informational. A red required unit test blocks merge. The author waits for current required checks and applicable approvals, including renewed approval when a changed proposal invalidates an earlier review."
+          }
+        ]
+      },
+      {
+        "id": "choose-the-next-action",
+        "title": "Choose between another attempt and another change",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "If the runner failed while installing a dependency, record the first failing setup step and route it to the CI maintainer. A rerun can investigate a transient interruption once its cause is understood. GitHub retains the original event’s revision and reference for the rerun. The workflow run ID stays the same and the attempt number increases. A push containing a repair triggers a separate run with its own run ID under this workflow. A passing retry of the old version cannot demonstrate the effect of a later edit."
+          },
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "Retrying a reproducible functional failure until it turns green conceals unreliable behavior. Preserve the failing attempts, identify the differing inputs and require an explained result before resuming review."
+          },
+          {
+            "type": "callout",
+            "label": "Common mistake",
+            "value": "Using a passing focused command as the required unit result skips the rest of the suite and the target branch changes included by CI. Open the full shared job and match its tested revision to the updated proposal."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "On another CI service, find the proposal, selected revision, failing step and history of attempts before choosing a repair. Preserve the failing run, link the new result and apply the shared branch’s own review and merge policy."
+          }
+        ]
+      }
+    ],
+    "kind": "flow"
+  },
+  {
+    "id": "flow-bug-qa",
+    "kind": "flow",
+    "touches": [
+      "qa-tests",
+      "hold",
+      "branch",
+      "pull-request",
+      "merge",
+      "build",
+      "digest",
+      "qa-revision",
+      "uat-promotion",
+      "tool-jira",
+      "tool-test"
+    ],
+    "audience": [
+      "Business Analyst",
+      "QA Engineer",
+      "Developer"
+    ],
+    "phase": "Prove",
+    "title": "Follow the unauthorized decision from failed test to verified fix",
+    "summary": "An employee outside the approval group records a decision. The tester stops the affected version from advancing and gives the developer the evidence needed to repair it. Follow the original failure, the repair test and the final version to see which decision each one supports.",
+    "owner": "The quality assurance (QA) tester reports what happened. The QA lead and Product Owner agree the hold and priority, the developer delivers the repair, and the QA lead owns the decision to clear this defect hold.",
+    "inputs": [
+      "Feature CC-123 and its acceptance criterion AC-02, which allows only an authorized approver to record a decision",
+      "The failed test, the exact packaged version running in QA, and access to inspect request state as appropriate for the test roles",
+      "Permission to add an execution link in Kiwi TCMS, the test management system, and to create and link Jira bugs in the correct project"
+    ],
+    "steps": [
+      "Start at the first failed execution. Check the tested package and record the observed decision before the test request is reset.",
+      "Link the Jira bug and place the hold. Follow the code fix from its branch through review into a new package, then identify the version deployed for retest.",
+      "Preserve both outcomes and record a human closure or reopening decision. Follow the later integrated version to its own QA qualification before business testing."
+    ],
+    "detail": [
+      {
+        "id": "follow-the-owners",
+        "title": "Find the first point where the feature cannot advance",
+        "blocks": [
+          {
+            "type": "figure",
+            "src": "assets/figures/flow-bug-qa.svg",
+            "caption": "The QA defect crosses three builds and two tracking systems",
+            "alt": "QA defect swimlane showing the failure, Jira hold, developer’s repair, independent retest and later integrated candidate.",
+            "text_equivalent": "PR-40 produces build-412. TC-04 fails in qa-196. The Kiwi execution holds the CC-131 Jira URL. Jira can contain an originating execution URL on creation or an optional comment when linking an existing defect. Triage separately links CC-131 blocks CC-123. PR-41 produces build-415. QA records a new execution in qa-198 and links it to CC-131. From Ready for retest, the triage owner moves the bug to Closed with resolution Fixed after confirmation and regression, or to Reopened with resolution empty and the hold retained after failure. PR-42 produces build-418, independently qualified in qa-204."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative TC-04 setup in quality assurance (QA)",
+            "value": "Starting state: synthetic pending request\nActor: employee outside the authorized approval group\nAction: attempt to record a decision\nExpected: request remains pending and no decision is saved"
+          },
+          {
+            "type": "text",
+            "value": "A pull request (PR) is a proposal to integrate a source change. A build packages the integrated source. The image digest is a content identifier for that package. A test case describes a repeatable check, while an execution records what happened when someone performed it in a particular run. Begin with the execution. The reusable TC-04 case can have different results on different builds."
+          },
+          {
+            "type": "table",
+            "caption": "Three increments from one main-release-build pipeline",
+            "columns": [
+              "Change and candidate",
+              "What QA observes",
+              "Decision this record supports"
+            ],
+            "rows": [
+              [
+                "PR-40 · build-412",
+                "TC-04 fails in qa-196. The early candidate records the unrelated employee’s decision.",
+                "Raise CC-131 against AC-02. Hold advancement of the affected feature."
+              ],
+              [
+                "PR-41 · build-415",
+                "In qa-198 the tester records a new TC-04 retest and verifies the allowed approver path separately.",
+                "QA may clear this defect hold after verifying the repair."
+              ],
+              [
+                "PR-42 · build-418",
+                "qa-204 verifies automatic routing and authorized decisions on the integrated package.",
+                "Hand off this identified candidate to business acceptance."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "Allow roughly ten minutes in this exercise to capture the failure and link it, separate from the time spent changing code, building and rerunning. The report time is 5 March 2026 at 10:00 UTC. The repair package was built on 6 March and the integrated package on 9 March. Those build dates locate the records without assigning a time to the original test action."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "The employee’s decision is saved",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The tester first opens TC-04 in qa-196. The employee is outside the designated approver group, the request begins pending, and the expected result is denial with the request still pending. The observed decision was recorded. Preserve that observation and the tested build before preparing another request. A message on screen alone would leave open whether the request changed. Record the QA environment and the available identity evidence. The later qa-r17 environment belongs to build-418."
+          },
+          {
+            "type": "text",
+            "value": "Kiwi TCMS 17.2 behavior is drawn from its documentation and published source code. This example has not been demonstrated on a live Kiwi TCMS and Jira setup."
+          },
+          {
+            "type": "table",
+            "caption": "Choose the link procedure by the state of the Jira bug",
+            "columns": [
+              "Starting point",
+              "What to verify in each system"
+            ],
+            "rows": [
+              [
+                "New issue, created through the Jira adapter",
+                "With the correct project, issue type and create permission, Kiwi’s adapter calls Jira’s application programming interface (API). The new Jira description includes the originating execution URL. The execution stores the returned bug URL as a defect. The tester supplies the actual result."
+              ],
+              [
+                "Reporting opens a prefilled form",
+                "Complete and verify creation in Jira. Confirm that the execution contains the resulting bug URL, adding it if needed, and that Jira readers have the originating evidence."
+              ],
+              [
+                "CC-131 already exists",
+                "Add its Jira URL to the execution as a defect. The tester can follow it immediately to the bug. A separate optional request can post evidence back to Jira."
+              ]
+            ]
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "For existing Jira issues, “Add comment to Issue tracker” requests a comment with the test run URL and execution identifier. Kiwi needs a defect URL matching its configured tracker, enabled credentials, permission to add the Kiwi link, and a Jira account allowed to comment. Open the Jira issue to verify the comment when the handoff needs it."
+          },
+          {
+            "type": "text",
+            "value": "The QA lead then links CC-131 blocks CC-123 within Jira. From the feature the link reads is blocked by CC-131. The bug moves from New to Triaged. The feature remains In QA with promotion held. The lead assesses the authorization impact as High and agrees Fix before qualification with the Product Owner. Adding the feature link, posting a tracker comment and making a status change are three separate actions."
+          }
+        ]
+      },
+      {
+        "id": "supply-a-repair",
+        "title": "Follow the changed code into QA",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The developer takes the bug In progress, fixes the decision rule on a repair branch and submits PR-41. A peer reviews the code and the tests for both sides of the rule. Once the change enters the shared branch, the same build pipeline publishes build-415. The developer gives QA the build receipt and sets the bug to Ready for retest. QA needs the running package’s identity, because the repaired source can be present in the repository while the test environment still serves the earlier package."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Compare the full image identifiers in the fictional records",
+            "value": "qa-196 · build-412 · original failure\nsha256:ad1985a0d6e0fe53eab9a6fdcd1d8acb4823434ae8e9ec257936d912fe95b78e\nqa-198 · build-415 · repair\nsha256:653039af804cc7ec40d01b3cc83d64dd1d4eee1c1aa9bc2cd0aee9c83a4d365d\nqa-204 · build-418 · integrated candidate\nsha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c"
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "Retain a link from every result to the version it examined. The original failure explains the hold, the repair test clears the defect, and the integrated test supports the next handoff."
+          }
+        ]
+      },
+      {
+        "id": "decide-the-hold",
+        "title": "Close or reopen after reading the new execution",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "On build-415, QA repeats TC-04 with a fresh pending request under the unrelated employee’s identity. It checks refusal and pending state, then verifies the authorized approver can record a decision on a suitable pending request. The first check confirms the repair. The adjacent check looks for a regression, a break in previously working behavior. A blanket prohibition on all decisions would leave the first check green and the second red."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "Record the new TC-04 execution in qa-198 and attach the existing CC-131 URL. The triage owner reads the candidate and both outcomes, then moves CC-131 from Ready for retest to Closed with resolution Fixed. If either check fails, preserve the failure, move the bug to Reopened with resolution empty, and retain the hold."
+          },
+          {
+            "type": "text",
+            "value": "Changing the failed qa-196 entry to Passed would erase the original evidence. Marking build-418 ready on the strength of qa-198 would apply the repair result to another package. Instead, keep qa-198 on build-415 and inspect qa-204 on build-418 with qa-r17 and qa-routing-3. The latter records routing-rule as the assignment actor, Purchasing approver as recipient, a denied requester attempt with the request still pending, and an authorized decision. The business analyst can now take that version to user acceptance testing."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Carry the original execution, repair candidate, new execution and accountable closure decision across whichever test and issue systems the team uses. Check each link from the reader’s side and require independent qualification of a later integrated package."
+          }
+        ]
+      }
+    ],
+    "evidence": "The failed execution, CC-131’s separately verified feature link, PR-41, the new digest, qa-198 and the triage decision explain the defect hold and release. qa-204 identifies the independently qualified integrated package.",
+    "example": "The repaired authorization check passes in qa-198. The later qa-204 result belongs to a different package and permits a different handoff.",
+    "failure": "If a repair cannot be identified in the running environment, QA stops before declaring the retest valid. The developer and environment owner reconcile the package, then QA records a fresh execution.",
+    "measure": "Trace a closed QA defect in both directions. Can the reader recover the original failure from the defect and the exact repair package and closure decision from the retest?",
+    "sources": [
+      {
+        "title": "Kiwi TCMS 17.2 · tcms.issuetracker package",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/modules/tcms.issuetracker.html"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 published source · JIRA",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/_modules/tcms/issuetracker/types.html#JIRA"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 published source · TestExecution.add_link",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/_modules/tcms/rpc/api/testexecution.html#add_link"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 published source · IssueTrackerType",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/_modules/tcms/issuetracker/base.html#IssueTrackerType.add_testexecution_to_issue"
+      },
+      {
+        "title": "Atlassian Support · Link work items",
+        "url": "https://support.atlassian.com/jira-software-cloud/docs/link-issues/"
+      },
+      {
+        "title": "ISTQB · Certified Tester Foundation Level Syllabus v4.0.1",
+        "url": "https://istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf"
+      },
+      {
+        "title": "Docker Docs · Image digests",
+        "url": "https://docs.docker.com/dhi/explore/security-concepts/digests/"
+      }
+    ]
+  },
+  {
+    "id": "flow-bug-uat",
+    "kind": "flow",
+    "touches": [
+      "qa-tests",
+      "uat-runtime",
+      "uat-decision",
+      "hold",
+      "build",
+      "digest",
+      "validation-summary"
+    ],
+    "audience": [
+      "Business Analyst",
+      "QA Lead",
+      "Business Representative"
+    ],
+    "phase": "Prove",
+    "title": "Follow a rejected user acceptance test to a new decision",
+    "summary": "The approval service passes its technical checks, but a purchase from unit B reaches unit A’s approver during business testing. The representative rejects the result. The team identifies what changed, repeats the affected checks and asks the representative for a fresh decision.",
+    "owner": "The designated business representative owns user acceptance testing (UAT) decisions. The business analyst records the hold on the feature, the configuration owner corrects the routing mapping, and the quality assurance (QA) lead selects and verifies the repeat checks.",
+    "inputs": [
+      "The approved routing expectation for Purchasing unit B and synthetic accounts for an eligible requester, the unit’s approver and an unrelated employee",
+      "The qualifying QA run, the actual software package and the routing settings in the business test environment",
+      "Access to inspect assignment and decision records, authority to review the mapping change, and the named business representative who can accept the repeated scenario"
+    ],
+    "steps": [
+      "Record the rejection against the running package, environment and mapping. Preserve the earlier QA evidence and the original rejected business decision.",
+      "Compare the expected and effective mappings and follow the assignment. Identify whether the correction changes configuration or executable code before choosing the repeat tests.",
+      "Give the representative the identified candidate, correction and repeat results. Record a new decision and pass the evidence to the release reviewer."
+    ],
+    "detail": [
+      {
+        "id": "read-the-rejection",
+        "title": "Start with the decision that holds release",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "The team’s acceptance criterion AC-01 requires the routing rule to assign eligible requests automatically to the designated approver. AC-02 allows only an authorized approver to decide. The version under consideration is build-418. Its image digest, the content identifier of the packaged application, lets a reviewer check that testers were using the intended software. The environment revision identifies a deployed version of the service. The mapping identifies which business unit goes to which approver in that environment."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative acceptance scenario for user acceptance testing (UAT)",
+            "value": "Starting state: fresh purchase request for unit B\nBusiness expectation: route to the authorized unit B approver\nCompare: approved expectation against first assignment event\nRelease gate: a rejection keeps the feature on hold"
+          },
+          {
+            "type": "table",
+            "caption": "Fictional evidence available at the moment of rejection",
+            "columns": [
+              "Record",
+              "Execution context",
+              "What the reviewer can conclude"
+            ],
+            "rows": [
+              [
+                "qa-204 · 10 March 2026",
+                "QA revision qa-r17 with qa-routing-3 on build-418. On request R-17, routing-rule assigned the Purchasing approver. The requester was denied while the request stayed pending, and an authorized approval was recorded.",
+                "QA verified the recorded AC-01 and AC-02 behaviors under those settings."
+              ],
+              [
+                "uat-80 · 11 March 2026, 10:00 UTC",
+                "In UAT revision uat-r8 with uat-routing-5, Purchasing unit B reached unit A’s approver on the same build-418 digest.",
+                "The designated representative rejects this business scenario. Advancement stays on hold."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "The business analyst keeps Jira feature CC-123 In UAT and adds a web link to the rejected decision. Identify who expected unit B’s group, which group actually received the request and which system selected it. Allow a short session of about 15 minutes for the initial inspection in this exercise. Correcting the settings, rechecking QA and arranging a repeat with the signatory take additional time. The recorded decisions are on different days."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Determine whether settings or code chose the wrong group",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "First read the actual assignment history. If someone supplied a recipient by hand, reset the scenario before relying on it to explain the routing rule. Look up the unit on the submitted request and compare the intended unit B entry with the environment’s effective lookup. Check the actual deployed digest against qa-204. A shared build number alone cannot rule out an incorrect deployment, and a matching digest alone cannot establish which mapping the environment used."
+          },
+          {
+            "type": "figure",
+            "src": "assets/figures/flow-bug-uat.svg",
+            "caption": "Two possible causes after a rejected business scenario",
+            "alt": "Decision flow showing the recorded mapping correction and the alternative route for a code repair.",
+            "text_equivalent": "uat-80 rejects unit B routing on uat-r8 with uat-routing-5. Hold and compare the actual digest, mapping and observed path. In the recorded path the configuration owner corrects the mapping on the same build-418 digest. QA rechecks the affected mapping and permissions in qa-209. The designated representative repeats the scenario on uat-r9 with uat-routing-6 and accepts it as uat-82. If code instead needs repair, build a new image, qualify its new digest in QA and repeat UAT before a fresh decision. Retain the rejection and the hold for any failed or unverified repeat."
+          },
+          {
+            "type": "text",
+            "value": "Suppose the effective unit B mapping already selected the intended group but the program read the wrong lookup key. A settings edit would leave that fault in place. On that hypothetical code branch the developer fixes the lookup, obtains review and publishes a new build. QA identifies the new digest, repeats the affected routing and authorization tests, and checks adjacent units at risk from the changed lookup. The analyst arranges another business test on that new package. The recorded uat-82 acceptance applies only to the actual configuration repair."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "Use the observed cause to choose the repeat scope. A routing fault can look identical to the user whether it comes from executable logic or the mapping that logic reads."
+          }
+        ]
+      },
+      {
+        "id": "actual-repair",
+        "title": "Recheck the mapping on the same image",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In the worked record the team corrected the UAT mapping. The image identifier remained unchanged. The QA lead selects tests that expose the wrong recipient and a possible permission error caused by the new mapping. Start with a fresh eligible unit B submission and no assignee supplied. Compare the actual first assignment with the agreed group and verify that an unrelated employee cannot record a decision, while a valid approver can. Record individual outcomes at the time of testing. The supplied qa-209 record summarizes the affected routing and permission recheck."
+          },
+          {
+            "type": "text",
+            "value": "When using Kiwi TCMS as the test management tool, record the affected cases in a Test Run for the identified build. Each case result is a separate execution. Give the business representative the run link and the scope of the recheck. Kiwi TCMS 17.2 behavior is drawn from its documentation and published source code. This example has not been demonstrated on a live Kiwi TCMS and Jira setup."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Fictional validation summary for CC-123",
+            "value": "build-418 digest shared by QA and UAT:\nsha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c\nQA baseline: qa-204 · qa-r17 · qa-routing-3\nRejected: uat-80 · uat-r8 · uat-routing-5 · unit B reached unit A’s approver\nCorrection: UAT mapping · image unchanged\nAffected QA recheck: qa-209 · Purchasing mapping and permissions\nNew business decision: uat-82 · uat-r9 · uat-routing-6 · accepted"
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "Docker identifies image content by digest. Azure Container Apps revisions are immutable snapshots of revision-scoped configuration, while application-scoped settings can affect multiple revisions. Retain the image, runtime revision and effective business mapping as separate evidence when investigating an environment."
+          },
+          {
+            "type": "text",
+            "value": "Have the mapping owner show the reviewed change and the deployment owner identify which settings are active in uat-r9. An edit in a configuration repository shows intent. A business test against the corrected environment shows what the user experiences. If the digest differs unexpectedly, stop and establish which package is running before carrying the earlier QA results into the decision."
+          }
+        ]
+      },
+      {
+        "id": "sign-again",
+        "title": "Obtain the revised business decision",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "In the repeated UAT scenario, the representative observes a fresh eligible submission, verifies the recipient and follows the designated approver through a final decision. The person acting as approver inside the application exercises a permission. The designated business representative judges whether the whole scenario is acceptable for the business. Record the signatory role, scenario, environment, configuration, package, outcome and decision time."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "The designated representative accepts or rejects the repeated scenario. qa-209 supplies technical recheck evidence. Only a new business decision can clear the uat-80 hold. If the scenario still fails, keep CC-123 In UAT and retain the named investigation owner."
+          },
+          {
+            "type": "text",
+            "value": "On 12 March 2026 at 11:00 UTC the representative accepted uat-82 on uat-r9 with uat-routing-6. Add links to qa-209 and uat-82 to CC-123 alongside uat-80. The release manager receives the validation summary for a separate authorization decision. Editing uat-80 in place would hide the rejected configuration. Treating a green qa-209 as acceptance would skip the person authorized to decide whether the workflow now serves the business."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Preserve the rejected business decision, the affected environment and the result of testing the correction in whatever tools the team uses. When the cause changes the software package, tie fresh technical and business evidence to the new package before seeking authorization."
+          }
+        ]
+      }
+    ],
+    "evidence": "The summary connects qa-204, uat-80, the mapping correction, qa-209 and uat-82 to one image digest. A reader can recover the rejected and accepted UAT configurations and the signatory role for both decisions.",
+    "example": "The same build-418 package was rejected with uat-routing-5 and accepted with uat-routing-6 after the relevant checks were repeated.",
+    "failure": "On another wrong assignment the representative records the actual recipient and maintains the hold. The lead compares package, mapping and assignment history before selecting the next repair path.",
+    "measure": "Sample a reworked acceptance decision and trace the rejected result, changed input, repeat checks and new signatory decision. Check which evidence would need to be collected again if the package changed.",
+    "sources": [
+      {
+        "title": "ISTQB · Certified Tester Foundation Level Syllabus v4.0.1",
+        "url": "https://istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf"
+      },
+      {
+        "title": "Docker Docs · Image digests",
+        "url": "https://docs.docker.com/dhi/explore/security-concepts/digests/"
+      },
+      {
+        "title": "Microsoft Learn · Update and deploy changes in Azure Container Apps",
+        "url": "https://learn.microsoft.com/en-us/azure/container-apps/revisions"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 · Test Runs",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/guide/testrun.html"
+      },
+      {
+        "title": "Kiwi TCMS 17.2 published source · TestExecution",
+        "url": "https://kiwitcms.readthedocs.io/en/stable/_modules/tcms/rpc/api/testexecution.html"
+      }
+    ]
+  },
+  {
+    "id": "flow-bug-prod",
+    "kind": "flow",
+    "touches": [
+      "smoke",
+      "alert",
+      "incident",
+      "recover",
+      "policy",
+      "rollout",
+      "deployment-record",
+      "tool-jira"
+    ],
+    "audience": [
+      "Business Analyst",
+      "On-call Responder",
+      "Release Manager",
+      "Service Owner"
+    ],
+    "title": "Follow a wrong production assignment through INC-7",
+    "phase": "Learn",
+    "summary": "A purchase request can reach the wrong person while every queue looks healthy. Follow the incident from the first misdirected request through the decision to let more buyers use the service, and see how the team accounted for work already sent.",
+    "owner": "The on-call responder contains the incident. The Service Owner is accountable for user impact and reconciliation, the review of each affected request. The Release Manager checks the repair’s authorization and retains both deployment attempts.",
+    "inputs": [
+      "The controlled submission, expected recipient from the approved business mapping, observed assignment event and serving revision (the deployed version that handled the request).",
+      "The rollout record, active configuration and image digest (the packaged application’s content fingerprint), permission to halt expansion and read access to the request and decision histories."
+    ],
+    "steps": [
+      "Hold exposure as soon as a controlled request reaches an unintended approver. Record the running target and identify the owner of the response.",
+      "Separate a bad mapping from faulty application logic. Link the incident to the relevant change or defect, qualify the correction and check the running repair.",
+      "Reconcile affected requests, retain authorized decisions, and give the Service Owner the impact ledger and the corrected pilot observations before expanding."
+    ],
+    "evidence": "INC-7 identifies the failed prod-r41 attempt. The record retains prod-r42’s corrected mapping and smoke check, the disposition of eight affected requests and the two-hour observation used for expansion.",
+    "example": "On 13 March 2026 a controlled request reached the wrong approver during the limited prod-r41 pilot. Seven affected requests were reassigned and one authorized decision was retained.",
+    "failure": "A missing request disposition or unverified decision keeps reconciliation open with the Service Owner. A fresh wrong recipient on the corrected target holds expansion even if the application continues serving requests.",
+    "measure": "Compare first automatic recipient with the independently approved group for eligible submissions. Track every impacted request to a verified disposition and count controlled smoke requests separately from the pilot population.",
+    "sources": [
+      {
+        "title": "Google SRE Workbook · Incident Response",
+        "url": "https://sre.google/workbook/incident-response/"
+      },
+      {
+        "title": "Google SRE Workbook · Postmortem Culture: Learning from Failure",
+        "url": "https://sre.google/workbook/postmortem-culture/"
+      },
+      {
+        "title": "Microsoft Azure Well-Architected Framework · Architecture strategies for safe deployment practices",
+        "url": "https://learn.microsoft.com/en-us/azure/well-architected/operational-excellence/safe-deployments"
+      },
+      {
+        "title": "Microsoft Learn · Traffic splitting in Azure Container Apps",
+        "url": "https://learn.microsoft.com/en-us/azure/container-apps/traffic-splitting"
+      }
+    ],
+    "detail": [
+      {
+        "id": "detect-and-hold",
+        "title": "What prompts the first call?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "A smoke check is a short controlled exercise immediately after a deployment. Here the responder submits a purchase request without selecting an approver. A business-approved mapping gives the expected recipient independently of the table loaded by the application. Read the first assignment event for that request and compare its actor and recipient with the expected rule and group. If the app assigns the wrong group quickly, an unassigned-work count stays at zero. Likewise a later manual correction can make the current screen look right while hiding the original failure."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative pilot rollout setting",
+            "value": "Exposure: limited pilot\nCheck: compare first assignment against business-approved recipient\nOn unexpected recipient: halt expansion and alert the on-call responder"
+          },
+          {
+            "type": "text",
+            "value": "The 09:00 UTC attempt on 13 March used prod-r41 with prod-routing-10 on a limited pilot. The record says a controlled request reached the wrong approver and the team halted expansion. In this example the on-call responder declares the incident, confirms the affected target with the operator and hands coordination to the Service Owner. Act as soon as the mismatch is seen. Capture the time, request reference, expected and observed recipients and serving target while they are available. The supplied record does not identify the triggering request, the actual group names, or an exact declaration time."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "A technically healthy response can still be a business failure. Use a source of expected recipients independent of the live lookup and keep the original event history available for examination."
+          }
+        ]
+      },
+      {
+        "id": "incident-links",
+        "title": "Who holds which decision?",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "Illustrative incident handoff using recorded values",
+            "columns": [
+              "Role",
+              "First action and evidence",
+              "What happens next"
+            ],
+            "rows": [
+              [
+                "On-call responder",
+                "Capture the controlled failure, pilot exposure, prod-r41 and prod-routing-10. Record INC-7 and mobilize the operator.",
+                "Stop rollout expansion. Establish whether traffic already exposed needs containment under the service’s recovery procedure."
+              ],
+              [
+                "Service Owner and purchasing owner",
+                "Compare first assignment events and decision histories with the approved mapping and memberships. Determine the affected requests.",
+                "Own the reconciliation list and verify that a proposed repair addresses the actual cause."
+              ],
+              [
+                "Configuration owner or developer",
+                "Compare effective settings and application behavior with the intended purchasing rule. Give the Release Manager the repair and qualification evidence.",
+                "A mapping repair preserves the image. A code repair creates another build and digest."
+              ],
+              [
+                "Release Manager and operator",
+                "Record which repair may run and what actually served. Link both deployment attempts and the incident.",
+                "Return the corrected target and observations to the Service Owner for the exposure decision."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "In Jira link INC-7 to the rollout record and relate it to feature CC-123. Link the corrective change to the incident, or link a new code defect if investigation identifies one. The record supplies no separate production change or bug key, incident closure time or automatic status transition. CC-131 is an earlier pre-release authorization defect. Under this example’s feature workflow CC-123 remains Ready for release during the failed attempt. The Release Manager moves it to Released after evidence from the corrected rollout."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "In Azure Container Apps multiple-revision mode, traffic can be distributed between active revisions by weight. The operator needs permission to change that distribution. Record what happened to actual traffic after a change. The incident record states the pilot was halted but gives no traffic weights or command transcript."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Correct the mapping or repair the code",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Both production attempts used the recorded build-418 digest sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c. The actual correction changed the production mapping to prod-routing-11 and used revision prod-r42. The configuration review mapped the quality assurance (QA) purchasing role to its intended production group and verified membership. Check the affected lookup and authorization boundary under the corrected settings. A fresh controlled request should acquire its designated test approver automatically. The record reports that smoke result on the corrected revision at the 11:00 UTC attempt."
+          },
+          {
+            "type": "text",
+            "value": "If the approved table were correct but the program ignored the unit, the alternative would be a hotfix, an urgent narrowly scoped code repair. A developer would link the defect and reviewed change, produce a new build and digest, and hand them to QA to reproduce the original issue and exercise neighboring units and decision permissions. The Release Manager would obtain the applicable business and change authorization for that candidate. Any shortened qualification needs an explicit accountable decision on the checks retained, deferred work and residual risk. The published incident history contains no such hotfix or replacement image."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "Keep the rollout on hold until the correction is authorized, its running identity is verified and the controlled routing check reaches the expected group. A missing check, unexpected recipient or unresolved exposure risk goes back to the Service Owner for a disposition."
+          },
+          {
+            "type": "figure",
+            "src": "assets/figures/flow-bug-prod.svg",
+            "alt": "Incident handoffs from the failed prod-r41 pilot through repair, request reconciliation and review.",
+            "caption": "INC-7 followed the same-image mapping repair. The code hotfix is an alternative.",
+            "text_equivalent": "A controlled wrong recipient on prod-r41 with prod-routing-10 triggers INC-7 and halts expansion. The on-call responder declares the incident and hands coordination to the Service Owner, who tracks affected work and links the corrective change. The actual repair keeps the digest and uses prod-routing-11 on prod-r42. The alternate code path would require a linked defect, new build and digest, affected tests and authorization. The operator checks the corrected target and smoke. The Service Owner accounts for eight affected requests, seven reassigned and one authorized decision retained, and keeps ownership of any unresolved case. The corrected pilot observations support expansion. Incident review retains both attempts and assigns follow-up work."
+          }
+        ]
+      },
+      {
+        "id": "account-for-requests",
+        "title": "When is the impact accounted for?",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "Read the incident disposition beside the later operating observations",
+            "columns": [
+              "Population",
+              "Evidence in the fictional record",
+              "Decision it supports"
+            ],
+            "rows": [
+              [
+                "Eight affected requests on prod-r41",
+                "Seven reassigned, one authorized decision retained. The ledger balances to eight.",
+                "Record disposition for each affected request. Correcting the lookup does not move work already assigned."
+              ],
+              [
+                "Corrected pilot on prod-r42",
+                "11:00–13:00 UTC on 13 March. All 24 distinct eligible pilot requests reached the correct group within two minutes. Two additional controlled smokes were excluded. No increase in serving errors was observed.",
+                "The Service Owner expanded exposure after this window."
+              ],
+              [
+                "Later production cohort",
+                "Eight different requests in a later cohort of 100 lacked a correct assignment at the 24-hour horizon.",
+                "Investigate separately. These are not outstanding cases from INC-7."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "For an open request, inspect its ID, first recipient, current owner and decision history before moving it. Verify the new recipient can find it and record who checked. For a decided request, establish that the deciding person held the required authority at the time. Preserving a verified decision avoids making the buyer obtain approval twice. If authorization is uncertain, do not silently reassign or undo a decision. Escalate to the Service Owner and business owner, keep the case unresolved and retain the original events."
+          },
+          {
+            "type": "text",
+            "value": "An incident review should preserve the two attempts and describe how the wrong recipient was detected, why the check stopped expansion, how the population was identified, and what evidence accounted for the eight. Give each preventive action an owner and a verifiable completion condition, for example comparing the first recipient against independently approved mappings on a controlled unit B request. The record contains aggregate dispositions. It does not supply a per-request ledger or say that a post-incident action was completed."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Any incident system can connect the first observation, containment decision, repair authorization, running target and affected requests. Keep an accountable owner until both service behavior and the disposition of earlier work can be verified."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "flow-traceability",
+    "kind": "flow",
+    "touches": [
+      "pull-request",
+      "merge",
+      "build",
+      "digest",
+      "qa-tests",
+      "uat-decision",
+      "policy",
+      "rollout",
+      "deployment-record",
+      "smoke",
+      "evidence-record"
+    ],
+    "audience": [
+      "Business Analyst",
+      "Release Manager",
+      "Deployment Operator"
+    ],
+    "title": "Trace one approved image from source to a running request",
+    "phase": "Reference",
+    "summary": "A release reviewer needs to know which package the business accepted. An operator needs to know which package actually handled a request. Following the same content fingerprint through both records lets them check whether those answers agree.",
+    "owner": "The Release Manager owns the production authorization under the team’s policy. The deployment operator records the running state. The quality assurance (QA) lead and designated business representative own the technical test evidence and business decision respectively.",
+    "inputs": [
+      "Feature CC-123, the reviewed pull request (PR), its integrated commit (the saved version on the shared branch), and the build receipt for the packaged application image.",
+      "The full image digest (a fingerprint of the published content), platform, QA and user acceptance testing (UAT) records, environment configuration reviews, dated authorization, and a production deployment and routing observation."
+    ],
+    "steps": [
+      "Start with the integrated source, follow the build receipt to the published digest, and verify the tested candidate and environment in each decision.",
+      "Compare the authorized digest with the running image and read the actual configuration and smoke result, a short controlled check after deployment.",
+      "Starting at the production observation, trace back through the authorization and tests to the build and feature. Hold an unexplained mismatch or missing identity."
+    ],
+    "evidence": "The fictional qualification-record.json provides the source, qualification, release, production and product-review records. Carry the full digest and the relevant configuration at every handoff. A display label or version alone cannot establish identity.",
+    "example": "Both prod-r41 and prod-r42 used the authorized build-418 digest. Different routing configurations produced a failed first attempt and a corrected second attempt in prod-rollout-87.",
+    "failure": "The reviewer holds promotion if the selected candidate differs from the one accepted. If observed production differs after deployment, the operator contains exposure and records the mismatch for investigation.",
+    "measure": "Ask a reviewer to trace a production observation back to CC-123 and an operator to trace a release decision forward to the running revision. Count unresolved identity or configuration gaps separately from failed business observations.",
+    "sources": [
+      {
+        "title": "Docker Docs · Image digests",
+        "url": "https://docs.docker.com/dhi/explore/security-concepts/digests/"
+      },
+      {
+        "title": "Docker Docs · docker buildx imagetools inspect",
+        "url": "https://docs.docker.com/reference/cli/docker/buildx/imagetools/inspect/"
+      },
+      {
+        "title": "GitHub Docs · Deployments and environments",
+        "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments"
+      },
+      {
+        "title": "Microsoft Learn · Update and deploy changes in Azure Container Apps",
+        "url": "https://learn.microsoft.com/en-us/azure/container-apps/revisions"
+      }
+    ],
+    "detail": [
+      {
+        "id": "source-to-candidate",
+        "title": "Find the package that came from the reviewed source",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Start at production authorization, at a new deployment, or whenever someone asks what handled a reported request. For a desk review, allow about ten minutes if the linked records are available. This is an exercise estimate. The actual sequence below spans several days. The reviewer needs read access to the feature and code review, build receipt, registry, test and decision records. The operator needs read access to the live serving target to verify what ran. A deployment permission is separate from permission to inspect evidence."
+          },
+          {
+            "type": "code",
+            "language": "text",
+            "caption": "Illustrative release selector",
+            "value": "Image: build-418 publication pinned by its full digest\nPlatform recorded on the build: linux/amd64\nAuthorization: accepted candidate and reviewed production configuration"
+          },
+          {
+            "type": "table",
+            "caption": "Read the fictional source and build receipt",
+            "columns": [
+              "Record",
+              "Value",
+              "What to do with it"
+            ],
+            "rows": [
+              [
+                "Feature / pull request",
+                "CC-123 / PR-42",
+                "Check the reviewed change and the commit that entered the shared branch. The record omits the proposed branch’s head commit and the pre-merge check run number."
+              ],
+              [
+                "Integrated commit",
+                "3ab862bc3190549bff7df2e0c1a02c9cc11459e4",
+                "Match this full commit to the build input and subsequently to the source point marked by release tag v1.3.0."
+              ],
+              [
+                "Build and platform",
+                "build-418 · linux/amd64",
+                "The build packages the application for Linux on 64-bit x86. Read the digest from the publication receipt."
+              ],
+              [
+                "Published digest",
+                "sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c",
+                "Carry this full value to QA, UAT, production authorization and the observed runtime."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "When a registry returns an index, it lists separate manifests, the descriptions of runnable images for specific platforms. A platform’s manifest can have a different digest from the index that contains it. Compare like objects and use the platform relationship when an operator reports a child digest. The case supplies the published digest and platform. It does not supply an index media type, a separate child digest or a registry host. A short fingerprint can be convenient on a diagram; use the full recorded value in a decision."
+          }
+        ]
+      },
+      {
+        "id": "qualification",
+        "title": "Which observations qualified this candidate?",
+        "blocks": [
+          {
+            "type": "table",
+            "caption": "One image, several environments and distinct decisions",
+            "columns": [
+              "Evidence",
+              "Setting",
+              "Observation and boundary"
+            ],
+            "rows": [
+              [
+                "qa-204 · 10 March 2026, 10:00 UTC",
+                "qa-r17 / qa-routing-3 · build-418",
+                "R-17 automatically reached the expected Purchasing approver, actor routing-rule. The requester was denied and the request remained pending. The authorized approval was recorded. AC-01 and AC-02 passed."
+              ],
+              [
+                "uat-80 · 11 March, 10:00 UTC",
+                "uat-r8 / uat-routing-5 · same digest",
+                "Unit B reached unit A’s approver. The designated business representative rejected the scenario. Preserve the rejection and hold onward promotion."
+              ],
+              [
+                "qa-209 · after the UAT hold",
+                "The affected purchasing mapping and permissions",
+                "Following the mapping correction QA rechecked the affected rule and authorization. The summary omits a qa-209 timestamp, QA configuration revision and individual request-level observations."
+              ],
+              [
+                "uat-82 · 12 March, 11:00 UTC",
+                "uat-r9 / uat-routing-6 · same digest",
+                "The designated business representative accepted the repeated submission, recipient and final-decision scenario. The summary supplies the role and scoped outcome, without a named signatory or full event transcript."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "Check the identifier of the candidate in each decision and read the scenario, setting and evidence. The earlier PR-40/build-412 failure in qa-196 and PR-41/build-415 repair retest in qa-198 explain the history of defect CC-131. Its closure after qa-198 applied to the repair. QA qualified the later integrated build-418 independently in qa-204. Picking the most recent green result from a different candidate would break the chain."
+          },
+          {
+            "type": "callout",
+            "label": "Principle",
+            "value": "The digest identifies the packaged bits. Reading it alongside the active mapping explains how the same software can route requests to different groups. Business acceptance applies to the identified scenario and configuration."
+          }
+        ]
+      },
+      {
+        "id": "authorization-and-runtime",
+        "title": "May we deploy? What ran?",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "For the first question, the Release Manager reviews the accepted candidate, the QA evidence, the business decision and the production mapping review. The release record names version 1.3.0 and the Git tag v1.3.0, a source label attached to the integrated commit. The team’s standard change policy authorizes the recorded digest after the required reviews. Authorization was issued at 12:00 UTC on 12 March. The record gives the policy and authorized digest. It does not identify an individual approver or an environment-protection log."
+          },
+          {
+            "type": "callout",
+            "label": "Tool behavior",
+            "value": "A GitHub Actions job referencing an environment must satisfy its configured protection rules before it proceeds. Azure Container Apps gives each deployed revision its own version identity. These mechanisms support a review; the case’s evidence for a deployment is the named running revision, its image and settings, and the observed routing result."
+          },
+          {
+            "type": "text",
+            "value": "For the second question, open prod-rollout-87. At 09:00 UTC on 13 March, prod-r41 with prod-routing-10 handled the limited pilot on the authorized digest, but a controlled request went to the wrong approver. Exposure halted under INC-7. At 11:00 UTC prod-r42 used prod-routing-11 with the same digest. The team checked the production purchasing group and membership. A fresh controlled request automatically reached its designated test approver. Between 11:00 and 13:00 UTC, 24 of 24 distinct eligible pilot requests routed correctly inside two minutes. Two controlled smoke submissions were excluded. The Service Owner then expanded exposure."
+          },
+          {
+            "type": "callout",
+            "label": "Team policy",
+            "value": "A digest mismatch or unexplained configuration difference holds the relevant promotion. The Release Manager records CC-123 as Ready for release when authorization and release evidence are available, then Released after the corrected production smoke and observation. Add web links to the build, QA and UAT decisions, production authorization, rollout and incident so another reader can reopen both attempts."
+          },
+          {
+            "type": "figure",
+            "src": "assets/figures/flow-traceability.svg",
+            "alt": "Evidence chain from the reviewed change through acceptance and authorization to the running production revision.",
+            "caption": "Trace the candidate forward or begin at a production observation and work back.",
+            "text_equivalent": "PR-42’s integrated commit produces build-418 and its published digest for linux/amd64. qa-204 tests that candidate on qa-r17 with qa-routing-3. uat-80 rejects unit B’s wrong recipient. The routing mapping changes while the image digest stays fixed. The team records affected QA checks in qa-209 and a fresh uat-82 acceptance on uat-r9 with uat-routing-6. “May we deploy?” is answered by the recorded authorization for that digest after configuration review. “What ran?” is answered by prod-rollout-87: prod-r41 on prod-routing-10 failed with INC-7, while prod-r42 on prod-routing-11 with the same digest passed controlled smoke and observation. Read the links backwards from smoke and actual revision through authorization, decisions, digest and build to the integrated commit and PR-42."
+          }
+        ]
+      },
+      {
+        "id": "worked-failure",
+        "title": "Resolve a mismatch, then trace back from the smoke observation",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "Suppose the rollout input instead resolves to the earlier build-415 digest. Compare it first with the publication record for the same platform and object type. If it is the repair image, hold deployment. The Release Manager selects the authorized build-418 by digest or obtains independent qualification and authorization for a genuinely different candidate. If a mismatched digest is already serving, the operator halts expansion, preserves the observation and verifies exposure before recovery. This identity mismatch is hypothetical. The fictional incident recorded for prod-r41 illustrates how a matching digest can still accompany a wrong setting."
+          },
+          {
+            "type": "table",
+            "caption": "Illustrative mismatch decision before rollout",
+            "columns": [
+              "Comparison",
+              "Value"
+            ],
+            "rows": [
+              [
+                "Authorized build-418",
+                "sha256:041f649df9da0e8f01adbfb779b80fef6aef2fad08edecb62f2de49858ccec5c"
+              ],
+              [
+                "Hypothetical selected build-415",
+                "sha256:653039af804cc7ec40d01b3cc83d64dd1d4eee1c1aa9bc2cd0aee9c83a4d365d"
+              ],
+              [
+                "Disposition",
+                "Held. Reconcile the selected object and platform with the build receipt and obtain the correctly authorized candidate before proceeding."
+              ]
+            ]
+          },
+          {
+            "type": "text",
+            "value": "Now walk backwards from the controlled success. The smoke observation belongs to prod-r42 using prod-routing-11 under prod-rollout-87. Read its actual image digest and match it to the production authorization. The authorization cites the accepted candidate, so verify uat-82, its preceding rejection and qa-209, then the independent qa-204 record. Match the candidate digest to the build-418 receipt, the integrated commit and PR-42 linked to CC-123. Opening only the release announcement would omit the failed first attempt. Reading a mutable image tag, a name that can be reassigned, would leave the running package uncertain."
+          },
+          {
+            "type": "text",
+            "value": "The separate product question is whether buyers get decisions sooner. In the later cohort of 100 submissions, observed for a full day each, 40 had decisions and 60 remained open. The median time to decision was not reached by one day. That cohort excludes the incident and controlled pilot tests. It supplies neither an exact median nor an improvement estimate against the two-day baseline. Record the product follow-up against CC-100 without changing what the production authorization or smoke check established."
+          }
+        ]
+      },
+      {
+        "id": "what-transfers",
+        "title": "What transfers",
+        "blocks": [
+          {
+            "type": "text",
+            "value": "On another release platform, preserve identifiers for reviewed source, packaged artifact, tested environment, approval and serving target, and include a dated business observation. A reviewer should be able to trace a single request’s target back to its source and explain both the permission to deploy and the evidence of actual behavior."
+          }
+        ]
+      }
+    ]
+  }
+]
